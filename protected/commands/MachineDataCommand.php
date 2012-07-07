@@ -6,7 +6,6 @@ class MachineDataCommand extends CConsoleCommand {
         //echo 'run check command' . PHP_EOL;
 
         //Yii::import('application.modules.smto.models.*');
-        $tasks = TaskManager::getList();
 
 //        $mac = '00BD3B330571';
 //        $machine = Machine::model()->findByAttributes(array('mac' => $mac));
@@ -17,37 +16,49 @@ class MachineDataCommand extends CConsoleCommand {
 
         //$dir = DbTable_Param::getParam('data_file_path');
         //$dir = YiiBase::getPathOfAlias('application.runtime.import.machine_data');
-        $dir = Yii::app()->smto->machine_data_path;
+        //$dir = Yii::app()->smto->machine_data_path;
 
         //die($dir);
 
-        foreach($tasks as $task) {
+        //$machines = Machine::model()->real_records()->findAll();
+        $machines = Machine::model()->template_records()->findAll();
+        //$cnt = count($machines);echo "$cnt".PHP_EOL;die;
 
-            // reload task
-            $task = Task::model()->findByPk($task->id);
-            if (!in_array($task->status, array('progress') )) {
-                $task->status = 'progress';
-                $task->dt_check = new CDbExpression('NOW()');
-                $task->pid = getmypid ();
-                $task->save();
+        $dir = realpath(dirname(__FILE__ ) . '/../');
+        //echo "$dir".PHP_EOL;die;
 
-                $machineRec = Machine::model()->findByPk($task->machine_id);
-                echo $dir . PHP_EOL . $machineRec['mac'] . PHP_EOL;
-                $import = new MachineDataImport();
-                $import->run($dir, $machineRec['mac'], 1);
+        foreach($machines as $machineAR) {
+            $check = "ps ax | grep -v grep | grep -i 'MachineData import --mac=" . $machineAR->mac . "'";
+            //echo "$check" . PHP_EOL;
 
-                $task->status = 'end';
-                $task->save();
-                break;
-            } else {
-                //TODO: check, is process crashed?
+            exec($check, $output);
+
+            if (count($output) > 0) {
+                continue;
             }
+
+            $cmd = array();
+
+            $cmd[] = "$dir/yiic";
+            $cmd[] = "MachineData import";
+            $cmd[] = "--mac=" . $machineAR->mac;
+            $cmd[] = "--maxProcessDataFiles=" . 10;
+            $cmd[] = "> /dev/null 2>/dev/null &";
+            $cmd = implode(' ', $cmd);
+
+            echo "$cmd" . PHP_EOL;
+
+            exec($cmd);
         }
     }
 
     public function actionImport($mac, $maxProcessDataFiles = 10) {
 
         $dir = Yii::app()->params['machine_data_path'];
+
+        sleep(30);
+        Yii::log("Machine with MAC: $mac is done!", 'warning', __METHOD__);
+        die;
 
         //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");
         //$output = Helpers::scandirFast($dir,"", true, 2);
