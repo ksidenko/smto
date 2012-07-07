@@ -1,10 +1,10 @@
 <?php
 
-class CheckCommand extends CConsoleCommand {
+class MachineDataCommand extends CConsoleCommand {
 
-    public function run($args) {
+    public function actionCheck() {
         //echo 'run check command' . PHP_EOL;
-        
+
         //Yii::import('application.modules.smto.models.*');
         $tasks = TaskManager::getList();
 
@@ -43,5 +43,26 @@ class CheckCommand extends CConsoleCommand {
                 //TODO: check, is process crashed?
             }
         }
+    }
+
+    public function actionImport($mac, $maxProcessDataFiles = 10) {
+
+        $dir = Yii::app()->params['machine_data_path'];
+
+        //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");
+        //$output = Helpers::scandirFast($dir,"", true, 2);
+        //echo print_r($output, true) . PHP_EOL;die();
+
+        $machineAR = Machine::getRecByMAC($mac);
+
+        if (!$machineAR) {
+            Yii::log("Machine with MAC: $mac is unknown!", 'warning', __METHOD__);
+            Yii::app()->end();
+        }
+        echo $machineAR->mac . PHP_EOL;
+
+        $import = new MachineDataImport();
+        $import->run($dir, $machineAR->mac, $maxProcessDataFiles);
+
     }
 }

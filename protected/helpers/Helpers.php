@@ -132,5 +132,26 @@ class Helpers {
             }
         }
         return(array_keys($r));
-    } 
+    }
+
+    /*
+     * Fast list of files ordered by its ctime
+     */
+    static function scandirFast($dir, $exp = "", $desc = false, $limit = null) {
+
+        $dir = rtrim($dir, '/') . '/';
+        $order = $desc == false ? '-t' : '-tr';
+
+        $sLimit = '';
+        if ($limit) {
+            $sLimit = " | head -n$limit";
+        }
+
+        $cmd = "cd $dir; ls $exp $order -1$sLimit";
+        //echo $cmd . PHP_EOL;
+
+        exec($cmd, $output);
+
+        return $output;
+    }
 }

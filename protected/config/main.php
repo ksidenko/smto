@@ -39,7 +39,6 @@ return CMap::mergeArray(
             ),
             'smto' => array(
                 'max_duration' => 100,
-                'machine_data_path' => './protected/runtime/import/machine_data/'
             )
         ),
         'onBeginRequest' =>function($event){
@@ -62,7 +61,7 @@ return CMap::mergeArray(
             ),
 
             'db'=>array(
-                'connectionString' => 'mysql:host=localhost;dbname=smto_new',
+                'connectionString' => 'mysql:host=localhost;dbname=smto',
                 'emulatePrepare' => true,
                 'username' => 'root',
                 'password' => '1',
@@ -100,7 +99,8 @@ return CMap::mergeArray(
             'adminEmail'=>'webmaster@example.com',
             'languages' => array(
                         'ru_ru' => "Русский",
-                        'en_us' => 'English')
+                        'en_us' => 'English'),
+            'machine_data_path' => './protected/runtime/machine_data/'
         ),
         //'language' => 'ru_ru'
     )

@@ -39,7 +39,6 @@ return CMap::mergeArray(
             ),
             'smto' => array(
                 'max_duration' => 100,
-                'machine_data_path' => '__MACHINE_DATA_PATH__'
             )
         ),
         'onBeginRequest' =>function($event){
@@ -100,7 +99,8 @@ return CMap::mergeArray(
             'adminEmail'=>'webmaster@example.com',
             'languages' => array(
                         'ru_ru' => "Русский",
-                        'en_us' => 'English')
+                        'en_us' => 'English'),
+            'machine_data_path' => '__MACHINE_DATA_PATH__'
         ),
         //'language' => 'ru_ru'
     )

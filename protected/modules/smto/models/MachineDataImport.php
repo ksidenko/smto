@@ -62,11 +62,13 @@ class MachineDataImport {
     
     public function getFilenames($dir, $mac, $limit) {
         $format = $this->manager->getFileFormat($mac);
-        $filenames = Helpers::scandir($dir, $format, 'ctime', true);
+        $filenames = Helpers::scandirFast($dir, $format, true, $limit);
 
-        if ( count($filenames) > $limit ) {
-            $filenames = array_slice($filenames, 0, $limit);
-        }
+//        $filenames = Helpers::scandir($dir, $format, 'ctime', true);
+//
+//        if ( count($filenames) > $limit ) {
+//            $filenames = array_slice($filenames, 0, $limit);
+//        }
         return $filenames;
     }
     

@@ -5,12 +5,12 @@ YII_DEBUG = 1
 APP_URL =
 APP_NAME = СМТО
 APP_PATH = /var/www/smto/
-FRAMEWORK_PATH  = /var/www/yii-1.1.8.r3324/
+;;;;;;FRAMEWORK_PATH  = /var/www/smto/yii-1.1.10/
 
 
 ; Database connection params
 DB_HOST=localhost
-DB_NAME=smto_13_10_2011
+DB_NAME=smto
 
 DB_USER=root
 DB_PWD=1
@@ -22,7 +22,7 @@ DB_ENABLEPARAMLOGGING=1
 SVN.REPO.USERNAME=sks
 SVN.REPO.PWD=qazqaz
 
-MACHINE_DATA_PATH = ./protected/runtime/import/machine_data/
+MACHINE_DATA_PATH = ./protected/runtime/machine_data/
 
 ; Debug options
 LOG_LEVELS = error, warning

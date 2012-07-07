@@ -29,7 +29,7 @@ return CMap::mergeArray(
         ),
 
         'commandMap'=>array(
-           //'check' => '/../modules/smto/commands/CheckCommand.php'
+           //'check' => '/../modules/smto/commands/MachineDataCommand.php'
         ),
     )
 );
