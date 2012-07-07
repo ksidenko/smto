@@ -143,14 +143,19 @@ class Helpers {
         $order = $desc == false ? '-t' : '-tr';
 
         $sLimit = '';
-        if ($limit) {
-            $sLimit = " | head -n$limit";
-        }
+//        if ($limit) {
+//            $sLimit = " | head -n$limit";
+//        }
 
         $cmd = "cd $dir; ls $exp $order -1$sLimit";
         //echo $cmd . PHP_EOL;
 
         exec($cmd, $output);
+
+        if ($limit && $output) {
+            $output = array_slice($output, 0, $limit);
+        }
+
 
         return $output;
     }

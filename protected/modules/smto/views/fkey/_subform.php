@@ -22,7 +22,7 @@
 	</td>
 
 	<td>
-        <? if ($model->machine_event)  { ?>
+        <?php if ($model->machine_event)  { ?>
 		<?php //echo $form->labelEx($model,$index . 'color'); ?>
         <?php echo CHtml::label($model->machine_event->color, '', array('size'=>12,'maxlength'=>12, 'style' =>
             'background-color: #' . $model->machine_event->color
