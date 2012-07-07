@@ -40,7 +40,7 @@
     <!-- ============================================  -->
     <!-- Target: Config                                -->
     <!-- ============================================  -->
-    <target name="config" depends="init, permissions">
+    <target name="config" depends="init">
         <copy file="${APP_PATH}/protected/config/main.php.template" tofile="${APP_PATH}/protected/config/main.php" overwrite="true" />
         <echo msg="Parsing main.php.template  file..." />
         <reflexive file="${APP_PATH}/protected/config/main.php">

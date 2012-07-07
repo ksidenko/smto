@@ -1,23 +1,24 @@
 #drop database smto;
 #create database smto;
-USE smto_new;
+#USE smto_new;
 
 DROP TABLE IF EXISTS `machine`;
-CREATE TABLE IF NOT EXISTS `machine` (
-        `id` INT(10) NOT NULL AUTO_INCREMENT,
-        `name` VARCHAR(512) NOT NULL,
-        `code` VARCHAR(512) NOT NULL,
-        `ip` VARCHAR(32) NOT NULL,
-        `port` INT(10) NOT NULL DEFAULT 900,
-        `pwd` VARCHAR(512) NOT NULL DEFAULT '',
-        `mac` VARCHAR(16) NOT NULL,
-        `work_type` ENUM('amplitude','average') NOT NULL,
-        `time_idle_run` INT(10) NOT NULL DEFAULT 5 comment 'Время холостого хода, сек',
-    	`rec_type` ENUM('real','template') NOT NULL DEFAULT 'real',
-        PRIMARY KEY (`id`),  
-   INDEX `code` (`code`),      
-   INDEX `mac` (`mac`),
-   INDEX `mac_rec_type` (`mac`, `rec_type`)
+CREATE TABLE `machine` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `template_id` int(10) DEFAULT NULL,
+  `name` varchar(512) NOT NULL,
+  `code` varchar(512) NOT NULL,
+  `ip` varchar(32) NOT NULL,
+  `port` INT(10) NOT NULL DEFAULT 900,
+  `pwd` VARCHAR(512) NOT NULL DEFAULT '',
+  `mac` varchar(16) NOT NULL,
+  `work_type` enum('amplitude','average') NOT NULL,
+  `time_idle_run` int(10) NOT NULL DEFAULT '0' COMMENT 'Время холостого хода, сек',
+  `rec_type` enum('real','template') NOT NULL DEFAULT 'real',
+  PRIMARY KEY (`id`),
+  KEY `code` (`code`(255)),
+  KEY `mac` (`mac`),
+  KEY `mac_rec_type` (`mac`, `rec_type`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
@@ -25,12 +26,12 @@ ROW_FORMAT=DEFAULT;
 
 TRUNCATE `machine`;
 # machine tamplates
-INSERT INTO `machine` ('id', 'name', 'code', 'ip', 'mac', 'work_type', 'rec_type') VALUES
+INSERT INTO `machine` (id, name, code, ip, mac, work_type, rec_type) VALUES
         (1, '', '', '10.128.132.', '', 'amplitude', 'template')
 ;
 
-INSERT INTO `machine` ('id', 'name', 'code', 'ip', 'port', 'pwd', 'mac', 'work_type') VALUES
-        (2, '', '', '10.128.132.103', 900, 'PxZt0003', '7E4AE2C2875E', 'amplitude', 'real')
+INSERT INTO `machine` (id, template_id, name, code, ip, port, pwd, mac, work_type) VALUES
+        (2, 1, '', '', '10.128.132.103', 900, 'PxZt0003', '7E4AE2C2875E', 'amplitude')
 ;
 
 
@@ -67,20 +68,21 @@ INSERT INTO `machine_event` (`id`, `code`, `name`, `descr`, `color`) VALUES
 
 
 DROP TABLE IF EXISTS `fkey`;
-CREATE TABLE IF NOT EXISTS `fkey` (
-        `id` INT(10) NOT NULL AUTO_INCREMENT,
-        `number` INT(10),      
-        `machine_id` INT(10) NOT NULL,
-        `machine_event_id` INT(10), -- machine_event_id may be null !  
-        `code` VARCHAR(128) NOT NULL,
-        `name` TEXT NOT NULL default '',        
-        `color` VARCHAR(128) NOT NULL default '',
-        `type` ENUM('work', 'valid', 'not_valid') NOT NULL,
-        `status` INT NOT NULL DEFAULT 1,
-   	  `rec_type` ENUM('real', 'template') NOT NULL DEFAULT 'real',
-        PRIMARY KEY (`id`),  
-   INDEX `machine_id` (`machine_id`),  
-   UNIQUE INDEX `hash` (`machine_id`, `number`)
+CREATE TABLE `fkey` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `number` int(10) DEFAULT NULL,
+  `machine_id` int(10) NOT NULL,
+  `machine_event_id` int(10) DEFAULT NULL,
+  `code` varchar(128) NOT NULL,
+  `name` text NOT NULL,
+  `color` varchar(128) NOT NULL DEFAULT '',
+  `type` enum('work','valid','not_valid') NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  `descr` varchar(1024) NOT NULL DEFAULT '',
+  `rec_type` enum('real','template') NOT NULL DEFAULT 'real',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `hash` (`machine_id`,`number`),
+  KEY `machine_id` (`machine_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
@@ -124,15 +126,15 @@ INSERT INTO `fkey` (`id`, `number`, `machine_id`, `machine_event_id`, `code`, `c
 ;
 
 DROP TABLE IF EXISTS `detector`;
-CREATE TABLE IF NOT EXISTS `detector` (
-	  `id` INT(10) NOT NULL AUTO_INCREMENT,
-	  `number` INT(10),
-	  `machine_id` INT(10),
-	  `status` INT(10) NOT NULL,
-	  `type` ENUM('digit', 'analog') NOT NULL,
-	  `rec_type` ENUM('real', 'template') NOT NULL DEFAULT 'real',
-	PRIMARY KEY (`id`),  
-   INDEX `machine_id` (`machine_id`)
+CREATE TABLE `detector` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `number` int(10) DEFAULT NULL,
+  `machine_id` int(10) DEFAULT NULL,
+  `status` int(10) NOT NULL,
+  `type` enum('digit','analog') NOT NULL,
+  `rec_type` enum('real','template') NOT NULL DEFAULT 'real',
+  PRIMARY KEY (`id`),
+  KEY `machine_id` (`machine_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
@@ -160,15 +162,15 @@ INSERT INTO `detector` VALUES
 ;
 
 DROP TABLE IF EXISTS `amplitude`;      
-CREATE TABLE IF NOT EXISTS `amplitude` (
-		`id` INT(10) NOT NULL AUTO_INCREMENT,
-	  	`number` INT(10),
-	   `machine_id` INT(10),
-	   `value` INT(10) NOT NULL,
-	   `type` ENUM('zero', 'idle_run') NOT NULL,
-	   `rec_type` ENUM('real', 'template') NOT NULL DEFAULT 'real',
-   PRIMARY KEY (`id`),  
-   INDEX `machine_id` (`machine_id`)
+CREATE TABLE `amplitude` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `number` int(10) DEFAULT NULL,
+  `machine_id` int(10) DEFAULT NULL,
+  `value` int(10) NOT NULL,
+  `type` enum('zero','idle_run') NOT NULL,
+  `rec_type` enum('real','template') NOT NULL DEFAULT 'real',
+  PRIMARY KEY (`id`),
+  KEY `machine_id` (`machine_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
@@ -211,18 +213,14 @@ ROW_FORMAT=DEFAULT
 
 TRUNCATE `event_color`;
 INSERT INTO `event_color` (`id`, `code`, `name`, `color`) VALUES
-	(1, 'work', 'Работа', '#0ef21a'),
-	(2, 'work_not_valid', 'Необоснованный простой', '#f20c33'),
-	(3, 'work_valid', 'Обоснованный простой', '#3b08f5'),
-    (4, 'time_ignored', 'Не учтено', '#000000'),
-
-	(5, 'machine_off', 'Станок выключен', '#e8051b'),
-	(6, 'machine_on', 'Станок включен', '#1ccc19'),
-	(7, 'machine_idle_run', 'Станок на холостом ходу', '#31ab09'),
-	(8, 'machine_work', 'Станок работает', '#2f940d')
+	(1, 'time_ignored', 'Не учтено', '#B8B8B8'),
+	(2, 'machine_0', 'Станок выключен', '#e8051b'),
+	(3, 'machine_1', 'Станок простаивает', '#FA8071'),
+	(4, 'machine_2', 'Станок на холостом ходу', '#31ab09'),
+	(5, 'machine_3', 'Станок работае', '#2f940d')
 ;
 
-DROP TABLE `operator`;
+DROP TABLE IF EXISTS `operator`;
 CREATE TABLE IF NOT EXISTS `operator` (
         `id` INT(10) NOT NULL AUTO_INCREMENT,
         `c1` INT(10) UNSIGNED NOT NULL,
@@ -288,10 +286,14 @@ CREATE TABLE IF NOT EXISTS `machine_data` (
 
         `flags` int(10) NOT NULL,                              
 
-       PRIMARY KEY (`id`),
-       UNIQUE INDEX `dt_mac` (`dt`, `mac`),  
-    	 INDEX `machine_id` (`machine_id`),
-    	 INDEX `operator_id` (`operator_id`)
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `dt_mac` (`dt`,`mac`),
+        KEY `machine_id` (`machine_id`),
+        KEY `operator_id` (`operator_id`),
+        KEY `dt` (`dt`),
+        KEY `state` (`state`),
+        KEY `fkey_last` (`fkey_last`),
+        KEY `fkey_all` (`fkey_all`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
@@ -316,7 +318,7 @@ INSERT INTO `machine_state` VALUES
         (0, 'off', 'выключен'),
         (1, 'on', 'включен'),
         (2, 'idle_run', 'холостой ход'),    
-        (3, 'work', 'работает'),
+        (3, 'work', 'работает')
 ;
 
 

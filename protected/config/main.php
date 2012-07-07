@@ -61,7 +61,7 @@ return CMap::mergeArray(
             ),
 
             'db'=>array(
-                'connectionString' => 'mysql:host=localhost;dbname=smto',
+                'connectionString' => 'mysql:host=localhost;dbname=smto_07.07.2012',
                 'emulatePrepare' => true,
                 'username' => 'root',
                 'password' => '1',
