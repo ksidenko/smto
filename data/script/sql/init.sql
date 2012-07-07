@@ -8,22 +8,29 @@ CREATE TABLE IF NOT EXISTS `machine` (
         `name` VARCHAR(512) NOT NULL,
         `code` VARCHAR(512) NOT NULL,
         `ip` VARCHAR(32) NOT NULL,
+        `port` INT(10) NOT NULL DEFAULT 900,
+        `pwd` VARCHAR(512) NOT NULL DEFAULT '',
         `mac` VARCHAR(16) NOT NULL,
         `work_type` ENUM('amplitude','average') NOT NULL,
-        `time_idle_run` INT(10) NOT NULL DEFAULT 0 comment 'Время холостого хода, сек',
-   	  `rec_type` ENUM('real','template') NOT NULL DEFAULT 'real',
+        `time_idle_run` INT(10) NOT NULL DEFAULT 5 comment 'Время холостого хода, сек',
+    	`rec_type` ENUM('real','template') NOT NULL DEFAULT 'real',
         PRIMARY KEY (`id`),  
    INDEX `code` (`code`),      
-   INDEX `mac` (`mac`)
+   INDEX `mac` (`mac`),
+   INDEX `mac_rec_type` (`mac`, `rec_type`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ROW_FORMAT=DEFAULT;
 
 TRUNCATE `machine`;
-INSERT INTO `machine` VALUES
-        (1, 'название', 'код', '192.168.0.', 'AABBCCDDEE', 'amplitude', 5, 'template'),
-        (2, 'test machine', 'test_machine', '192.168.0.1', '00BD3B330571', 'amplitude', 5, 'real')     
+# machine tamplates
+INSERT INTO `machine` ('id', 'name', 'code', 'ip', 'mac', 'work_type', 'rec_type') VALUES
+        (1, '', '', '10.128.132.', '', 'amplitude', 'template')
+;
+
+INSERT INTO `machine` ('id', 'name', 'code', 'ip', 'port', 'pwd', 'mac', 'work_type') VALUES
+        (2, '', '', '10.128.132.103', 900, 'PxZt0003', '7E4AE2C2875E', 'amplitude', 'real')
 ;
 
 
@@ -313,24 +320,6 @@ INSERT INTO `machine_state` VALUES
 ;
 
 
-drop table if exists `task` ;
-CREATE TABLE `task` (
-	`id` INT(10) NOT NULL AUTO_INCREMENT,
-	`pid` INT(10) NULL DEFAULT NULL,
-	`machine_id` INT(10) NULL DEFAULT NULL,
-	`status` ENUM('start','progress', 'stop', 'end') NULL DEFAULT NULL,
-	`dt_create` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-	`dt_check` TIMESTAMP NULL DEFAULT NULL,
-	`progress` INT(10) NULL DEFAULT NULL,
-	`error` TEXT NULL,
-	PRIMARY KEY (`id`),
-	INDEX `machine_id` (`machine_id`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-ROW_FORMAT=DEFAULT
-;
-
 drop table if exists `param` ;
 CREATE TABLE IF NOT EXISTS `param` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -346,11 +335,10 @@ ENGINE=InnoDB
 ROW_FORMAT=DEFAULT
 ;
 
-
 INSERT INTO `param` (`id`, `key`, `value`, `descr`, `stable`) VALUES
     (1, 'title', 'СМТО', 'Заголовок сайта', 1),
 	(2, 'description', 'СМТО', 'Тэг description', 1),
 	(3, 'keywords', 'СМТО', 'ключевые слова', 1),
-	(4, 'machine_data_path', '/var/www/smto/protected/runtime/import/machine_data/', 'Путь к *.dat файлам', 1)
+	(4, 'machine_data_path', '/var/www/smto/protected/runtime/machine_data/', 'Путь к *.dat файлам', 1)
 ;
 
