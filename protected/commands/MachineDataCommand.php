@@ -3,20 +3,10 @@
 class MachineDataCommand extends CConsoleCommand {
 
     public function actionCheck() {
-        //echo 'run check command' . PHP_EOL;
-
         //Yii::import('application.modules.smto.models.*');
-
-//        $mac = '00BD3B330571';
-//        $machine = Machine::model()->findByAttributes(array('mac' => $mac));
-//        print_r(Machine::getRecByMAC($machine->mac)->name);
 
         //$oper = Operator::model()->findByPk(1);
         //print_r(Operator::getRecByCode($oper->c1, $oper->c2, $oper->c3)->full_name);
-
-
-        //$dir = YiiBase::getPathOfAlias('application.runtime.import.machine_data');
-        //$dir = Yii::app()->smto->machine_data_path;
 
         $machines = Machine::model()->real_records()->findAll();
         //$cnt = count($machines);echo "$cnt".PHP_EOL;die;
@@ -51,19 +41,12 @@ class MachineDataCommand extends CConsoleCommand {
 
     public function actionImport($mac, $maxProcessDataFiles = 10) {
 
-//        sleep(30);
-//        Yii::log("Machine with MAC: $mac is done!", 'warning', __METHOD__);
-//        die;
-
-
-
         $machineAR = Machine::getRecByMAC($mac);
 
         if (!$machineAR) {
             Yii::log("Machine with MAC: $mac is unknown!", 'warning', __METHOD__);
             Yii::app()->end();
         }
-        //echo $machineAR->mac . PHP_EOL;
 
         $import = new MachineDataImport();
         //$dir = Yii::app()->params['machine_data_path'];
@@ -73,7 +56,6 @@ class MachineDataCommand extends CConsoleCommand {
         //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");
         //$output = Helpers::scandirFast($dir,"", true, 2);
         //echo print_r($output, true) . PHP_EOL; die();
-
 
         $import->run($dir, $machineAR->mac, $maxProcessDataFiles);
     }

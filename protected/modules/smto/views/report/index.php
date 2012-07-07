@@ -67,7 +67,7 @@
 </div>
 <?php } ?>
 
-<?
+<?php
 //echo '<pre>' . print_r($chartDataJSON, true) . '</pre>';die();
 ?>
 <script type="text/javascript">
