@@ -1,0 +1,25 @@
+update externals
+modules/p2 https://phundament.svn.sourceforge.net/svnroot/phundament/branches/2.1/modules/p2
+lib/Zend http://framework.zend.com/svn/framework/standard/tags/release-1.10.2/library/Zend/
+
+
+sql update
+
+
+update config
+$config = CMap::mergeArray(
+    require($basePath.DS.'modules'.DS.'pii'.DS.'config'.DS.'module.php'),
+    $config);
+    NOTE: CASE SENSITIVE REPLACE!
+replace 'pii' with 'p2'
+replace 'Pii' with 'P2'
+in components config controllers models www/themes views
+update config options - no longer arrays - main NS
+
+
+Update P2AutoTheme to EAutoTheme
+
+
+
+done ...
+

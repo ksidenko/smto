@@ -1,0 +1,123 @@
+<?xml version="1.0"  encoding="UTF-8" ?>
+
+<project name="catalog" basedir="." default="help">
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT) Target: help                        -->
+    <!-- ============================================  -->
+    <target name="help">
+        <echo msg="Avalilable tasks:" />
+        <echo msg="-- update:       Update application" />
+        <echo msg="-- config:       Generate application configuration file" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: init                                  -->
+    <!-- Init the build script. Ask and load necessary -->
+    <!-- build properties.                             -->
+    <!-- ============================================  -->
+    <target name="init">
+        <available file="${project.basedir}/build.prop.server" type="file" property="my_propfile_exists" value="true" />
+        <if>
+            <and>
+                <isset property="my_propfile_exists" />
+                <istrue value="${my_propfile_exists}" />
+            </and>
+            <then>
+                <property file="./build.prop.server" override="true" />
+            </then>
+        </if>
+
+        <!-- Load main Property List File -->
+        <property file="${project.basedir}/build.prop" />
+        <property name="inited" value="true" />
+
+        <echo msg="Application mode: ${APP_MODE}" />
+        <mkdir dir="${MACHINE_DATA_PATH}" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Config                                -->
+    <!-- ============================================  -->
+    <target name="config" depends="init, permissions">
+        <copy file="${APP_PATH}/protected/config/main.php.template" tofile="${APP_PATH}/protected/config/main.php" overwrite="true" />
+        <echo msg="Parsing main.php.template  file..." />
+        <reflexive file="${APP_PATH}/protected/config/main.php">
+            <filterchain>
+				<replaceregexp>
+                    <regexp pattern="__APP_MODE__" replace="${APP_MODE}"/>
+                    <regexp pattern="__APP_PATH__" replace="${APP_PATH}"/>
+                    <regexp pattern="__APP_NAME__" replace="${APP_NAME}"/>
+                    <regexp pattern="__APP_URL__"  replace="${APP_URL}"/>
+
+                    <regexp pattern="__DB_HOST__"  replace="${DB_HOST}"/>
+                    <regexp pattern="__DB_NAME__"  replace="${DB_NAME}"/>
+
+                    <regexp pattern="__DB_USER__"  replace="${DB_USER}"/>
+                    <regexp pattern="__DB_PWD__"  replace="${DB_PWD}"/>
+
+                    <regexp pattern="__DB_ENABLEPROFILING__"  replace="${DB_ENABLEPROFILING}"/>
+                    <regexp pattern="__DB_ENABLEPARAMLOGGING__"  replace="${DB_ENABLEPARAMLOGGING}"/>
+
+                    <regexp pattern="__SHOW_IN_FIREBUG__"  replace="${SHOW_IN_FIREBUG}"/>
+                    <regexp pattern="__SHOW_IN_FIREBUG_CATEGORIES__"  replace="${SHOW_IN_FIREBUG_CATEGORIES}"/>
+                    <regexp pattern="__LOG_LEVELS__"  replace="${LOG_LEVELS}"/>
+
+                    <regexp pattern="__MACHINE_DATA_PATH__"  replace="${MACHINE_DATA_PATH}"/>
+
+                    <regexp pattern="__yii.debug__" replace="${YII_DEBUG}"/>
+                </replaceregexp>
+            </filterchain>
+        </reflexive>
+        <echo msg="Config OK" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Permissions                           -->
+    <!-- ============================================  -->
+    <target name="permissions" depends="init">
+        <chmod mode="0777" quiet="true" failonerror="false" verbose="false">
+            <fileset dir="${APP_PATH}/protected/config">
+                <exclude name=".svn/" />
+            </fileset>
+            <fileset dir="${APP_PATH}/protected/runtime">
+                <exclude name=".svn/" />
+            </fileset>
+            <fileset dir="${APP_PATH}/assets">
+                <exclude name=".svn/" />
+            </fileset>
+            <fileset dir="${MACHINE_DATA_PATH}">
+                <exclude name=".svn/" />
+            </fileset>
+        </chmod>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: svnUp                           -->
+    <!-- ============================================  -->
+    <target name="svnUp" depends="config">
+        <exec passthru="true" command="svn cleanup ${project.basedir} --no-auth-cache --username ${SVN.REPO.USERNAME} --password ${SVN.REPO.PWD}" />
+        <echo msg= "Update from svn" />
+        <exec passthru="true" command="svn up ${project.basedir} -r HEAD --no-auth-cache --accept theirs-full --username ${SVN.REPO.USERNAME} --password ${SVN.REPO.PWD}" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: update                           -->
+    <!-- ============================================  -->
+    <target name="update" >
+        <echo msg= "Update application ${APP_NAME}" />
+        <phingcall target="svnUp" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: dump DB                           -->
+    <!-- ============================================  -->
+    <target name="dumpDb" depends="init">
+        <echo msg= "Dump database ${DB_NAME} from host ${DB_HOST}" />
+        <exec passthru="true" command="mysqldump ${DB_NAME} -h ${DB_HOST} -u ${DB_USER} --password=${DB_PWD} --ignore-table=${DB_NAME}.machine_data -r ${project.basedir}/protected/runtime/dump.sql" />
+        <exec passthru="true" command="mysqldump ${DB_NAME} machine_data -h ${DB_HOST}  -u ${DB_USER} --password=${DB_PWD} --no-data >> ${project.basedir}/protected/runtime/dump.sql" />
+    </target>
+
+</project>

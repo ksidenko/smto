@@ -1,0 +1,85 @@
+.p2CellManagerWidget {
+    clear: both;
+}
+
+.ui-widget {
+    text-align: left;
+}
+
+.p2CellManager .ui-tabs {
+    Xpadding: 0.2em 0.2em 0;
+    margin: 0em -0.4em 0;
+    Xborder-width: 0.1em;
+}
+.p2CellManager .ui-tabs .ui-tabs-panel{
+    padding: 0.2em;
+    Xmargin: 0em 0em;
+    Xborder-width: 0.1em;
+}
+.p2CellManager .buttons {
+    background: #f4f4f4;
+    padding: 0.2em;
+}
+.p2CellManager .buttons .checkAccess {
+    float: right;
+    background: #ddd;
+    font-style: italic;
+}
+div.p2CellManager .button
+{
+    Xfont-family: inherit;
+    Xfont-size: 2em;
+    padding: 0.5em 0.5em;
+    margin: 0 0.25em 0 0;
+    text-decoration: none;
+}
+div.p2CellManager A.button
+{
+    display: block;
+    float: left;
+    Xwidth: 150px;
+}
+div.p2CellManager .ui-widget-content {
+    Xfont-family: Arial;
+    Xfont-size: 0.9091em;
+}
+div.p2CellManager .widgetContent {
+    font-size: 0.9091em;
+    font-family: Arial;
+}
+div.p2CellManager .ui-icon {
+    display: inline-block;
+    margin: 0 2px -2px 0;
+}
+div.p2CellManager .ui-tabs-nav a{
+    height: 1em;
+    display: block;
+    float:left;
+}
+
+div.p2CellManager .simpleTable {
+    width: auto;
+}
+
+div.p2CellManager .simpleTable TD {
+    border: 1px solid #ccc;
+    padding: 0.1em 0.25em;
+    border-collapse: collapse;
+    margin: 0;
+}
+div.p2CellManager .simpleTable TH {
+    text-align: right;
+    font-weight: normal;
+    color: #999;
+    margin: 0;
+}
+
+div.p2CellManager .form label {
+    font-weight:bold;
+    display: block;
+    margin: 1em 0 0.5em;
+}
+
+div.p2CellManager .form .hint {
+    display: block;
+}

@@ -1,0 +1,33 @@
+lithron		{ display: lithron; font-family: helvetica; font-size: 10pt; line-height: 15pt}
+file		{ display: file;  }
+page		{ display: page; max-width: 14400pt; max-height: 14400pt; }
+image		{ display: block-image; }
+
+p, div, ul, ol	{ display: block; }
+h1, h2, h3, h4, h5, h6, h7 { display: block; margin-top: 1em; margin-bottom: 0.5em; font-weight: bold}
+h1 { font-size: 200%;}
+h2 { font-size: 150%;}
+h3 { font-size: 130%;}
+h4 { font-size: 120%;}
+h5 { font-size: 110%;}
+h6 { font-size: 100%;}
+h7 { font-size: 100%;}
+
+ul, ol	{ counter-reset: item; }
+ol		{ list-style-type: decimal; }
+ul		{ list-style-type: disc; }
+li		{ display: list-item; padding-left:1em }
+
+strong, b   {font-weight: bold; }
+i, em       {font-style: italic; }
+u           { text-decoration: underline; }
+
+sink        { display: sink; }
+well        { display: well; }
+anchor      { display: inline; }
+repeater    { display: repeater; }
+
+br			{ white-space: pre; content: "\A"; }
+cbr, pbr	{ white-space: pre; content: "\C"; }
+
+table, tbody, tr, td { display: block; }

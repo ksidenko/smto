@@ -1,0 +1,46 @@
+phundament 2.1 Installation
+===========================
+
+1. Download & Extract
+2. Run
+    $ ./yiic install
+   This will create config/local.php
+3. Create a database, update credentials in config/local.php
+4. Run
+    $ ./yiic install
+   Follow instructions.
+5. Open home URL.
+
+
+
+Module Installation
+===================
+1. Merge configurations
+2. Open index.php?r=p2/default/install
+3. Update configuration / downlod add-ons (modules/srbac, lib/zend)
+4. Update LoginForm model P2User
+
+
+
+
+IMPORTANT UPGRADE INSTRUCTIONS
+==============================
+
+Upgrading from 2.1-b4 to 2.1-b5
+-------------------------------
+
+Extended replaces in your project:
+* pii ==> p2
+* Pii ==> P2
+
+Config option changes (example):
+* PiiHelper::findModule()->params['piiFile']['imagePresets']
+==>
+* Yii::app()->params['p2.file.imagePresets']
+
+
+SQL:
+see p2/install/upgrades.sql
+
+
+

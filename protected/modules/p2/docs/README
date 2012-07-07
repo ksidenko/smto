@@ -1,0 +1,80 @@
+p2 2.1 bets1
+=============
+
+
+Requirements
+============
+yii-1.1.1 (not released yet) or svn trunk
+Database (currently only with MySQL create script)
+
+
+Contact
+=======
+schmunk@usrbin.de
+
+
+Idea
+====
+This is basically a port of phundament (PRADO-based) to yii.
+So I called it phundament II, while all classes are prefixed P2.
+
+Currently there I've implemented P2CellManagerWidget. This is a widget
+which allows you to add any widget to your page.
+It determines its location or variation from class properties and saves all data
+to the database.
+By default it varies by moduleId, controllerId and actionName.
+You can specify the loadble widgets by module configuration.
+If a widget implements ICellManagerWidget, it can show a more complex admin
+interface. While from regular CWidgets the cell-manager reads the public class
+properties and generates an admin interface from those.
+
+
+Best regards
+schmunk
+
+
+schmunk@usrbin.de
+
+
+Project / Download / SVN
+========================
+https://sourceforge.net/projects/phundament/
+
+
+
+Conventions
+===========
+
+models
+------
+Primary Key:                id
+Unique Named Primary Key:   name
+
+Column Names:               lowerCamelCase (property)
+Table Names:                UpperCamelCase (object)
+Relation/ForeignKey:        UpperCamelCase (object)
+
+
+
+
+CSS
+===
+
+with ids (CamelCase)
+--------
+
+body
+ wrapper
+  header
+  logo
+  mainMenu
+ content
+ sidebar
+ footer
+
+Classes
+-------
+.yiiForm
+
+
+

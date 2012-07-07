@@ -1,0 +1,131 @@
+
+Developer
+=========
+
+yiic commands
+-------------
+./yiic shell config/main.php
+
+model p2.models./^(P2.*)$/
+
+p2crud p2.models.P2Cell
+p2crud p2.models.P2Html
+p2crud p2.models.P2Info
+p2crud p2.models.P2User
+p2crud p2.models.P2File
+p2crud p2.models.P2Log
+
+./yiic api modules/p2/docs/
+
+
+svn export
+----------
+svn export http://phundament.svn.sourceforge.net/svnroot/phundament/branches/2.0/modules/p2
+svn list https://phundament.svn.sourceforge.net/svnroot/phundament/branches/2.0/modules/p2
+tar -czf p2-2.0-a1.tar.gz p2/
+
+Model behaviours
+----------------
+
+    public function behaviors() {
+        return array(
+        'ActiveRecordLogableBehavior'=>
+        'application.modules.p2.behaviors.P2ActiveRecordLogableBehavior',
+        'application.modules.p2.behaviors.P2ActiveRecordInfoBehavior',
+        );
+    }
+
+Language by role
+----------------
+return array_key_exists(
+  Yii::app()->language,
+  Yii::app()->authManager->getRoles(Yii::app()->user->id)
+);
+
+
+Links
+=========
+http://www.yiiframework.com/doc/api/CHtml#ajax-detail
+http://docs.jquery.com/Ajax/jQuery.ajax#options
+
+
+
+Database Updates 2.0 > 2.1
+==========================
+Config update!!!
+
+UPDATE `P2Cell`
+SET classPath = 'p2.widgets.html.P2HtmlWidget'
+WHERE classPath = 'application.modules.p2.components.P2HtmlWidget';
+
+UPDATE `P2Cell`
+SET classPath = 'application.widgets.flashHeader.FlashHeaderWidget'
+WHERE classPath = 'application.components.flashHeaderWidget.FlashHeaderWidget';
+
+UPDATE `P2Cell`
+SET classPath = 'application.widgets.RelatedBoxHeaderWidget'
+WHERE classPath = 'application.components.RelatedBoxHeaderWidget';
+
+UPDATE `P2Cell`
+SET classPath = 'application.widgets.RelatedBoxFooterWidget'
+WHERE classPath = 'application.components.RelatedBoxFooterWidget';
+
+UPDATE `P2Cell`
+SET classPath = 'p2.widgets.skeleton.P2SkeletonWidget'
+WHERE classPath = 'application.modules.p2.components.P2TestWidget';
+
+
+
+STATS
+=====
+Most active editors
+
+SELECT P2User.name, COUNT(  `P2Log`.`createdBy` ) AS numberOfEdits
+FROM  `P2Log` 
+LEFT JOIN P2User ON P2User.id = P2Log.createdBy
+GROUP BY P2Log.`createdBy` 
+ORDER BY numberOfEdits DESC
+LIMIT 0 , 30
+
+
+
+
+
+
+Benchmarks
+==========
+pdepend \
+--summary-xml=/Users/tobias/debug/summary.xml \
+--jdepend-chart=/Users/tobias/debug/jdepend.svg \
+--overview-pyramid=/Users/tobias/debug/pyramid.svg \
+/Users/tobias/Webserver/NetBeans/p2/modules/p2/
+
+
+
+
+
+
+
+
+FIBONACCI
+=========
+
+CSS
+
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987

@@ -1,0 +1,26 @@
+; Application mode: DEV|PROD
+
+APP_MODE = DEV
+YII_DEBUG = 1
+
+DB_HOST=localhost
+DB_NAME=smto_new
+
+DB_USER=root
+DB_PWD=1
+
+DB_ENABLEPROFILING=1
+DB_ENABLEPARAMLOGGING=1
+
+; svn
+
+SVN.REPO.USERNAME=sks
+SVN.REPO.PWD=qazqaz
+
+MACHINE_DATA_PATH = ./protected/runtime/import/machine_data/
+
+; Debug options
+LOG_LEVELS = error, warning
+SHOW_IN_FIREBUG = 1
+;SHOW_IN_FIREBUG_CATEGORIES = *
+SHOW_IN_FIREBUG_CATEGORIES = system.db.CDbCommand.*

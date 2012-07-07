@@ -1,0 +1,50 @@
+$ ./yiic install
+
+Welcome to p2 installer
+========================
+
+Configuration
+-------------
+
+Created config/local.php
+ERROR - Please specifiy a database component in config!
+ERROR - Please specifiy parameter adminEmail in config!
+
+
+$ ./yiic install
+
+Welcome to p2 installer
+========================
+Opening database connection 'mysql:dbname=p22a2;host=localhost' ...
+Application path set to: /Users/tobias/Webserver/TESTING/p2-2.0-a2
+Directories
+-----------
+Create a p2 environment under '/Users/tobias/Webserver/TESTING/p2-2.0-a2'? [Yes|No] y
+
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/runtime
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/www/assets
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/data
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/runtime/data
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/www/data
+Created directory /Users/tobias/Webserver/TESTING/p2-2.0-a2/www/assets/runtime
+Direcorties and permissions created successfully under /Users/tobias/Webserver/TESTING/p2-2.0-a2.
+
+Database
+--------
+==============================================
+WARNING! THESE ACTIONS MAY ERASE EXISTING DATA
+==============================================
+Create p2 schema in database? [Yes|No] y
+......................
+Import p2 data into database? [Yes|No] y
+Creating admin user ...
+Please choose a password: admin
+E-Mail address: admin@h17n.de
+........
+Create project schema in database? [Yes|No] y
+.
+Import project data into database? [Yes|No] y
+.
+
+Installation complete. Please check back to your browser.
+Thank you for choosing p2.

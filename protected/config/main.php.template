@@ -1,0 +1,107 @@
+<?php
+
+// uncomment the following to define a path alias
+Yii::setPathOfAlias('local','__APP_PATH__');
+
+return CMap::mergeArray(
+    include(dirname(__FILE__)."/../modules/p2/config/module.php"),
+    array(
+        'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
+
+        'name'=>'__APP_NAME__',
+
+        // preloading 'log' component
+        'preload'=>array('log'),
+
+        // autoloading model and component classes
+        'import'=>array(
+            'application.models.*',
+            'application.components.*',
+            'application.helpers.*',
+            'application.extensions.ipvalidator.*',
+            'application.modules.user.models.*',
+            'application.modules.user.components.*',
+            'application.modules.srbac.controllers.SBaseController',
+            'application.modules.smto.models.*',
+            'application.modules.smto.models.forms.*',
+            //'application.vendors.*',
+        ),
+
+        'modules'=>array(
+            // uncomment the following to enable the Gii tool
+
+            'gii'=>array(
+                'class'=>'system.gii.GiiModule',
+                'password'=>'1',
+                // If removed, Gii defaults to localhost only. Edit carefully to taste.
+                //'ipFilters'=>array('178.49.155.34', '178.49.201.40', '::1'),
+
+            ),
+            'smto' => array(
+                'max_duration' => 100,
+                'machine_data_path' => '__MACHINE_DATA_PATH__'
+            )
+        ),
+        'onBeginRequest' =>function($event){
+            //echo Yii::getPathOfAlias('system.gii.GiiModule'); die;
+            //print_r(Yii::App()->db);die;
+         },
+
+        // application components
+        'components'=>array(
+            // uncomment the following to enable URLs in path-format
+            'urlManager'=>array(
+                'urlFormat'=>'path',
+                'showScriptName' => false,
+                'rules'=>array(
+                      'gii'=>'gii',
+                      'gii/<controller:\w+>'=>'gii/<controller>',
+                      'gii/<controller:\w+>/<action:\w+>'=>'gii/<controller>/<action>',
+                ),
+                'baseUrl'=>'__APP_URL__',
+            ),
+
+            'db'=>array(
+                'connectionString' => 'mysql:host=__DB_HOST__;dbname=__DB_NAME__',
+                'emulatePrepare' => true,
+                'username' => '__DB_USER__',
+                'password' => '__DB_PWD__',
+                'charset' => 'utf8',
+                'enableProfiling'=>__DB_ENABLEPROFILING__,
+                'enableParamLogging'=>__DB_ENABLEPARAMLOGGING__,
+            ),
+            'errorHandler'=>array(
+                'errorAction'=>'site/error',
+            ),
+            'log'=>array(
+                'class'=>'CLogRouter',
+                'routes'=>array(
+                    array(
+                        'class'=>'CFileLogRoute',
+                        'levels'=>'__LOG_LEVELS__',
+                        'categories'=>'__SHOW_IN_FIREBUG_CATEGORIES__',
+                    ),
+                    array(
+                        'class'=>'CWebLogRoute',
+                        'levels'=>'__LOG_LEVELS__',
+                        'showInFireBug'=>__SHOW_IN_FIREBUG__,
+                        'categories'=>'__SHOW_IN_FIREBUG_CATEGORIES__',
+                        //'filter'=>'CLogFilter',
+                    ),
+                ),
+            ),
+            'fusioncharts' => array(
+                'class' => 'ext.fusioncharts.fusionCharts',
+            ),
+        ),
+
+        'params'=>array(
+            // this is used in contact page
+            'adminEmail'=>'webmaster@example.com',
+            'languages' => array(
+                        'ru_ru' => "Русский",
+                        'en_us' => 'English')
+        ),
+        //'language' => 'ru_ru'
+    )
+);

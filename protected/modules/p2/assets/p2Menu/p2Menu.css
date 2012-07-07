@@ -1,0 +1,170 @@
+div.p2Menu, div.p2MenuContainer{
+   z-index: 800;
+   position: relative;
+    font-size: 12px;
+    font-family: Arial;
+    line-height: 22px;
+}
+
+div.p2Menu
+{
+    background: #ccc;
+    color: #333;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    opacity: 0.7;
+    border-bottom: 1px solid #ccc;
+}
+
+.p2Menu table, .menuDiv table {
+        margin: 0;
+}
+
+
+div.p2Menu FORM {
+    margin: 0;
+    padding: 0;
+}
+
+div.p2Menu ul
+{
+    padding: 0;
+    margin: 0;
+    padding: 0.4em 0 0.4em 0;
+}
+
+div.p2Menu ul li
+{
+    display: inline;
+}
+
+div.p2Menu ul li a
+{
+    padding: 0.4em 0.4em;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+div.p2Menu ul li a:hover, div.p2Menu ul li a.active
+{
+    background: #f44400;
+    color: #fff;
+}
+
+div.p2Menu ul li ul
+{
+    display: none;
+}
+
+div.p2Menu .mbmenu{
+  display:none;
+}
+
+div.p2Menu .rootVoices{
+	background-color:#fff;
+	padding:0 0 0 10px;
+	padding-bottom:0;
+}
+div.p2Menu .rootVoices td.rootVoice {
+	background-color:transparent;
+	width:auto;
+	
+	Xfont-family:Arial,Helvetica,sans-serif;
+	color: #333;
+	
+	Xfont-size: 13px;
+	Xline-height:22px;
+	
+	padding: 2px 10px 2px;
+	cursor: pointer;
+    margin: 0px;
+}
+div.p2Menu .rootVoices td.selected{
+	background-color:#333;
+	color:#ffffff;
+	cursor: pointer;
+}
+
+div.p2Menu .rootVoices A, div.p2MenuContainer A{
+	color:#000 !important;
+        text-decoration: none;
+        padding-right: 2em;
+}
+
+.p2MenuContainer{
+	background-color:gray;
+        -moz-box-shadow: 0px 10px 20px #666;
+        -webkit-box-shadow: 0px 10px 20px #666;
+}
+
+.p2MenuContainer .line{
+	background-color:white;
+	width:100%;
+	padding-left:-5px;
+}
+
+.p2MenuContainer .line.title {
+	text-align:right;
+}
+
+.p2MenuContainer .line.title a{
+	color:dimgray;
+	Xfont-size:1em;
+}
+
+.p2MenuContainer td a{
+	text-decoration:none;
+	color: #000000;
+        display: block;
+}
+
+.p2MenuContainer td.voice{
+	border-top:1px solid #f3f3f3;
+	Xfont-family:Arial,Helvetica,sans-serif;
+	Xfont-size:12px;
+	padding: 4px 10px;
+        Xline-height: 19px;
+}
+
+.p2MenuContainer .separator{
+	background-color:#ccc;
+	height:1px;
+}
+.p2MenuContainer td.img{
+	border-top:1px solid #f3f3f3;
+	Xfont-family:Arial,Helvetica,sans-serif;
+	text-align:center;
+	Xfont-size:12px;
+	color: #c3c3c3;
+	background-color:#f9f9f9;
+	width:1px;
+	padding:4px 2px;
+        display: none;
+}
+.p2MenuContainer td.img img{
+	width:20px;
+}
+.p2MenuContainer .textBox{
+	padding: 5px;
+	Xfont-family:Arial,Helvetica,sans-serif;
+	Xfont-size:12px;
+	background-color:#ffffff;
+	color: #c3c3c3;
+}
+.p2MenuContainer .selected td{
+	background-color:#666;
+}
+.p2MenuContainer .selected td a{
+	color:#fff !important;
+}
+.p2MenuContainer .disabled td, .p2MenuContainer .disabled td a {
+	color: #cccccc !important;
+}
+.p2MenuContainer .subMenuOpener{
+	background-image:url("menuArrow.gif");
+	background-repeat:no-repeat;
+	background-position:right;
+}
