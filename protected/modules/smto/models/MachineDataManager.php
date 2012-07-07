@@ -11,10 +11,16 @@ class MachineDataManager {
     function getFileFormat($mac) {
         $s = '';
 
+//        if ($this->version == '1.0') {
+//            $s = '/^log1.txt_.*/i';
+//        } else if ($this->version == '2.0') {
+//            $s = '/^pw' . $mac . '.*\.dat$/i';
+//        }
+
         if ($this->version == '1.0') {
-            $s = '/^log1.txt_.*/i';
+            $s = 'log1.txt_*';
         } else if ($this->version == '2.0') {
-            $s = '/^pw' . $mac . '.*\.dat$/i';
+            $s = 'pw' . $mac . '*.dat';
         }
 
         return $s;
