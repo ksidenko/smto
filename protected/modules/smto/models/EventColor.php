@@ -112,11 +112,32 @@ class EventColor extends CActiveRecord
 		return $value;
 	}
 
-    static public function getByCode($code) {
-        $row = EventColor::model()->findByAttributes(array('code' => $code), array('select' => 'color'));
-        if ($row) {
-            return '#' . str_replace('#', '', $row->color);
+//    static public function getByCode($code) {
+//        $row = EventColor::model()->findByAttributes(array('code' => $code), array('select' => 'color'));
+//        if ($row) {
+//            return '#' . str_replace('#', '', $row->color);
+//        }
+//        return '';
+//    }
+
+    public static function getColorByCode($code)  {
+        static $date = array();
+
+        if ( !isset($date[$code]) ) {
+
+            $res = false;
+            try {
+                $rows = EventColor::model()->findAll();
+                if ($rows) {
+                    foreach($rows as $row) {
+                        $date[$row->code] = '#' . str_replace('#', '', $row->color);
+                    }
+                }
+            } catch (Exception $e) {
+                //print_r($e->getMessage());
+            }
         }
-        return '';
+
+        return isset($date[$code]) ? $date[$code] : '';
     }
 }

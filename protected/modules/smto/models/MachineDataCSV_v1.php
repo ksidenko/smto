@@ -122,7 +122,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         if ( $this->errors == null ) {
             $s = implode(',', array(
                 '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? 10 : $this->duration),
+                ($this->duration == null || $this->duration < 0 ? "null" : $this->duration),
                 '"' . $this->mac . '"',
                 ( !empty($this->machineId) ? $this->machineId : 'null'),
                 ( !empty($this->operatorId) ? $this->operatorId : 'null'),

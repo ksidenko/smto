@@ -10,7 +10,7 @@ class ReportConstructor extends ReportSearchForm {
     public $operatorInfo = null;
     public $timetableInfo = null;
     public $secTotal = null;
-    protected $output = array('separate' => array(), 'join' => array('machine' => array()));
+    protected $output = array('separate' => array(), 'join' => array());
 
     public function __construct() {
         $this->cr = new CDbCriteria();
@@ -27,11 +27,11 @@ class ReportConstructor extends ReportSearchForm {
 
     public function _processParams() {
 
-        if ($this->machineId && is_int($this->machineId)) {
+        if ($this->machineId && is_numeric($this->machineId)) {
+            $this->machineReportType = 'separate';
             $this->machineInfo = Machine::model()->findByPk($this->machineId);
         } else if (is_string($this->machineId)) {
             $this->machineReportType = $this->machineId;
-            $this->machineId = null;
         }
 
         if ($this->operatorId) {
@@ -109,8 +109,6 @@ class ReportConstructor extends ReportSearchForm {
         // Может быть state == 0|1, но оператор ничего не нажимал!
         //$this->crNotWorking->addCondition('t.operator_last_fkey != 0');
 
-        $this->machineId = $this->machineReportType;
-
         $this->cr->group = implode(', ', $this->cr->group);
         $this->crNotWorking->group = implode(', ', $this->crNotWorking->group);
 
@@ -150,7 +148,7 @@ class ReportConstructor extends ReportSearchForm {
             $currMachineInfo['states_work'] [$machineState->code] = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
-                'color' => EventColor::getByCode('machine_' . $stateInfo['state']),
+                'color' => EventColor::getColorByCode('machine_' . $stateInfo['state']),
                 //'color' => MachineState::getByColor($machineState->id),
                 'sec_duration' => $stateInfo['sec_duration'],
             );
@@ -173,7 +171,7 @@ class ReportConstructor extends ReportSearchForm {
                 $machineState = MachineState::model()->findByPk($stateInfo['state']);
                 $code = $machineState->code;
                 $name = $machineState->name;
-                $color = EventColor::getByCode('machine_' . $stateInfo['state']);
+                $color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
             } else {
                 $fkeyState = MachineEvent::getRec($stateInfo['operator_last_fkey']);
                 $code = $fkeyState->code;
@@ -206,40 +204,41 @@ class ReportConstructor extends ReportSearchForm {
                 $code = 'time_ignored';
                 $currMachineInfo['states_not_work'] [$code]= array(
                     'code' => $code,
-                    'name' => 'Не учтеное время',
-                    'color' => EventColor::getByCode('time_ignored'),
+                    'name' => 'Нет данных',
+                    'color' => EventColor::getColorByCode('time_ignored'),
                     'sec_duration' => $timeIgnored,
                 );
             }
         }
 
         // считаем объединенную информацию по всем станкам
-        $joinMachineInfo = array(
-            'states_work' => array(),
-            'states_not_work' => array(),
-        );
+        if ($this->output['separate']) {
+            $joinMachineInfo = array(
+                'states_work' => array(),
+                'states_not_work' => array(),
+            );
 
-        foreach ($this->output['separate'] as $currMachineId => &$currMachineInfo) {
+            foreach ($this->output['separate'] as $currMachineId => &$currMachineInfo) {
 
-            foreach ($currMachineInfo['states_work'] as $code => $stateInfo) {
-                if (!isset($joinMachineInfo['states_work'][$code])) {
-                    $joinMachineInfo['states_work'][$code] = $stateInfo;
-                } else {
-                    $joinMachineInfo['states_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                foreach ($currMachineInfo['states_work'] as $code => $stateInfo) {
+                    if (!isset($joinMachineInfo['states_work'][$code])) {
+                        $joinMachineInfo['states_work'][$code] = $stateInfo;
+                    } else {
+                        $joinMachineInfo['states_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                    }
+                }
+
+                foreach($currMachineInfo['states_not_work'] as $code => $stateInfo) {
+                    if (!isset($joinMachineInfo['states_not_work'][$code])) {
+                        $joinMachineInfo['states_not_work'][$code] = $stateInfo;
+                    } else {
+                        $joinMachineInfo['states_not_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                    }
                 }
             }
-
-            foreach($currMachineInfo['states_not_work'] as $code => $stateInfo) {
-                if (!isset($joinMachineInfo['states_not_work'][$code])) {
-                    $joinMachineInfo['states_not_work'][$code] = $stateInfo;
-                } else {
-                    $joinMachineInfo['states_not_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
-                }
-            }
+            $this->output['join']['machine'] = $joinMachineInfo;
         }
-        $this->output['join']['machine'] = $joinMachineInfo;
-
-        //echo '<pre>' . print_r($this->output, true) . '</pre>';die();
+        // echo '<pre>' . print_r($this->output, true) . '</pre>';die();
 
         //echo $secTotalProcess . ' ' . $this->secTotal; die;
         

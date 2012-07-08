@@ -136,7 +136,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $s = implode(',', array(
                 $this->number,
                 '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? 10: $this->duration),
+                ($this->duration == null || $this->duration < 0 ? 'null': $this->duration),
                 '"' . $this->mac . '"',
 
                 ( !empty($this->machineId) ? $this->machineId : 'null'),

@@ -27,7 +27,7 @@ ROW_FORMAT=DEFAULT;
 TRUNCATE `machine`;
 # machine tamplates
 INSERT INTO `machine` (id, name, code, ip, mac, work_type, rec_type) VALUES
-        (1, '', '', '10.128.132.', '', 'amplitude', 'template')
+        (1, 'Шаблон №1', 'Template #1', '10.128.132.', '', 'amplitude', 'template')
 ;
 
 INSERT INTO `machine` (id, template_id, name, code, ip, port, pwd, mac, work_type) VALUES
@@ -52,7 +52,6 @@ ROW_FORMAT=DEFAULT
 
 truncate machine_event;
 INSERT INTO `machine_event` (`id`, `code`, `name`, `descr`, `color`) VALUES
-(0, 'working',  		  'Работает', '', '#FF776F'),
 (1, 'crash',    		  'Авария',   'Требуется диагностика', '#2E8C58'),
 (2, 'no_instrument',   'Нет инструмента', 'Отсутствует инструмент', '#AEE8EC'),
 (3, 'no_gaz', 			  'Нет газа', 'Отсутствует газ', '#754B24'),

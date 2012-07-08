@@ -27,7 +27,7 @@ class ReportController extends SBaseController
             if ($model->validate()) {
                 $chartData = $model->getData();
 
-                if (count($chartData)) {
+                if (isset($chartData, $chartData['separate'], $chartData['join']) && ($chartData['separate'] || $chartData['join']) ) {
 
                     //foreach($chartData as $reportType => $value) {
                         $chartDataJSON_ = array(
@@ -36,7 +36,6 @@ class ReportController extends SBaseController
                         );
 
                         $reportType = $model->machineReportType;
-
                         foreach($chartData[$reportType] as $machineId => $machineData) {
                             $caption = array();
                             if (isset($machineData['machine']) && $machineData['machine']) {
@@ -60,31 +59,37 @@ class ReportController extends SBaseController
 
                             $colors = array();
                             foreach($machineData['states_work'] as $row){
-
-                                $chartDataJSON_['states_work'][$machineId]["data"] []= array(
-                                    //'label'=>$row['name'],
-                                    'toolText' => $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                    'value'=>$row["sec_duration"],
-                                    'color'=>$row["color"],
-                                    //'displayValue'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                );
-                                $colors []= $row["color"];
+                                if ( ($row["sec_duration"] / $model->secTotal * 100) > 2) {
+                                    $chartDataJSON_['states_work'][$machineId]["data"] []= array(
+                                        //'label'=>$row['name'],
+                                        'toolText' => $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                        'value'=>$row["sec_duration"],
+                                        'color'=>$row["color"],
+                                        //'displayValue'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                    );
+                                    $colors []= $row["color"];
+                                }
                             }
                             $chartDataJSON_ ['states_work'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
 
 
-                            $chartDataJSON_ ['states_not_work'][$machineId]["chart"]["caption"] = 'Причины простоя оборудования';
+                            $caption = implode(', ', $caption);
+                            $caption = !empty($caption) ? ', ' . $caption : '';
+
+                            $chartDataJSON_ ['states_not_work'][$machineId]["chart"]["caption"] = 'Простой оборудования' . $caption;
 
                             $colors = array();
                             foreach($machineData['states_not_work'] as $row){
-                                $chartDataJSON_['states_not_work'][$machineId]["data"] []= array(
-                                    //'label'=>$row['name'],
-                                    'toolText'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                    'value'=>$row["sec_duration"],
-                                    'color'=>$row["color"],
-                                    //'displayValue'=>$row['code'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                );
-                                $colors []= $row["color"];
+                                if ( ($row["sec_duration"] / $model->secTotal * 100) > 2) {
+                                    $chartDataJSON_['states_not_work'][$machineId]["data"] []= array(
+                                        //'label'=>$row['name'],
+                                        'toolText'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                        'value'=>$row["sec_duration"],
+                                        'color'=>$row["color"],
+                                        //'displayValue'=>$row['code'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                    );
+                                    $colors []= $row["color"];
+                                }
                             }
                             $chartDataJSON_ ['states_not_work'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
                         }
@@ -108,6 +113,8 @@ class ReportController extends SBaseController
                 $chartDataView = $chartData['separate'];
             }
         }
+
+        //echo '<pre>'.print_r($model->machineId, true) . '<pre>'; die;
 
         //print_r($chartDataXml); die;
         $chartType = ucfirst($model->graphReportType).'2D';
