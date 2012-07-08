@@ -35,7 +35,7 @@ $this->breadcrumbs=array(
     <?php //echo $form->dropDownList($model, 'machineId',CHtml::listData(Machine::model()->findAll(array('order' => 'name')), 'id', 'name')) ?>
 
     <?php echo CHtml::label('Обновлять графики', 'update_plots');?><?php echo CHtml::checkBox('update_plots', 1);?><br>
-    <?php echo CHtml::label('Период обновления, сек', 'update_interval');?><?php echo CHtml::textField('update_interval', 2, array('size' => 3));?>
+    <?php echo CHtml::label('Период обновления, сек', 'update_interval');?><?php echo CHtml::textField('update_interval', 10, array('size' => 3));?>
     <?php echo CHtml::hiddenField('dt_start', $dt_start);?>
     <?php echo CHtml::hiddenField('dt_delta_sec', 2);?>
 
@@ -49,25 +49,25 @@ $this->breadcrumbs=array(
 <table>
     <tr>
         <td>
-    <H1><?=$translate['da_max'];?> 1-4</H1>
+    <H1><?php echo $translate['da_max'];?> 1-4</H1>
     <!--da_max1-4-->
     <?php foreach(range(1,4) as $i) {?>
     <div class="machine_plot"> 
         <?php echo CHtml::hiddenField('machine_id', $machineId);?>
         <?php echo CHtml::hiddenField('name', "da_max$i");?>
-        <div id="plot_<?=$machineId?>_da_max<?php echo $i;?>" class="graph" style="width: <?=$plotW?>px; height: <?=$plotH?>px;"></div>
+        <div id="plot_<?php echo $machineId?>_da_max<?php echo $i;?>" class="graph" style="width: <?php echo $plotW?>px; height: <?php echo $plotH?>px;"></div>
     </div>
     <?php } ?>
         </td>
         <td>
-    <H1><?=$translate['da_avg'];?> 1-4</H1>
+    <H1><?php echo $translate['da_avg'];?> 1-4</H1>
     <!--da_avg1-4-->
     <?php foreach(range(1,4) as $i) {?>
     <div class="machine_plot"> 
         <?php echo CHtml::hiddenField('machine_id', $machineId);?>
         <?php echo CHtml::hiddenField('name', "da_avg$i");?>
         <?php //echo CHtml::hiddenField('dt_start', $dt_start);?>
-        <div id="plot_<?=$machineId?>_da_avg<?php echo $i;?>" class="graph" style="width: <?=$plotW?>px; height: <?=$plotH?>px;"></div>
+        <div id="plot_<?php echo $machineId?>_da_avg<?php echo $i;?>" class="graph" style="width: <?php echo $plotW?>px; height: <?php echo $plotH?>px;"></div>
     </div>
     <?php } ?>
         </td>
@@ -75,26 +75,26 @@ $this->breadcrumbs=array(
     
     <tr>
         <td>
-    <H1><?=$translate['dd'];?> 1-4</H1>
+    <H1><?php echo $translate['dd'];?> 1-4</H1>
     <!--dd1-4-->
     <?php foreach(range(1,4) as $i) {?>
     <div class="machine_plot"> 
         <?php echo CHtml::hiddenField('machine_id', $machineId);?>
         <?php echo CHtml::hiddenField('name', "dd$i");?>
         <?php //echo CHtml::hiddenField('dt_start', $dt_start);?>
-        <div id="plot_<?=$machineId?>_dd<?php echo $i;?>" class="graph" style="width: <?=$plotW?>px; height: <?=$plotH?>px;"></div>
+        <div id="plot_<?php echo $machineId?>_dd<?php echo $i;?>" class="graph" style="width: <?php echo $plotW?>px; height: <?php echo $plotH?>px;"></div>
     </div>
     <?php } ?>
         </td>
         <td>
-    <H1><?=$translate['dd_change'];?> 1-4</H1>
+    <H1><?php echo $translate['dd_change'];?> 1-4</H1>
     <!--dd_change1-4-->
     <?php foreach(range(1,4) as $i) {?>
     <div class="machine_plot"> 
         <?php echo CHtml::hiddenField('machine_id', $machineId);?>
         <?php echo CHtml::hiddenField('name', "dd_change$i");?>
         <?php //echo CHtml::hiddenField('dt_start', $dt_start);?>
-        <div id="plot_<?=$machineId?>_dd_change<?php echo $i;?>" class="graph" style="width: <?=$plotW?>px; height: <?=$plotH?>px;"></div>
+        <div id="plot_<?php echo $machineId?>_dd_change<?php echo $i;?>" class="graph" style="width: <?php echo $plotW?>px; height: <?php echo $plotH?>px;"></div>
     </div>
     <?php } ?>
         </td>
