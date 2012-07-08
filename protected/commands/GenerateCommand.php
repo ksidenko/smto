@@ -61,7 +61,7 @@ class GenerateCommand extends CConsoleCommand {
 
                 $state = rand(0,3);
 
-                $fkey_last = ($state <= 1 ? rand(1,16) : 0);
+                $operator_last_fkey = ($state <= 1 ? rand(1,16) : 0);
                 $fkey_all = 0;
                 $flags = 0;
 
@@ -69,7 +69,7 @@ class GenerateCommand extends CConsoleCommand {
                 $c1 = $operatorInfo->c1;
                 $c2 = $operatorInfo->c2;
                 $c3 = $operatorInfo->c3;
-                fwrite($fd,"D,$mac,$number, $dt, $da_max1,$da_max2,$da_max3,$da_max4, $da_avg1,$da_avg2,$da_avg3,$da_avg4, $dd1,$dd2,$dd3,$dd4, $dd_change1,$dd_change2,$dd_change3,$dd_change4, $state,$fkey_last, $fkey_all,$flags, $c1,$c2,$c3" . PHP_EOL);
+                fwrite($fd,"D,$mac,$number, $dt, $da_max1,$da_max2,$da_max3,$da_max4, $da_avg1,$da_avg2,$da_avg3,$da_avg4, $dd1,$dd2,$dd3,$dd4, $dd_change1,$dd_change2,$dd_change3,$dd_change4, $state,$operator_last_fkey, $fkey_all,$flags, $c1,$c2,$c3" . PHP_EOL);
                 $number++;
                 if($number > 1000) $number = 0;
             }

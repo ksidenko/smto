@@ -15,7 +15,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
 
     public $da_max1 = null;
 
-    public $fkey_last = null;
+    public $operator_last_fkey = null;
     
     public $state = null;
 
@@ -28,7 +28,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `fkey_last`,  `state`)
+        $sql = 'insert into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
                 values ' . PHP_EOL;
 
         return $sql;
@@ -97,7 +97,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
                 }
             }
 
-            $this->fkey_last = $eventCode;
+            $this->operator_last_fkey = $eventCode;
             
             $c1 = trim(array_shift($arr));
             $c2 = $c3 = '';
@@ -122,12 +122,12 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         if ( $this->errors == null ) {
             $s = implode(',', array(
                 '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? 'NULL' : $this->duration),
+                ($this->duration == null || $this->duration < 0 ? 10 : $this->duration),
                 '"' . $this->mac . '"',
                 ( !empty($this->machineId) ? $this->machineId : 'null'),
                 ( !empty($this->operatorId) ? $this->operatorId : 'null'),
                 $this->da_max1,
-                $this->fkey_last,
+                $this->operator_last_fkey,
                 $this->state,
             ));
         }

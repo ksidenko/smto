@@ -13,8 +13,8 @@ class ReportController extends SBaseController
         $model = new ReportConstructor();
 
         $chartData = array();
-        $chartDataJSON = '{}';
-        
+        $chartDataJSON = array('states_work' => array(), 'states_not_work' => array());
+
         $chartPath = Yii::getPathOfAlias('ext.fusioncharts.assets');
         $chartAssetsPath = Yii::app()->assetManager->publish( $chartPath, YII_DEBUG );
         Yii::app()->clientScript->registerScriptFile( $chartAssetsPath . '/JSClass/FusionCharts.site.min.js', CClientScript::POS_HEAD );
@@ -23,83 +23,99 @@ class ReportController extends SBaseController
 
         if (isset($_POST['ReportConstructor'])) {
             $model->attributes=$_POST['ReportConstructor'];
-            if($model->validate()) {
+
+            if ($model->validate()) {
                 $chartData = $model->getData();
 
-                if(count($chartData)) {
-                    $chartDataJSON_ = array(
-                        'states' => array(),
-                        'states_not_working' => array(),                        
-                    );
-                    
-                    //print_r($chartData); die;
-                    foreach($chartData as $machineId => $machineData) {
-                        $caption = array();
-                        if ($machineData['machine']) {
-                            $caption []= $machineData['machine']['name'];
-                        }
-                        if ($machineData['operator']) {
-                            $caption []= $machineData['operator']['name'];
-                        }
-                              
-                        
-                        $chartDataJSON_ ['states'][$machineId]= array(
-                            "chart" => array(
-                                "caption" => implode(', ', $caption),
-                                "showpercentvalues" => 1,
-                                "palettecolors" => "",
-                                "numberscalevalue" => "60,60,24,7",
-                                "numberscaleunit" => "мин,ч,д,нед",
-                                
-                            ),
-                            "data" => array()
+                if (count($chartData)) {
+
+                    //foreach($chartData as $reportType => $value) {
+                        $chartDataJSON_ = array(
+                            'states_work' => array(),
+                            'states_not_work' => array(),
                         );
-                        $chartDataJSON_ ['states_not_working'][$machineId] = $chartDataJSON_ ['states'][$machineId];
-                        
-                        $colors = array();
-                        foreach($machineData['states'] as $row){
-                            $chartDataJSON_['states'][$machineId]["data"] []= array(
-                                //'label'=>$row['name'],
-                                'toolText' => $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                'value'=>$row["sec_duration"],
-                                'color'=>$row["color"],
-                                //'displayValue'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                            );
-                            $colors []= $row["color"];
-                        }
-                        $chartDataJSON_ ['states'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
 
-                        $chartDataJSON_ ['states_not_working'][$machineId]["chart"]["caption"] = 'Причины простоя оборудования';
+                        $reportType = $model->machineReportType;
 
-                        $colors = array();
-                        foreach($machineData['states_not_working'] as $row){
-                            $chartDataJSON_['states_not_working'][$machineId]["data"] []= array(
-                                //'label'=>$row['name'],
-                                'toolText'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
-                                'value'=>$row["sec_duration"],
-                                'color'=>$row["color"],
-                                //'displayValue'=>$row['code'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                        foreach($chartData[$reportType] as $machineId => $machineData) {
+                            $caption = array();
+                            if (isset($machineData['machine']) && $machineData['machine']) {
+                                $caption []= $machineData['machine']['name'];
+                            }
+                            if (isset($machineData['operator']) && $machineData['operator']) {
+                                $caption []= $machineData['operator']['name'];
+                            }
+
+                            $chartDataJSON_ ['states_work'][$machineId] = array(
+                                "chart" => array(
+                                    "caption" => implode(', ', $caption),
+                                    "showpercentvalues" => 1,
+                                    "palettecolors" => "",
+                                    "numberscalevalue" => "60,60,24,7",
+                                    "numberscaleunit" => "мин,ч,д,нед",
+                                ),
+                                "data" => array()
                             );
-                            $colors []= $row["color"];
+                            $chartDataJSON_ ['states_not_work'][$machineId] = $chartDataJSON_ ['states_work'][$machineId];
+
+                            $colors = array();
+                            foreach($machineData['states_work'] as $row){
+
+                                $chartDataJSON_['states_work'][$machineId]["data"] []= array(
+                                    //'label'=>$row['name'],
+                                    'toolText' => $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                    'value'=>$row["sec_duration"],
+                                    'color'=>$row["color"],
+                                    //'displayValue'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                );
+                                $colors []= $row["color"];
+                            }
+                            $chartDataJSON_ ['states_work'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
+
+
+                            $chartDataJSON_ ['states_not_work'][$machineId]["chart"]["caption"] = 'Причины простоя оборудования';
+
+                            $colors = array();
+                            foreach($machineData['states_not_work'] as $row){
+                                $chartDataJSON_['states_not_work'][$machineId]["data"] []= array(
+                                    //'label'=>$row['name'],
+                                    'toolText'=>$row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                    'value'=>$row["sec_duration"],
+                                    'color'=>$row["color"],
+                                    //'displayValue'=>$row['code'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                );
+                                $colors []= $row["color"];
+                            }
+                            $chartDataJSON_ ['states_not_work'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
                         }
-                        $chartDataJSON_ ['states_not_working'][$machineId]["chart"]["palettecolors"] = implode(', ', $colors);
-                    }
-                    $chartDataJSON = $chartDataJSON_;
+                        $chartDataJSON = $chartDataJSON_;
+                    //}
+
                 }
-                //print_r($chartDataJSON); die;
+                //echo '<pre>'.print_r($chartDataJSON, true) . '<pre>'; die;
             }
         } else {
 
-            $model->dtStart = '2011-11-21 08:00:00';
-            $model->dtEnd = '2011-11-21 10:00:00';
+            $model->dtStart = '2012-07-04 08:00:00';
+            $model->dtEnd = '2012-07-04 09:00:00';
+        }
+
+        $chartDataView = array();
+        if ($chartData) {
+            if ($model->machineReportType == 'join') {
+                $chartDataView = $chartData['join'];
+            } else {
+                $chartDataView = $chartData['separate'];
+            }
         }
 
         //print_r($chartDataXml); die;
         $chartType = ucfirst($model->graphReportType).'2D';
-        $this->render('index',array('model'=>$model, 
-            'chartAssetsPath' => $chartAssetsPath, 
+        $this->render('index',array(
+            'model'=>$model,
+            'chartAssetsPath' => $chartAssetsPath,
             'chartType' => $chartType,
-            'chartData' => $chartData, 
+            'chartData' => $chartDataView,
             "chartDataJSON" => $chartDataJSON));
 	}
 

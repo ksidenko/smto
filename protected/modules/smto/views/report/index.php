@@ -61,8 +61,8 @@
 <?php foreach($chartData as $machineId => $data){  ?>
 <!--<div style="margin-top:10px"></div>-->
 <div class="row" style="padding: 10px 0px;">
-    <div id="chart_states_<?=$machineId; ?>" style="float:left"></div>
-    <div id="chart_states_not_working_<?=$machineId; ?>" style="float:left; padding-left: 10px"></div>
+    <div id="chart_states_work_<?php echo $machineId; ?>" style="float:left"></div>
+    <div id="chart_states_not_work_<?php echo $machineId; ?>" style="float:left; padding-left: 10px"></div>
     <div style="clear:both"></div>
 </div>
 <?php } ?>
@@ -71,23 +71,23 @@
 //echo '<pre>' . print_r($chartDataJSON, true) . '</pre>';die();
 ?>
 <script type="text/javascript">
-    var dataJsonStates = <?=json_encode($chartDataJSON['states']) ?>;
-    var dataJsonStatesNotWorking = <?=json_encode($chartDataJSON['states_not_working']) ?>;
+    var dataJsonStatesWork = <?php echo json_encode($chartDataJSON['states_work']) ?>;
+    var dataJsonStatesNotWork = <?php echo json_encode($chartDataJSON['states_not_work']) ?>;
 
     $(function() {
         FusionCharts._fallbackJSChartWhenNoFlash();
         //FusionCharts.setCurrentRenderer('javascript');
 
-        for(var i in dataJsonStates) {
-            var myChart = new FusionCharts('<?=$chartAssetsPath?>/Charts/<?=$chartType?>.swf', '_chart_states_' + i, '350', '300', '0', '1');
-            myChart.setJSONData(dataJsonStates[i]);
-            myChart.render('chart_states_' + i);
+        for(var i in dataJsonStatesWork) {
+            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', '_chart_states_work_' + i, '350', '300', '0', '1');
+            myChart.setJSONData(dataJsonStatesWork[i]);
+            myChart.render('chart_states_work' + i);
         }
         
-        for(var i in dataJsonStatesNotWorking) {
-            var myChart = new FusionCharts('<?=$chartAssetsPath?>/Charts/<?=$chartType?>.swf', '_chart_states_not_working_' + i, '350', '300', '0', '1');
-            myChart.setJSONData(dataJsonStatesNotWorking[i]);
-            myChart.render('chart_states_not_working_' + i);
+        for(var i in dataJsonStatesNotWork) {
+            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', '_chart_states_not_work_' + i, '350', '300', '0', '1');
+            myChart.setJSONData(dataJsonStatesNotWork[i]);
+            myChart.render('chart_states_not_work_' + i);
         }
     });
 </script>

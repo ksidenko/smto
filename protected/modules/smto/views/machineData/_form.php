@@ -148,9 +148,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'fkey_last'); ?>
-		<?php echo $form->textField($model,'fkey_last'); ?>
-		<?php echo $form->error($model,'fkey_last'); ?>
+		<?php echo $form->labelEx($model,'operator_last_fkey'); ?>
+		<?php echo $form->textField($model,'operator_last_fkey'); ?>
+		<?php echo $form->error($model,'operator_last_fkey'); ?>
 	</div>
 
 	<div class="row">

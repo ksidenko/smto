@@ -42,7 +42,7 @@ $this->menu=array(
 		'dd_change3',
 		'dd_change4',
 		'state',
-		'fkey_last',
+		'operator_last_fkey',
 		'fkey_all',
 		'flags',
 	),

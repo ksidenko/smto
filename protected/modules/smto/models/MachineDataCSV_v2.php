@@ -34,7 +34,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 
     public $state = null;
 
-    public $fkey_last = null;
+    public $operator_last_fkey = null;
     public $fkey_all = null;
     public $flags = null;
 
@@ -45,7 +45,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `fkey_last`, `fkey_all`, `flags`)
+        $sql = 'insert into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `operator_last_fkey`, `fkey_all`, `flags`)
                 values ' . PHP_EOL;
 
         return $sql;
@@ -100,8 +100,13 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $this->dd_change3 = intval(trim(array_shift($arr)));
             $this->dd_change4 = intval(trim(array_shift($arr)));
 
+            //состояние станка (0...3), с точки зрения контроллера, на НАЧАЛО интервала (то есть 10 секунд назад от времени записи)
+            //0 - выключен, 1 - включен, 2 - холостой ход, 3 - работает
             $this->state = trim(array_shift($arr));
-            $this->fkey_last = intval(trim(array_shift($arr)));
+
+            //последняя причина простоя, указанная оператором станка на пульте контроллера
+            //0 - неизвестная причина, 1...15 - нажатая оператором станка кнопка.
+            $this->operator_last_fkey = intval(trim(array_shift($arr)));
 
             $this->fkey_all = intval(trim(array_shift($arr)));
             $this->flags = intval(trim(array_shift($arr)));
@@ -131,7 +136,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $s = implode(',', array(
                 $this->number,
                 '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? 'NULL' : $this->duration),
+                ($this->duration == null || $this->duration < 0 ? 10: $this->duration),
                 '"' . $this->mac . '"',
 
                 ( !empty($this->machineId) ? $this->machineId : 'null'),
@@ -147,7 +152,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 
                 $this->state,
 
-                $this->fkey_last,
+                $this->operator_last_fkey,
                 $this->fkey_all,
                 $this->flags,
             ));

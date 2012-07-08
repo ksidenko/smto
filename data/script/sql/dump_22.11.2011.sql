@@ -228,7 +228,7 @@ CREATE TABLE `machine_log` (
   `dd_change3` int(10) NOT NULL,
   `dd_change4` int(10) NOT NULL,
   `state` int(10) NOT NULL,
-  `fkey_last` int(10) NOT NULL,
+  `operator_last_fkey` int(10) NOT NULL,
   `fkey_all` int(10) NOT NULL,
   `flags` int(10) NOT NULL,
   PRIMARY KEY (`id`),
@@ -795,7 +795,7 @@ CREATE TABLE `machine_data` (
   `dd_change3` int(10) NOT NULL,
   `dd_change4` int(10) NOT NULL,
   `state` int(10) NOT NULL,
-  `fkey_last` int(10) NOT NULL,
+  `operator_last_fkey` int(10) NOT NULL,
   `fkey_all` int(10) NOT NULL,
   `flags` int(10) NOT NULL,
   PRIMARY KEY (`id`),
@@ -803,7 +803,7 @@ CREATE TABLE `machine_data` (
   KEY `machine_id` (`machine_id`),
   KEY `operator_id` (`operator_id`),
   KEY `dt` (`dt`),
-  KEY `fkey_last` (`fkey_last`),
+  KEY `operator_last_fkey` (`operator_last_fkey`),
   KEY `state` (`state`)
 ) ENGINE=InnoDB AUTO_INCREMENT=599311 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

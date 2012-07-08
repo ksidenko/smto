@@ -207,6 +207,8 @@ class Machine extends CActiveRecord
                 $res = Machine::model()->find($criteria);
                 if ($res) {
                     $ids[$mac] = $res;
+                } else {
+                    $ids[$mac] = false;
                 }
             } catch (Exception $e) {
                 print_r($e->getMessage());

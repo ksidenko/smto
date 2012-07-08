@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS `machine_data` (
        
         `state` int(10) NOT NULL,
 
-        `fkey_last` int(10) NOT NULL,
+        `operator_last_fkey` int(10) NOT NULL,
         `fkey_all` int(10) NOT NULL,
 
         `flags` int(10) NOT NULL,                              
@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `machine_data` (
         KEY `operator_id` (`operator_id`),
         KEY `dt` (`dt`),
         KEY `state` (`state`),
-        KEY `fkey_last` (`fkey_last`),
+        KEY `operator_last_fkey` (`operator_last_fkey`),
         KEY `fkey_all` (`fkey_all`)
 )
 COLLATE='utf8_general_ci'

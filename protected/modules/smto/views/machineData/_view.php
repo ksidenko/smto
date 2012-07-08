@@ -97,8 +97,8 @@
 	<?php echo CHtml::encode($data->state); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('fkey_last')); ?>:</b>
-	<?php echo CHtml::encode($data->fkey_last); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('operator_last_fkey')); ?>:</b>
+	<?php echo CHtml::encode($data->operator_last_fkey); ?>
 	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('fkey_all')); ?>:</b>

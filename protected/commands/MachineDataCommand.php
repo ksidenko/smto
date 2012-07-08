@@ -21,6 +21,7 @@ class MachineDataCommand extends CConsoleCommand {
             exec($check, $output);
 
             if (count($output) > 0) {
+                echo "Machine with MAC {$machineAR->mac} is all ready processing..." . PHP_EOL;
                 continue;
             }
 
@@ -29,7 +30,7 @@ class MachineDataCommand extends CConsoleCommand {
             $cmd[] = "$dir/yiic";
             $cmd[] = "MachineData import";
             $cmd[] = "--mac=" . $machineAR->mac;
-            $cmd[] = "--maxProcessDataFiles=" . 200;
+            $cmd[] = "--maxProcessDataFiles=" . 400;
             $cmd[] = "> /dev/null 2>/dev/null &";
             $cmd = implode(' ', $cmd);
 

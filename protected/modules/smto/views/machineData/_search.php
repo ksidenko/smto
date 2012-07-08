@@ -126,8 +126,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'fkey_last'); ?>
-		<?php echo $form->textField($model,'fkey_last'); ?>
+		<?php echo $form->label($model,'operator_last_fkey'); ?>
+		<?php echo $form->textField($model,'operator_last_fkey'); ?>
 	</div>
 
 	<div class="row">

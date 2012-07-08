@@ -28,7 +28,7 @@
  * @property integer $dd_change3
  * @property integer $dd_change4
  * @property integer $state
- * @property integer $fkey_last
+ * @property integer $operator_last_fkey
  * @property integer $fkey_all
  * @property integer $flags
  */
@@ -93,12 +93,12 @@ class MachineData extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('number, dt, mac, machine_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, fkey_last, fkey_all, flags', 'required'),
-			array('number, duration, machine_id, operator_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, fkey_last, fkey_all, flags', 'numerical', 'integerOnly'=>true),
+			array('number, dt, mac, machine_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, operator_last_fkey, fkey_all, flags', 'required'),
+			array('number, duration, machine_id, operator_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, operator_last_fkey, fkey_all, flags', 'numerical', 'integerOnly'=>true),
 			array('mac', 'length', 'max'=>16),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, number, dt, duration, mac, machine_id, operator_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, fkey_last, fkey_all, flags', 'safe', 'on'=>'search'),
+			array('id, number, dt, duration, mac, machine_id, operator_id, da_max1, da_max2, da_max3, da_max4, da_avg1, da_avg2, da_avg3, da_avg4, dd1, dd2, dd3, dd4, dd_change1, dd_change2, dd_change3, dd_change4, state, operator_last_fkey, fkey_all, flags', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -145,7 +145,7 @@ class MachineData extends CActiveRecord
 			'dd_change3' => 'Dd Change3',
 			'dd_change4' => 'Dd Change4',
 			'state' => 'State',
-			'fkey_last' => 'Fkey Last',
+			'operator_last_fkey' => 'Operator Last Fkey',
 			'fkey_all' => 'Fkey All',
 			'flags' => 'Flags',
 		);
@@ -186,7 +186,7 @@ class MachineData extends CActiveRecord
 		$criteria->compare('t.dd_change3',$this->dd_change3);
 		$criteria->compare('t.dd_change4',$this->dd_change4);
 		$criteria->compare('t.state',$this->state);
-		$criteria->compare('t.fkey_last',$this->fkey_last);
+		$criteria->compare('t.operator_last_fkey',$this->operator_last_fkey);
 		$criteria->compare('t.fkey_all',$this->fkey_all);
 		$criteria->compare('t.flags',$this->flags);
 
