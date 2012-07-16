@@ -25,20 +25,31 @@
 		<?php echo $form->textField($model,'ip',array('size'=>32,'maxlength'=>32)); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->label($model,'mac'); ?>
-		<?php echo $form->textField($model,'mac',array('size'=>16,'maxlength'=>16)); ?>
-	</div>
+    <div class="row">
+        <?php echo $form->label($model,'port'); ?>
+        <?php echo $form->textField($model,'port',array('size'=>32,'maxlength'=>32)); ?>
+    </div>
 
-	<div class="row">
-		<?php echo $form->label($model,'work_type'); ?>
-		<?php echo $form->textField($model,'work_type',array('size'=>9,'maxlength'=>9)); ?>
-	</div>
+    <div class="row">
+        <?php echo $form->label($model,'local_port'); ?>
+        <?php echo $form->textField($model,'local_port',array('size'=>32,'maxlength'=>32)); ?>
+    </div>
 
-	<div class="row">
-		<?php echo $form->label($model,'time_idle_run'); ?>
-		<?php echo $form->textField($model,'time_idle_run'); ?>
-	</div>
+    <div class="row">
+        <?php echo $form->label($model,'pwd'); ?>
+        <?php echo $form->textField($model,'pwd',array('size'=>32,'maxlength'=>32)); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->label($model,'s_values'); ?>
+        <?php echo $form->textField($model,'s_values',array('size'=>32,'maxlength'=>32)); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->label($model,'reasons_timeout_table'); ?>
+        <?php echo $form->textField($model,'reasons_timeout_table',array('size'=>32,'maxlength'=>32)); ?>
+    </div>
+
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton('Поиск'); ?>

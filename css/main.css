@@ -242,6 +242,10 @@ div.flash-success{
     padding: 10px;
 }
 
+#machine_config .selectCell{
+    border: 2px dotted red;
+}
+
 body, .widgetContent
 #page, .widgetContent
 

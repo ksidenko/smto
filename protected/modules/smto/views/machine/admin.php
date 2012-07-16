@@ -58,15 +58,19 @@ $('.search-form form').submit(function(){
 		'name',
 		'code',
 		'ip',
-		'mac',
-		array(
-            'type'=>'raw',
-            'name' => 'work_type',
-            //'value' => CHtml::activeDropDownList($data,"work_type",Machine::$work_type)
-            'value' => 'Machine::$work_type_list[$data->work_type]'
-        ),
+        'port',
+        'local_port',
+        //'pwd',
+        'mac',
+        //'s_values',
+        //'reasons_timeout_table',
+//		array(
+//            'type'=>'raw',
+//            'name' => 'work_type',
+//            //'value' => CHtml::activeDropDownList($data,"work_type",Machine::$work_type)
+//            'value' => 'Machine::$work_type_list[$data->work_type]'
+//        ),
         
-		'time_idle_run',
 		array(
 			'class'=>'CButtonColumn',
 		),

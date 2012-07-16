@@ -41,23 +41,42 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'mac'); ?>
-		<?php echo $form->textField($model,'mac',array('size'=>16,'maxlength'=>16)); ?>
-		<?php echo $form->error($model,'mac'); ?>
+		<?php echo $form->labelEx($model,'port'); ?>
+		<?php echo $form->textField($model,'port',array('size'=>5,'maxlength'=>7)); ?>
+		<?php echo $form->error($model,'port'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'work_type'); ?>
-		<?php echo $form->dropDownList($model,'work_type',Machine::$work_type_list, array()); ?>
-		<?php echo $form->error($model,'work_type'); ?>
-	</div>
+    <div class="row">
+        <?php echo $form->labelEx($model,'local_port'); ?>
+        <?php echo $form->textField($model,'local_port',array('size'=>5,'maxlength'=>7)); ?>
+        <?php echo $form->error($model,'local_port'); ?>
+    </div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'time_idle_run'); ?>
-		<?php echo $form->textField($model,'time_idle_run',array('size'=>8,'maxlength'=>8)); ?>
-		<?php echo $form->error($model,'time_idle_run'); ?>
-	</div>
+    <div class="row">
+        <?php echo $form->labelEx($model,'pwd'); ?>
+        <?php echo $form->textField($model,'pwd',array('size'=>16,'maxlength'=>20)); ?>
+        <?php echo $form->error($model,'pwd'); ?>
+    </div>
 
+    <div class="row">
+        <?php echo $form->labelEx($model,'mac'); ?>
+        <?php echo $form->textField($model,'mac',array('size'=>16,'maxlength'=>16)); ?>
+        <?php echo $form->error($model,'mac'); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'s_values'); ?>
+        <?php echo $form->textField($model,'s_values',array('size'=>16,'maxlength'=>20)); ?>
+        <?php echo $form->error($model,'s_values'); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'reasons_timeout_table'); ?>
+        <?php echo $form->textField($model,'reasons_timeout_table',array('size'=>50,'maxlength'=>100)); ?>
+        <?php echo $form->error($model,'reasons_timeout_table'); ?>
+    </div>
+
+    <?php echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); ?>
 
     <h2>F - кнопки</h2>
     <table style="border: 1px solid black; width: 500px;"  rules="all" >
@@ -96,50 +115,57 @@
     </table>
 
     <table>
-        <tr><td>
-            <h2>Датчики</h2>
-            <table style="border: 1px solid black; width: 200px;"  rules="all" >
-                <tr>
-                    <td width="50">
-                        <?php echo $form->label(Detector::model(), 'number'); ?>
-                    </td>
+<!--        <tr><td>-->
+<!--            <h2>Датчики</h2>-->
+<!--            <table style="border: 1px solid black; width: 200px;"  rules="all" >-->
+<!--                <tr>-->
+<!--                    <td width="50">-->
+<!--                        --><?php //echo $form->label(Detector::model(), 'number'); ?>
+<!--                    </td>-->
+<!---->
+<!--                    <td width="100%%">-->
+<!--                        --><?php //echo $form->label(Detector::model(), 'type'); ?>
+<!--                    </td>-->
+<!---->
+<!--                    <td width="30">-->
+<!--                        --><?php //echo $form->label(Detector::model(), 'status'); ?>
+<!--                    </td>-->
+<!--                </tr>-->
+<!---->
+<!--            --><?php ////foreach($model->detector as $i => $detector) { ?>
+<!--            --><?php //// echo $this->renderPartial('../detector/_subform', array('form' => $form, 'model'=>$detector, 'index' => $i)); ?>
+<!--            --><?php ////} ?>
+<!--            </table>-->
+<!---->
+<!--        </td><td>-->
+<!--            -->
+<!--            <h2>Амплитуда</h2>-->
+<!--            <table style="border: 1px solid black; width: 200px;"  rules="all" >-->
+<!--                <tr>-->
+<!--                    <td width="50">-->
+<!--                        --><?php //echo $form->label(Amplitude::model(), 'number'); ?>
+<!--                    </td>-->
+<!---->
+<!--                    <td width="100%%">-->
+<!--                        --><?php //echo $form->label(Amplitude::model(), 'type'); ?>
+<!--                    </td>-->
+<!---->
+<!--                    <td width="50">-->
+<!--                        --><?php //echo $form->label(Amplitude::model(), 'value'); ?>
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            --><?php ////foreach($model->amplitude as $i => $amplitude) { ?>
+<!--            --><?php ////  echo $this->renderPartial('../amplitude/_subform', array('form' => $form, 'model'=>$amplitude, 'index' => $i)); ?>
+<!--            --><?php ////} ?>
+<!--            </table>-->
+<!--    -->
+<!--        </td>-->
+<!--    </tr>-->
+    <tr>
+        <td>
 
-                    <td width="100%%">
-                        <?php echo $form->label(Detector::model(), 'type'); ?>
-                    </td>
-
-                    <td width="30">
-                        <?php echo $form->label(Detector::model(), 'status'); ?>
-                    </td>
-                </tr>
-
-            <?php foreach($model->detector as $i => $detector) { ?>
-            <?php   echo $this->renderPartial('../detector/_subform', array('form' => $form, 'model'=>$detector, 'index' => $i)); ?>
-            <?php } ?>
-            </table>
-
-        </td><td>
-            
-            <h2>Амплитуда</h2>
-            <table style="border: 1px solid black; width: 200px;"  rules="all" >
-                <tr>
-                    <td width="50">
-                        <?php echo $form->label(Amplitude::model(), 'number'); ?>
-                    </td>
-
-                    <td width="100%%">
-                        <?php echo $form->label(Amplitude::model(), 'type'); ?>
-                    </td>
-
-                    <td width="50">
-                        <?php echo $form->label(Amplitude::model(), 'value'); ?>
-                    </td>
-                </tr>
-            <?php foreach($model->amplitude as $i => $amplitude) { ?>
-            <?php   echo $this->renderPartial('../amplitude/_subform', array('form' => $form, 'model'=>$amplitude, 'index' => $i)); ?>
-            <?php } ?>
-            </table>
-    
+        </td>
+        <td>
         </td>
     </tr>
     </table>

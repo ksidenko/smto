@@ -51,8 +51,8 @@ class Machine extends CActiveRecord
 		// will receive user inputs.
 		$validators =  array(
             array('id', 'safe'),
-			array('name, code, ip, work_type', 'required'),
-			array('time_idle_run', 'numerical', 'integerOnly'=>true),
+			array('name, code, ip, pwd, port, local_port', 'required'),
+			array('s_values, reasons_timeout_table', 'required'),
 			array('name, code', 'length', 'max'=>512),
 			//array('mac', 'length', 'max'=>16),
             array('mac', 'unique', 
@@ -95,6 +95,7 @@ class Machine extends CActiveRecord
             'fkey'=>array(self::HAS_MANY, 'Fkey', 'machine_id', 'order' => 'number ASC'),
             'detector'=>array(self::HAS_MANY, 'Detector', 'machine_id', 'order' => 'type ASC, number ASC'),
             'amplitude'=>array(self::HAS_MANY, 'Amplitude', 'machine_id', 'order' => 'type ASC, number ASC'),
+            'config'=>array(self::HAS_ONE, 'MachineConfig', 'machine_id'),
 		);
 	}
 
@@ -108,9 +109,14 @@ class Machine extends CActiveRecord
 			'name' => 'Название',
 			'code' => 'Код',
 			'ip' => 'IP',
+            'port' => 'port',
+            'local_port' => 'local port',
+            'pwd' => 'password',
 			'mac' => 'MAC',
-			'work_type' => 'Тип работы',
-			'time_idle_run' => 'Время холостого хода, сек',
+            's_values' => 's_values',
+            'reasons_timeout_table' => 'reasons_timeout_table',
+			//'work_type' => 'Тип работы',
+			//'time_idle_run' => 'Время холостого хода, сек',
 			'rec_type' => 'Тип записи',
             'template_id' => 'Шаблон',
 		);
@@ -173,7 +179,7 @@ class Machine extends CActiveRecord
 
         if ($isNewRecord) unset($data['Machine']['id']);
 
-        foreach(array('Fkey', 'Detector', 'Amplitude') as $key => $rel) {
+        foreach(array('Fkey'/*, 'Detector', 'Amplitude'*/) as $key => $rel) {
             foreach($data[$rel] as &$val) {
                 $val['rec_type'] = $this->rec_type;
                 if ($isNewRecord) $val['id'] = null;
@@ -182,9 +188,29 @@ class Machine extends CActiveRecord
 
         $this->attributes = $data['Machine'];
         $this->fkey = $data['Fkey'];
-        $this->detector = $data['Detector'];
-        $this->amplitude = $data['Amplitude'];
-        $res = $this->saveWithRelated(array('fkey', 'detector', 'amplitude'));
+        //$this->detector = $data['Detector'];
+        //$this->amplitude = $data['Amplitude'];
+        $res = $this->saveWithRelated(array('fkey'/*, 'detector', 'amplitude'*/));
+
+        MachineConfig::model()->deleteAllByAttributes(array('machine_id' => $this->id));
+        foreach ($data['MachineConfig'] as $condition_number => $MachineConfigData) {
+            foreach($MachineConfigData as $state => $MachineConfigDataStates) {
+                if ($MachineConfigDataStates['apply_number'] > 0) {
+                    $machineConfig = new MachineConfig();
+                    $machineConfig->machine_id = $this->id;
+                    $machineConfig->condition_number = $condition_number;
+                    $machineConfig->machine_state_id = $state;
+                    $machineConfig->apply_number = $MachineConfigDataStates['apply_number'];
+                    $machineConfig->value = $MachineConfigDataStates['value'];
+                    $machineConfig->save(false);
+                }
+            }
+        }
+
+        $path = rtrim(Param::getParamValue('machine_config_data_path'), '/') . '/' . 'd00' . substr($this->ip, -2) . '.cfg';
+        //echo $path; die;
+
+        $this->writeMachineConfigToFile($path);
 
         return $res;
 	}
@@ -236,5 +262,239 @@ class Machine extends CActiveRecord
             $this->isTemplate = $this->rec_type == 'template';
         }
         return (bool)$this->isTemplate;
+    }
+
+
+    public function writeMachineConfigToFile ($file) {
+        if (file_exists($file)) {
+              rename($file, $file . '_old');
+        }
+
+
+        $fd = fopen($file, 'w');
+        $line = array();
+        $line []= '; Этот файл создан автоматически! Нет смысла его менять вручную!';
+        $line []= ';Файл конфигурации для контроллера';
+        $line []= ';--------------------------------------------------------------';
+        $line []= ';Параметры для связи с контроллером';
+
+        $line []= ';Локальный UDP-порт:';
+        $line []= 'LocalPort=' . $this->local_port;
+
+        $line []= ';IP-адрес контроллера:';
+        $line []= 'IP=' . $this->ip;
+
+        $line []= ';Udp-порт контроллера:';
+        $line []= 'Port=' . $this->port;
+        $line []= ';MAC-адрес, чтобы не записать по ошибке в другой экземпляр:';
+        $line []= 'MAC=' . $this->mac;
+        $line []= ';Пароль для доступа к контроллеру:';
+        $line []= 'Password=' . $this->pwd ;
+
+
+        $line []= ';----------------------------------------------------------------';
+        $line []= ';Параметры для определения состояния (выключен-включен-холостой ход-работает)';
+        $line []= ';См. подробное описание в файле config.txt.';
+        $line []= ';Параметры KM0...KM3:';
+
+            $detectors = Detector::model()->findAllByAttributes(array(
+                'machine_id' => $this->id,
+                'type' => 'analog',
+                'rec_type' => 'real',
+            ), array(
+                'select' => 'max_k_value, avg_k_value',
+                'order' => 'number asc'
+            ));
+
+            $max_k_value = array();
+            $avg_k_value = array();
+            foreach( $detectors as  $detector) {
+                $max_k_value []= $detector['max_k_value'];
+                $avg_k_value []= $detector['avg_k_value'];
+            }
+
+        $line []= 'KmValues=' . implode(',', $max_k_value);
+
+        $line []= ';Параметры KA0...KA3:';
+        $line []= 'KaValues=' . implode(',', $avg_k_value);
+
+        $line []= ';Параметры S0...S3';
+        $line []= 'SValues=' . $this->s_values;
+
+            $machineConfig = MachineConfig::model()->findAllByAttributes(array(
+                'machine_id' => $this->id,
+            ), array(
+                'select' => 'machine_state_id, condition_number, apply_number, value',
+                'order' => 'machine_state_id, condition_number asc'
+            ));
+
+            $StateTables = array();
+            foreach( $machineConfig as $machineConfigData) {
+                $StateTables[$machineConfigData->machine_state_id][] =
+                      $machineConfigData->condition_number . ','
+                    . $machineConfigData->apply_number . ','
+                    . $machineConfigData->value
+                ;
+            }
+
+        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "работает"';
+        $line []= 'State3Table=' . implode(', ', $StateTables[3]);
+
+        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "холостой ход"';
+        $line []= 'State2Table=' . implode(', ', $StateTables[2]);
+
+        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "включен"';
+        $line []= 'State1Table=' . implode(', ', $StateTables[1]);
+
+        $line []= ';------------------------------------------------------------------';
+        $line []= '; Таблица таймаутов в секундах (0...65535) для причин простоя (до 16-ти).';
+
+        $line []= '; После истечения таймаута причина сбрасывается в состояние "неизвестная причина",';
+        $line []= '; что требует от оператора станка повторного ввода причины';
+        $line []= '; 0 - означает "бесконечный таймаут"';
+        $line []= 'ReasonsTimeoutsTable=' . $this->reasons_timeout_table;
+
+        $line []= '';
+        $line []= ';Каталог и префикс(опционально) для выходных файлов. Не может содержать пробелов:';
+        $line []= 'OutFileDir=' . rtrim(Param::getParamValue('machine_data_path'), '/') . '/' . $this->mac . '/pw';
+
+        $s = implode(PHP_EOL, $line);
+        fwrite($fd, $s);
+        fclose($fd);
+    }
+
+
+    public function initMachineConfigFromFile ($file) {
+        $configParams = parse_ini_file($file, false);
+        if ($configParams === false) {
+            Yii::log("Incorrect file path: " . $file, 'error');
+            return false;
+        }
+
+        $db = $this->getDbConnection();
+
+        $tr = $db->beginTransaction();
+
+        if ( isset($configParams['IP']) ) {
+            $this->ip = $configParams['IP'];
+        }
+
+        if ( isset($configParams['LocalPort']) ) {
+            $this->local_port = $configParams['LocalPort'];
+        }
+
+        if ( isset($configParams['Port']) ) {
+            $this->port = $configParams['Port'];
+        }
+
+        if ( isset($configParams['Password']) ) {
+            $this->pwd = $configParams['Password'];
+        }
+
+        if ( isset($configParams['MAC']) ) {
+            $this->mac = $configParams['MAC'];
+        }
+
+        if ( isset($configParams['SValues']) ) {
+            $this->s_values = $configParams['SValues'];
+        }
+
+        if ( isset($configParams['ReasonsTimeoutsTable']) ) {
+            $this->reasons_timeout_table = $configParams['ReasonsTimeoutsTable'];
+        }
+
+        $detectors = Detector::model()->findAllByAttributes(array(
+            'machine_id' => $this->id,
+            'type' => 'analog',
+            'rec_type' => 'real',
+        ), array(
+            'order' => 'number asc'
+        ));
+
+        if ( isset($configParams['KaValues']) ) {
+            $max_k_value = explode(',', $configParams['KaValues']);
+
+            foreach( $detectors as $i => $detector) {
+                if ( isset($max_k_value[$i]) ) {
+                    $detector->max_k_value = $max_k_value[$i];
+                    $detector->save();
+                }
+            }
+        }
+
+        if ( isset($configParams['KmValues']) ) {
+            $avg_k_value = explode(',', $configParams['KmValues']);
+
+            foreach( $detectors as $i => $detector) {
+                if ( isset($avg_k_value[$i]) ) {
+                    $detector->avg_k_value = $avg_k_value[$i];
+                    $detector->save();
+                }
+            }
+        }
+
+        MachineConfig::model()->deleteAllByAttributes(array('machine_id' => $this->id));
+
+        if ( isset($configParams['State1Table']) ) {
+            $StateTable = explode(',', $configParams['State1Table']);
+            if (count($StateTable) % 3 !== 0) {
+                Yii::log("Incorrect count items in State1Table: " . $StateTable, 'error');
+                return false;
+            }
+
+            for ($i=0;$i<count($StateTable); $i = $i + 3) {
+                $machineConfig = new MachineConfig;
+                $machineConfig->machine_id = $this->id;
+                $machineConfig->machine_state_id = MachineState::STATE_MACHINE_ON;
+                $machineConfig->condition_number = $StateTable[$i];
+                $machineConfig->apply_number = $StateTable[$i+1];
+                $machineConfig->value = $StateTable[$i+2];
+                $machineConfig->save(false);
+            }
+        }
+
+        if ( isset($configParams['State2Table']) ) {
+            $StateTable = explode(',', $configParams['State2Table']);
+            if (count($StateTable) % 3 !== 0) {
+                Yii::log("Incorrect count items in State2Table: " . $StateTable, 'error');
+                return false;
+            }
+
+            for ($i=0;$i<count($StateTable); $i = $i + 3) {
+                $machineConfig = new MachineConfig;
+                $machineConfig->machine_id = $this->id;
+                $machineConfig->machine_state_id = MachineState::STATE_MACHINE_IDLE_RUN;
+                $machineConfig->condition_number = $StateTable[$i];
+                $machineConfig->apply_number = $StateTable[$i+1];
+                $machineConfig->value = $StateTable[$i+2];
+                $machineConfig->save(false);
+            }
+        }
+
+        if ( isset($configParams['State3Table']) ) {
+            $StateTable = explode(',', $configParams['State3Table']);
+            if (count($StateTable) % 3 !== 0) {
+                Yii::log("Incorrect count items in State3Table: " . $StateTable, 'error');
+                return false;
+            }
+
+            for ($i=0;$i<count($StateTable); $i = $i + 3) {
+                $machineConfig = new MachineConfig;
+                $machineConfig->machine_id = $this->id;
+                $machineConfig->machine_state_id = MachineState::STATE_MACHINE_WORK;
+                $machineConfig->condition_number = $StateTable[$i];
+                $machineConfig->apply_number = $StateTable[$i+1];
+                $machineConfig->value = $StateTable[$i+2];
+                $machineConfig->save(false);
+            }
+        }
+
+        $this->save();
+
+        $tr->commit();
+
+        //print_r($configParams);
+
+        return true;
     }
 }

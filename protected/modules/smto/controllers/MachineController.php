@@ -104,6 +104,8 @@ class MachineController extends SBaseController
 
 		if (isset($_POST['Machine']) ) {
 
+            //echo '<pre>'. print_r($_POST, true) . '</pre>'; die;
+
             try {
                 $res = $model->saveMachine($_POST, false);
                 if ($res !== false) {
@@ -120,8 +122,23 @@ class MachineController extends SBaseController
             }
 		} 
 
+        $path = Param::getParamValue('machine_config_data_path') . '' . $model->mac . '/' . 'd0003.cfg_old';
+        //$model->initMachineConfigFromFile($path);
+
+
+        $machineConfig = MachineConfig::model();
+        $machineConfigRows = $machineConfig->findAllByAttributes(array('machine_id' => $model->id));
+        $machineConfigData = array();
+        foreach ($machineConfigRows as $machineConfigRow) {
+            $machineConfigData[$machineConfigRow['condition_number']][$machineConfigRow['machine_state_id']]['apply_number'] = $machineConfigRow['apply_number'];
+            $machineConfigData[$machineConfigRow['condition_number']][$machineConfigRow['machine_state_id']]['value'] = $machineConfigRow['value'];
+        }
+
+        //print_r($machineConfigData); die;
+
 		$this->render('update',array(
 			'model'=>$model,
+            'machineConfigData' => $machineConfigData,
 		));
 	}
 

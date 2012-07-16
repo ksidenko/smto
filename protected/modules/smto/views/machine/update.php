@@ -33,4 +33,4 @@ $this->menu []= array('label'=>'Управление событиями стан
 <?php } else {?> 
     <h1>Редактирование шаблона <?php echo '<i>' . $model->name . '</i>' . ' ( ' . $model->id . ' )'; ?> для нового станка</h1>
 <?php } ?> 
-<?php echo $this->renderPartial('_form', array('model'=>$model, 'is_create' => false)); ?>
+<?php echo $this->renderPartial('_form', array('model'=>$model, 'machineConfigData' => $machineConfigData, 'is_create' => false)); ?>

@@ -35,8 +35,11 @@ $this->menu []= array('label'=>'Управление событиями стан
 		'name',
 		'code',
 		'ip',
+        'port',
+        'local_port',
+        'pwd',
 		'mac',
-		'work_type',
-		'time_idle_run'
+        's_values',
+        'reasons_timeout_table',
 	),
 )); ?>

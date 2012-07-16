@@ -16,16 +16,24 @@
 	<?php echo CHtml::encode($data->ip); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('mac')); ?>:</b>
-	<?php echo CHtml::encode($data->mac); ?>
+    <b><?php echo CHtml::encode($data->getAttributeLabel('port')); ?>:</b>
+    <?php echo CHtml::encode($data->port); ?>
+    <br />
+
+	<b><?php echo CHtml::encode($data->getAttributeLabel('local_port')); ?>:</b>
+	<?php echo CHtml::encode($data->local_port); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('work_type')); ?>:</b>
-	<?php echo CHtml::encode($data->work_type); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('pwd')); ?>:</b>
+	<?php echo CHtml::encode($data->pwd); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('time_idle_run')); ?>:</b>
-	<?php echo CHtml::encode($data->time_idle_run); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('s_values')); ?>:</b>
+	<?php echo CHtml::encode($data->s_values); ?>
 	<br />
+
+    <b><?php echo CHtml::encode($data->getAttributeLabel('reasons_timeout_table')); ?>:</b>
+    <?php echo CHtml::encode($data->reasons_timeout_table); ?>
+    <br />
 
 </div>

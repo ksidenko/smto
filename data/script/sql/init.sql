@@ -10,6 +10,7 @@ CREATE TABLE `machine` (
   `code` varchar(512) NOT NULL,
   `ip` varchar(32) NOT NULL,
   `port` INT(10) NOT NULL DEFAULT 900,
+  `local_port` INT(10) NOT NULL DEFAULT 0,
   `pwd` VARCHAR(512) NOT NULL DEFAULT '',
   `mac` varchar(16) NOT NULL,
   `work_type` enum('amplitude','average') NOT NULL,
@@ -340,6 +341,7 @@ INSERT INTO `param` (`id`, `key`, `value`, `descr`, `stable`) VALUES
     (1, 'title', 'СМТО', 'Заголовок сайта', 1),
 	(2, 'description', 'СМТО', 'Тэг description', 1),
 	(3, 'keywords', 'СМТО', 'ключевые слова', 1),
-	(4, 'machine_data_path', '/var/www/smto/protected/runtime/machine_data/', 'Путь к *.dat файлам', 1)
+	(4, 'machine_data_path', '/var/www/smto/protected/runtime/machine_data/', 'Путь к *.dat файлам', 1),
+	(5, 'machine_config_data_path', '/var/www/smto/protected/runtime/machine_data/', 'Путь к файлам *.cfg', 1)
 ;
 
