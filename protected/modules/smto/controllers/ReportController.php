@@ -100,9 +100,8 @@ class ReportController extends SBaseController
                 //echo '<pre>'.print_r($chartDataJSON, true) . '<pre>'; die;
             }
         } else {
-
-            $model->dtStart = '2012-07-04 08:00:00';
-            $model->dtEnd = '2012-07-04 09:00:00';
+            $model->dtStart = date('Y.m.d 00:00:00');
+            $model->dtEnd = date('Y.m.d H:i:s');
         }
 
         $chartDataView = array();
