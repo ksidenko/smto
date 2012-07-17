@@ -4,6 +4,7 @@
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'machine-form',
 	'enableAjaxValidation'=>false,
+    'htmlOptions' => array('class' => 'form'),
 )); ?>
 
 	<p class="note">Поля отмеченные <span class="required">*</span> обязательны для заполнения.</p>
@@ -68,12 +69,20 @@
         <?php echo $form->labelEx($model,'s_values'); ?>
         <?php echo $form->textField($model,'s_values',array('size'=>16,'maxlength'=>20)); ?>
         <?php echo $form->error($model,'s_values'); ?>
+        <p class="hint" >Кол-во проверок, после которой станок переводиться в следующее состояние (выключен->включен->холостой ход->работа)</p>
     </div>
 
     <div class="row">
         <?php echo $form->labelEx($model,'reasons_timeout_table'); ?>
         <?php echo $form->textField($model,'reasons_timeout_table',array('size'=>50,'maxlength'=>100)); ?>
         <?php echo $form->error($model,'reasons_timeout_table'); ?>
+        <p class="hint" >
+            Таблица таймаутов в секундах (0...65535) для причин простоя (до 16-ти).
+            После истечения таймаута причина сбрасывается в состояние "неизвестная причина",
+            что требует от оператора станка повторного ввода причины
+            0 - означает "бесконечный таймаут"
+        </p>
+
     </div>
 
     <?php echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); ?>

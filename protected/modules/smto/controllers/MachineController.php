@@ -122,8 +122,9 @@ class MachineController extends SBaseController
             }
 		} 
 
-        $path = Param::getParamValue('machine_config_data_path') . '' . $model->mac . '/' . 'd0003.cfg_old';
-        //$model->initMachineConfigFromFile($path);
+
+        $path = $model->getMachineConfigFile();
+        //$model->initMachineConfigFromFile($path);$model->refresh();
 
 
         $machineConfig = MachineConfig::model();

@@ -19,6 +19,18 @@
         '(AdatA0*KA0 + <br />AdatA1*KA1 + <br />AdatA2*KA2 + <br />AdatA3*KA3)/1024',
         '1&nbsp;>&nbsp;0'
     );
+
+    $valuesRange = array(
+        '0','0','0','0',
+        '0...127','0...127','0...127','0...127',
+
+        '0...1023','0...1023','0...1023','0...1023',
+        '0...1023','0...1023','0...1023','0...1023',
+
+        '0...1023','0...1023',
+
+        '0'
+    );
 ?>
 
 <script type="text/javascript">
@@ -28,8 +40,13 @@
             $('#MachineConfig td input').each(function(){
                 if($(this).val().length > 0) {
                     $(this).addClass('selectCell');
+                    var v = $(this).next('select').val();
+                    if (v == 0) {
+                        $(this).next('select').val(3);
+                    }
                 } else {
                     $(this).removeClass('selectCell');
+                    $(this).next('select').val(0);
                 }
             })
         }
@@ -40,24 +57,27 @@
     });
 </script>
 
+<br>
+<H2>Таблица для вычисления состояния</H2>
 <p><b>Ddat</b> -  цифровой датчик </p>
 <p><b>Tdat</b> -  количество изменений состояния цифрового датчика за 10 секунд</p>
 <p><b>AdatM</b> - максимальное значение аналогового датчика за 10 секунд</p>
 <p><b>AdatA</b> - среднее значение аналогового датчика за 10 секунд</p>
 
-<H2>Таблица для вычисления состояния</H2>
-<table id="MachineConfig"  style="border: 1px solid black; width: 800px;" rules="all" >
+<table id="MachineConfig"  style="border: 1px solid black; width: 900px;" rules="all" >
     <tr>
-        <td width="40" >№</td>
-        <td width="100" >Условие</td>
-        <td width="340" >Работа</td>
-        <td width="340" >Холостой ход</td>
-        <td width="340" >Включен</td>
+        <td width="20" >№</td>
+        <td width="70" >Условие</td>
+        <td width="50" >Диапазон VAL</td>
+        <td width="370" >Работа</td>
+        <td width="370" >Холостой ход</td>
+        <td width="370" >Включен</td>
     </tr>
-    <?php for($currConditionNumber = 0; $currConditionNumber <= 18; $currConditionNumber++) { ?>
+    <?php for($currConditionNumber = 0; $currConditionNumber <= 17; $currConditionNumber++) { ?>
     <tr>
         <td><?php echo $currConditionNumber; ?></td>
         <td><?php echo $conditionsLabels[$currConditionNumber]; ?></td>
+        <td><?php echo $valuesRange[$currConditionNumber]; ?></td>
         <td><?php
             echo CHtml::hiddenField('MachineConfig['.$currConditionNumber.']['.MachineState::STATE_MACHINE_WORK.'][condition_number]', $currConditionNumber);
             $value = getValue($machineConfigData, $currConditionNumber, MachineState::STATE_MACHINE_WORK, 'value');
@@ -88,22 +108,18 @@
     Параметры для интегральных условий 16...17
     KM0...KM3 и KA0...KA3 задаются отдельно в диапазоне 0...255
 
-
-    Сначала выполняется проверка для состояния State=3,
-    если результат отрицателен, для State=2,
-    если результат отрицателен, для State=1,
+    Сначала выполняется проверка для состояния State=3 (работает),
+    если результат отрицателен, для State=2 (холостой ход),
+    если результат отрицателен, для State=1 (включен),
     если результат отрицателен, считаем, что State==0 (выключен)
 
     При каждой проверке таблица просматривается по порядку,
     пока не встретится первое выполненное достаточное условие ( результат проверки положителен) или
-    первое _не_выполненное необходимое (результат проверки - отрицателен) . Если таблицу прошли до конца -
+    первое не выполненное необходимое (результат проверки - отрицателен). Если таблицу прошли до конца -
     результат тоже положителен. Поэтому, как правило, таблица заканчивается условием "необходимо..."  (3 или 4).
-    Условие 18 - фиктивное - всегда считается выполненным
-
-
 
     После проверок "сырое" решение фильтруется и формируется итоговое состояние StateOut
-    в соответствии с параметрами S0,S1,S2,S3 и "сырыми" решениями в предыдущие 10-секундные такты:
+    в соответствии с параметрами S0,S1,S2,S3 (s_values) и "сырыми" решениями в предыдущие 10-секундные такты:
 
     Если зафиксировано S3 состояний (State==3) подряд, переходим в состояние StateOut=3 (работает);
     Иначе, если зафиксировано S2 состояний (State>=2) подряд, переходим в состояние StateOut=2 (холостой ход);

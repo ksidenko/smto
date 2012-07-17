@@ -111,7 +111,7 @@ class Machine extends CActiveRecord
 			'ip' => 'IP',
             'port' => 'port',
             'local_port' => 'local port',
-            'pwd' => 'password',
+            'pwd' => 'Пароль',
 			'mac' => 'MAC',
             's_values' => 's_values',
             'reasons_timeout_table' => 'reasons_timeout_table',
@@ -207,10 +207,17 @@ class Machine extends CActiveRecord
             }
         }
 
-        $path = rtrim(Param::getParamValue('machine_config_data_path'), '/') . '/' . 'd00' . substr($this->ip, -2) . '.cfg';
+        $path = $this->getMachineConfigFile();
         //echo $path; die;
 
         $this->writeMachineConfigToFile($path);
+
+        chmod($path, 0777);
+
+        $dataPath = $this->getMachineDataPath();
+        if (!file_exists($dataPath)) {
+            mkdir($this->getMachineDataPath(), 0777);
+        }
 
         return $res;
 	}
@@ -274,6 +281,7 @@ class Machine extends CActiveRecord
         $fd = fopen($file, 'w');
         $line = array();
         $line []= '; Этот файл создан автоматически! Нет смысла его менять вручную!';
+        $line []= ';';
         $line []= ';Файл конфигурации для контроллера';
         $line []= ';--------------------------------------------------------------';
         $line []= ';Параметры для связи с контроллером';
@@ -313,10 +321,10 @@ class Machine extends CActiveRecord
                 $avg_k_value []= $detector['avg_k_value'];
             }
 
-        $line []= 'KmValues=' . implode(',', $max_k_value);
+        $line []= 'KmValues=' . implode(',', $avg_k_value);
 
         $line []= ';Параметры KA0...KA3:';
-        $line []= 'KaValues=' . implode(',', $avg_k_value);
+        $line []= 'KaValues=' . implode(',', $max_k_value);
 
         $line []= ';Параметры S0...S3';
         $line []= 'SValues=' . $this->s_values;
@@ -337,14 +345,20 @@ class Machine extends CActiveRecord
                 ;
             }
 
-        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "работает"';
-        $line []= 'State3Table=' . implode(', ', $StateTables[3]);
+        if (isset($StateTables[3])) {
+            $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "работает"';
+            $line []= 'State3Table=' . implode(', ', $StateTables[3]);
+        }
 
-        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "холостой ход"';
-        $line []= 'State2Table=' . implode(', ', $StateTables[2]);
+        if (isset($StateTables[2])) {
+            $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "холостой ход"';
+            $line []= 'State2Table=' . implode(', ', $StateTables[2]);
+        }
 
-        $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "включен"';
-        $line []= 'State1Table=' . implode(', ', $StateTables[1]);
+        if (isset($StateTables[1])){
+            $line []= ';Таблица "номер_условия,применение,параметр,номер_условия,применение,параметр,..." (до 16ти групп) для состояния "включен"';
+            $line []= 'State1Table=' . implode(', ', $StateTables[1]);
+        }
 
         $line []= ';------------------------------------------------------------------';
         $line []= '; Таблица таймаутов в секундах (0...65535) для причин простоя (до 16-ти).';
@@ -356,7 +370,7 @@ class Machine extends CActiveRecord
 
         $line []= '';
         $line []= ';Каталог и префикс(опционально) для выходных файлов. Не может содержать пробелов:';
-        $line []= 'OutFileDir=' . rtrim(Param::getParamValue('machine_data_path'), '/') . '/' . $this->mac . '/pw';
+        $line []= 'OutFileDir=' . $this->getMachineDataPath() . '/pw';
 
         $s = implode(PHP_EOL, $line);
         fwrite($fd, $s);
@@ -497,4 +511,13 @@ class Machine extends CActiveRecord
 
         return true;
     }
+
+    public function getMachineDataPath() {
+        return rtrim(Param::getParamValue('machine_data_path'), '/') . '/' . $this->mac;
+    }
+
+    public function getMachineConfigFile() {
+        return rtrim(Param::getParamValue('machine_config_data_path'), '/') . '/' . 'd00' . substr($this->ip, -2) . '.cfg';
+    }
+
 }

@@ -50,9 +50,7 @@ class MachineDataCommand extends CConsoleCommand {
         }
 
         $import = new MachineDataImport();
-        //$dir = Yii::app()->params['machine_data_path'];
-        $dir = rtrim(Param::getParamValue('machine_data_path'), '/') . '/';
-        $dir = $dir . $machineAR->mac;
+        $dir = $machineAR->getMachineDataPath();
 
         //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");
         //$output = Helpers::scandirFast($dir,"", true, 2);

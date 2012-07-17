@@ -30,16 +30,8 @@ COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ROW_FORMAT=DEFAULT;
 
-INSERT INTO `param`
-(
-`key`,
-`value`,
-`descr`,
-`stable`)
+INSERT INTO `param`(`id`, `key`,`value`,`descr`,`stable`)
 VALUES
-(
-'machine_config_data_path',
-'/etc/pw/bin/config',
-'Путь к файлам *.cfg',
-1
-);
+(5, 'machine_config_data_path','/etc/pw/bin/config','Путь к файлам *.cfg',1);
+
+update detector set max_k_value = 128, avg_k_value = 128;
