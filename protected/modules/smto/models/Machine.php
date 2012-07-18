@@ -192,31 +192,34 @@ class Machine extends CActiveRecord
         //$this->amplitude = $data['Amplitude'];
         $res = $this->saveWithRelated(array('fkey'/*, 'detector', 'amplitude'*/));
 
-        MachineConfig::model()->deleteAllByAttributes(array('machine_id' => $this->id));
-        foreach ($data['MachineConfig'] as $condition_number => $MachineConfigData) {
-            foreach($MachineConfigData as $state => $MachineConfigDataStates) {
-                if ($MachineConfigDataStates['apply_number'] > 0) {
-                    $machineConfig = new MachineConfig();
-                    $machineConfig->machine_id = $this->id;
-                    $machineConfig->condition_number = $condition_number;
-                    $machineConfig->machine_state_id = $state;
-                    $machineConfig->apply_number = $MachineConfigDataStates['apply_number'];
-                    $machineConfig->value = $MachineConfigDataStates['value'];
-                    $machineConfig->save(false);
+        if (!$isNewRecord) {
+            MachineConfig::model()->deleteAllByAttributes(array('machine_id' => $this->id));
+            foreach ($data['MachineConfig'] as $condition_number => $MachineConfigData) {
+                foreach($MachineConfigData as $state => $MachineConfigDataStates) {
+                    if ($MachineConfigDataStates['apply_number'] > 0) {
+                        $machineConfig = new MachineConfig();
+                        $machineConfig->machine_id = $this->id;
+                        $machineConfig->condition_number = $condition_number;
+                        $machineConfig->machine_state_id = $state;
+                        $machineConfig->apply_number = $MachineConfigDataStates['apply_number'];
+                        $machineConfig->value = $MachineConfigDataStates['value'];
+                        $machineConfig->save(false);
+                    }
                 }
             }
-        }
 
-        $path = $this->getMachineConfigFile();
-        //echo $path; die;
+            $path = $this->getMachineConfigFile();
+            //echo $path; die;
 
-        $this->writeMachineConfigToFile($path);
+            $this->writeMachineConfigToFile($path);
 
-        chmod($path, 0777);
+            chmod($path, 0777);
 
-        $dataPath = $this->getMachineDataPath();
-        if (!file_exists($dataPath)) {
-            mkdir($this->getMachineDataPath(), 0777);
+            $dataPath = $this->getMachineDataPath();
+            if (!file_exists($dataPath)) {
+                mkdir($this->getMachineDataPath(), 0777);
+            }
+
         }
 
         return $res;

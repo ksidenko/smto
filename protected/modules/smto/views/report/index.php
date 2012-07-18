@@ -81,7 +81,7 @@
         for(var i in dataJsonStatesWork) {
             var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', '_chart_states_work_' + i, '350', '300', '0', '1');
             myChart.setJSONData(dataJsonStatesWork[i]);
-            myChart.render('chart_states_work' + i);
+            myChart.render('chart_states_work_' + i);
         }
         
         for(var i in dataJsonStatesNotWork) {

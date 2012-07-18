@@ -85,7 +85,7 @@
 
     </div>
 
-    <?php echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); ?>
+    <?php if (isset($machineConfigData) && is_array($machineConfigData)) {echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); } ?>
 
     <h2>F - кнопки</h2>
     <table style="border: 1px solid black; width: 500px;"  rules="all" >

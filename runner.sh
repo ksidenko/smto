@@ -1,1 +1,0 @@
-./data/script/bash/runner.sh

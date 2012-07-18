@@ -46,15 +46,19 @@ class MachineDataImport {
                 $path = dirname($filename) . '/process/';
                 $filename_ = basename($filename);
 
-                if (!file_exists($path)) {
-                    mkdir($path);
-                }
-            
                 $processFiles [$cnt]= $filename;
                 //copy($filename, $path . 'process_' . date("Y.m.d_H.i", time()) . '_' . $filename_);
 
-                //rename($filename, $path . $filename_);
-                unlink($filename);
+                $isSaveProcessFiles = false;
+                if ($isSaveProcessFiles) {
+
+                    if (!file_exists($path)) {
+                        mkdir($path);
+                    }
+                    rename($filename, $path . $filename_);
+                } else {
+                    unlink($filename);
+                }
             }
         }
         print_r($processFiles);
