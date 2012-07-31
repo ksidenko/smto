@@ -1,6 +1,6 @@
 <?php
 
-class MachineController extends SBaseController
+class MachineController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning

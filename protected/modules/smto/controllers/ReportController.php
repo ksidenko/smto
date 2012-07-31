@@ -1,6 +1,6 @@
 <?php
 
-class ReportController extends SBaseController
+class ReportController extends CController
 {
     public $layout='//layouts/column2'; 
         
