@@ -139,13 +139,47 @@ class ReportController extends SBaseController
 
             $output = array();
 
-            foreach ($dataCondition as $cond) {
-                $result = $machineData->getData($cond);
+            $path = Machine::getMachineDataPathCurr();
+            $machineDataCurr = array();
 
-                foreach((array)$result as $res) {
+            foreach ($dataCondition as $cond) {
+                $machineAR = Machine::model()->findByPk($cond['machine_id']);
+                if (!$machineAR) {
+                    continue;
+                }
+
+                $machineDataFabric = new MachineDataManager('2.0');
+
+                if (isset($machineDataCurr[$machineAR->id])) {
+                    $lineParser = $machineDataCurr[$machineAR->id];
+                } else {
+                    $filename = $path . 'cr' . $machineAR->mac . '.dat';
+                    //echo $filename;
+
+                    $fd = @fopen($filename, 'r');
+                    if (!$fd) {
+                        continue;
+                    }
+                    while ( $line = fgets($fd) ) {
+                        if ( !isset($line[0]) || $line[0] != 'D') {
+                            continue;
+                        }
+                        break;
+                    }
+                    fclose($fd);
+                    $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
+
+                    $lineParser->parseCSVLine($line);
+
+                    //print_r($lineParser); die;
+
+                    $machineDataCurr[$machineAR->id] = $lineParser;
+                }
+
+                if ($cond['dt_start'] < strtotime($lineParser->dt)) {
                     $output[$cond['machine_id']] [$cond['name']] []= array(
-                        ( strtotime($res['dt']) + 7 * 60 * 60 )*1000, // hack for timezone
-                        $res[$cond['name']],
+                        strtotime($lineParser->dt),
+                        $lineParser->{$cond['name']},
                     );
                 }
             }

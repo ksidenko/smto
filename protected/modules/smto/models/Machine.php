@@ -42,6 +42,11 @@ class Machine extends CActiveRecord
 		return 'machine';
 	}
 
+    public function primaryKey()
+    {
+        return 'id';
+    }
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -517,6 +522,10 @@ class Machine extends CActiveRecord
 
     public function getMachineDataPath() {
         return rtrim(Param::getParamValue('machine_data_path'), '/') . '/' . $this->mac;
+    }
+
+    static public function getMachineDataPathCurr() {
+        return rtrim(Param::getParamValue('machine_data_path_curr'), '/') . '/' ;
     }
 
     public function getMachineConfigFile() {

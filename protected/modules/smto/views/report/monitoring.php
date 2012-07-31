@@ -35,7 +35,7 @@ $this->breadcrumbs=array(
     <?php //echo $form->dropDownList($model, 'machineId',CHtml::listData(Machine::model()->findAll(array('order' => 'name')), 'id', 'name')) ?>
 
     <?php echo CHtml::label('Обновлять графики', 'update_plots');?><?php echo CHtml::checkBox('update_plots', 1);?><br>
-    <?php echo CHtml::label('Период обновления, сек', 'update_interval');?><?php echo CHtml::textField('update_interval', 10, array('size' => 3));?>
+    <?php echo CHtml::label('Период обновления, сек', 'update_interval');?><?php echo CHtml::textField('update_interval', 5, array('size' => 3));?>
     <?php echo CHtml::hiddenField('dt_start', $dt_start);?>
     <?php echo CHtml::hiddenField('dt_delta_sec', 2);?>
 
