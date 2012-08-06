@@ -10,7 +10,7 @@ class ReportConstructor extends ReportSearchForm {
     public $operatorInfo = null;
     public $timetableInfo = null;
     public $secTotal = null;
-    protected $output = array('separate' => array(), 'join' => array());
+    protected $output = array('separate' => array(), 'join' => array(), 'all' => array());
 
     public function __construct() {
         $this->cr = new CDbCriteria();
@@ -236,9 +236,55 @@ class ReportConstructor extends ReportSearchForm {
                     }
                 }
             }
+
             $this->output['join']['machine'] = $joinMachineInfo;
+
+
+            $allMachineInfo = array(
+                'states_work' => array(),
+                'states_not_work' => array('off'=> array('sec_duration' => 0)),
+            );
+
+            $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
+            $code = $machineState->code;
+            $name = $machineState->name;
+            //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+            $color = '#2f940d'; //todo
+
+
+            $allMachineInfo['states_work'] = array( 'work' => array(
+                    'code' => $code,
+                    'name' => $name,
+                    'color' => $color,
+                    'sec_duration' => 0,
+                )
+            );
+
+            $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_OFF );
+            $code = $machineState->code;
+            $name = $machineState->name;
+            //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+            $color = '#e8051b'; //TODO
+
+            $allMachineInfo['states_not_work'] = array( 'off' => array(
+                    'code' => $code,
+                    'name' => $name,
+                    'color' => $color,
+                    'sec_duration' => 0,
+                )
+            );
+
+            foreach ($joinMachineInfo['states_work'] as $code => $stateInfo) {
+                $allMachineInfo['states_work']['work']['sec_duration'] += $stateInfo['sec_duration'];
+            }
+
+            foreach($joinMachineInfo['states_not_work'] as $code => $stateInfo) {
+                $allMachineInfo['states_not_work']['off']['sec_duration'] += $stateInfo['sec_duration'];
+            }
+
+            $this->output['all']['machine'] = $allMachineInfo;
         }
-        // echo '<pre>' . print_r($this->output, true) . '</pre>';die();
+         echo '<pre>' . print_r($this->output, true) . '</pre>';die();
 
         //echo $secTotalProcess . ' ' . $this->secTotal; die;
         

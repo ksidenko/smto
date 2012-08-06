@@ -61,8 +61,11 @@
 <?php foreach($chartData as $machineId => $data){  ?>
 <!--<div style="margin-top:10px"></div>-->
 <div class="row" style="padding: 10px 0px;">
-    <div id="chart_states_work_<?php echo $machineId; ?>" style="float:left"></div>
-    <div id="chart_states_not_work_<?php echo $machineId; ?>" style="float:left; padding-left: 10px"></div>
+    <div id="machine_chart_<?php echo $machineId; ?>" style="float:left"></div>
+    <div id="machine_chart_detail_<?php echo $machineId; ?>" style="float:left"></div>
+
+<!--        <div id="chart_states_work_--><?php //echo $machineId; ?><!--" style="float:left"></div>-->
+<!--        <div id="chart_states_not_work_--><?php //echo $machineId; ?><!--" style="float:left; padding-left: 10px"></div>-->
     <div style="clear:both"></div>
 </div>
 <?php } ?>
@@ -71,6 +74,7 @@
 //echo '<pre>' . print_r($chartDataJSON, true) . '</pre>';die();
 ?>
 <script type="text/javascript">
+    var machineIds = <?php echo json_encode(array_keys($chartData)); ?>;
     var dataJsonStatesWork = <?php echo json_encode($chartDataJSON['states_work']) ?>;
     var dataJsonStatesNotWork = <?php echo json_encode($chartDataJSON['states_not_work']) ?>;
 
@@ -78,16 +82,17 @@
         FusionCharts._fallbackJSChartWhenNoFlash();
         //FusionCharts.setCurrentRenderer('javascript');
 
-        for(var i in dataJsonStatesWork) {
-            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', '_chart_states_work_' + i, '350', '300', '0', '1');
-            myChart.setJSONData(dataJsonStatesWork[i]);
-            myChart.render('chart_states_work_' + i);
-        }
-        
-        for(var i in dataJsonStatesNotWork) {
-            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', '_chart_states_not_work_' + i, '350', '300', '0', '1');
+        for(var i in machineIds) {
+            var chartId = '_machine_chart_' + i;
+            var chartDetailId = '_machine_chart_detail_' + i;
+            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', chartId, '350', '300', '0', '1');
             myChart.setJSONData(dataJsonStatesNotWork[i]);
-            myChart.render('chart_states_not_work_' + i);
+            FusionCharts(chartId).configureLink ({
+                    //swfUrl : "../../../../Charts/Pie3D.swf",
+                    "renderAt" : chartDetailId,
+                    overlayButton: { show : false }
+            });
+            myChart.render('machine_chart_' + i);
         }
     });
 </script>

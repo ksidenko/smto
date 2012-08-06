@@ -27,7 +27,7 @@ class ReportController extends CController
             if ($model->validate()) {
                 $chartData = $model->getData();
 
-                if (isset($chartData, $chartData['separate'], $chartData['join']) && ($chartData['separate'] || $chartData['join']) ) {
+                if (isset($chartData, $chartData['separate'], $chartData['join']) && ($chartData['separate'] || $chartData['join'] || $chartData['all']) ) {
 
                     //foreach($chartData as $reportType => $value) {
                         $chartDataJSON_ = array(
@@ -122,6 +122,7 @@ class ReportController extends CController
             'chartAssetsPath' => $chartAssetsPath,
             'chartType' => $chartType,
             'chartData' => $chartDataView,
+            'machineCount' => count($chartDataView),
             "chartDataJSON" => $chartDataJSON));
 	}
 
