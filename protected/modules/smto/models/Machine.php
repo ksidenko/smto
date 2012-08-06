@@ -329,10 +329,22 @@ class Machine extends CActiveRecord
                 $avg_k_value []= $detector['avg_k_value'];
             }
 
-        $line []= 'KmValues=' . implode(',', $avg_k_value);
+	    $s = trim(implode(',', $avg_k_value));
+	    if (!empty($s)) {
+	        $line []= 'KmValues=' . $s;
+        } else {
+            $line []= 'KmValues=128,128,128,128';
+        }
 
         $line []= ';Параметры KA0...KA3:';
-        $line []= 'KaValues=' . implode(',', $max_k_value);
+//        $line []= 'KaValues=' . implode(',', $max_k_value);
+
+	    $s = trim(implode(',', $max_k_value));
+	    if (!empty($s)) {
+	        $line []= 'KaValues=' . $s;
+        } else {
+            $line []= 'KaValues=128,128,128,128';
+        }
 
         $line []= ';Параметры S0...S3';
         $line []= 'SValues=' . $this->s_values;

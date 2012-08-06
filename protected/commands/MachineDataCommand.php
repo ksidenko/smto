@@ -34,7 +34,7 @@ class MachineDataCommand extends CConsoleCommand {
             $cmd[] = "> /dev/null 2>/dev/null &";
             $cmd = implode(' ', $cmd);
 
-            //echo "$cmd" . PHP_EOL;
+//echo "$cmd" . PHP_EOL;
 
             exec($cmd);
         }

@@ -1,4 +1,4 @@
-USE smto_new;
+USE smto_07.07.2012;
 
 ALTER TABLE `detector`
 ADD COLUMN `max_k_value` SMALLINT DEFAULT 255,

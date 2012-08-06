@@ -33,25 +33,24 @@ class MachineDataImport {
             }
             $sql = $this->getSql(); //die($sql);
             
-            $cnt = 0;
+            $cnt = false;
             try {
                 //die($sql);
                 $cnt = $this->db->createCommand($sql)->execute();
             } catch (Exception $e) {
+                $cnt = false;
                 echo $e->getMessage() . PHP_EOL;
                 echo $e->getTraceAsString();
                 //fb($e, '', '', true);
             }
-            if ( $cnt > 0 ) {
-                $path = dirname($filename) . '/process/';
-                $filename_ = basename($filename);
+            if ( $cnt !== false ) {
 
+                $filename_ = basename($filename);
                 $processFiles [$cnt]= $filename;
-                //copy($filename, $path . 'process_' . date("Y.m.d_H.i", time()) . '_' . $filename_);
 
                 $isSaveProcessFiles = false;
                 if ($isSaveProcessFiles) {
-
+                    $path = dirname($filename) . '/process/';
                     if (!file_exists($path)) {
                         mkdir($path);
                     }

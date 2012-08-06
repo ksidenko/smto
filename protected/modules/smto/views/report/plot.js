@@ -55,8 +55,19 @@ $(function () {
                         xaxis: { 
                             mode: 'time',
                             minTickSize: [5, "second"],
+                            //tickSize:[10, "second"],
                             timeformat: "%H:%M:%S"
-                       }
+                            /*
+                            tickFormatter: function (val, axis) {
+                                var objToday  = new Date(val);
+                                curHour = objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours();
+                                curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes();
+                                curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds();
+                                var today = curHour + ":" + curMinute + ":" + curSeconds;
+                                return today;
+                	        }
+                	        */
+                        }
                     };
                     if (typeof $.plots[id] == 'undefined') {
                         $.plots[id] = $.plot($('#'+id), [data], options);
@@ -64,7 +75,7 @@ $(function () {
                         var plot = $.plots[id];
                         var old_data = plot.getData();
                         old_data.data = old_data[0].data.concat(data.data);
-                        if (old_data.data.length > 15) {
+                        if (old_data.data.length > 50) {
                             old_data.data = old_data.data.slice(1);
                         }
                             

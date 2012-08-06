@@ -20,7 +20,8 @@ class MachineDataManager {
         if ($this->version == '1.0') {
             $s = 'log1.txt_*';
         } else if ($this->version == '2.0') {
-            $s = 'pw' . $mac . '*.dat';
+            //$s = 'pw' . $mac . '*.dat';
+            $s = '';
         }
 
         return $s;

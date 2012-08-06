@@ -45,14 +45,18 @@ class MachineDataCSV_v2 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `operator_last_fkey`, `fkey_all`, `flags`)
+        $sql = 'insert ignore into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `operator_last_fkey`, `fkey_all`, `flags`)
                 values ' . PHP_EOL;
 
         return $sql;
     }
 
     public function parseCSVLine($line, &$lastDateTime = null) {
-        if ( !isset($line[0]) || $line[0] != 'D') {
+        if ( !isset($line[0])  ) {
+            return false;
+        }
+        $lineType = $line[0];
+        if ( !in_array($lineType, array( 'D', 'C') ) ) {
             return false;
         }
 
@@ -61,9 +65,10 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $arr = explode($this->separator, $line);
         $res = false;
 
-        if (count($arr) == 28) {
+        if ( 1 || count($arr) == 28) {
             // format example
-            // D,00BD3B330571,9462, 03.06.2011,21:43:46, 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
+            // D,00BD3B330571,9462, 03.06.2011,21:43:46, 
+            // 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
 
             array_shift($arr); //skip type record - only D-type
             $this->mac = trim(array_shift($arr));
@@ -80,6 +85,12 @@ class MachineDataCSV_v2 extends MachineDataCSV {
                     $this->duration = null;
                 }
             }
+            if ($lineType == 'C') {
+        	    array_shift($arr);
+                array_shift($arr);
+                array_shift($arr);
+                array_shift($arr);
+            }
             $this->da_max1 = intval(trim(array_shift($arr)));
             $this->da_max2 = intval(trim(array_shift($arr)));
             $this->da_max3 = intval(trim(array_shift($arr)));
@@ -89,6 +100,14 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $this->da_avg2 = intval(trim(array_shift($arr)));
             $this->da_avg3 = intval(trim(array_shift($arr)));
             $this->da_avg4 = intval(trim(array_shift($arr)));
+
+            if ($lineType == 'C') {
+        	    array_shift($arr);
+                array_shift($arr);
+                array_shift($arr);
+                array_shift($arr);
+            }
+
 
             $this->dd1 = intval(trim(array_shift($arr)));
             $this->dd2 = intval(trim(array_shift($arr)));

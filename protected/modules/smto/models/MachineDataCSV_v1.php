@@ -28,7 +28,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
+        $sql = 'insert ignore into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
                 values ' . PHP_EOL;
 
         return $sql;
