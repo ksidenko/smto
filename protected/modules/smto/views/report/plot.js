@@ -75,7 +75,7 @@ $(function () {
                         var plot = $.plots[id];
                         var old_data = plot.getData();
                         old_data.data = old_data[0].data.concat(data.data);
-                        if (old_data.data.length > 50) {
+                        if (old_data.data.length > 30) {
                             old_data.data = old_data.data.slice(1);
                         }
                             

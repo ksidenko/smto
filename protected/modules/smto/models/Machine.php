@@ -57,6 +57,7 @@ class Machine extends CActiveRecord
 		$validators =  array(
             array('id', 'safe'),
 			array('name, code, ip, pwd, port, local_port', 'required'),
+            array('port, local_port', 'type', 'type' => 'integer'),
 			array('s_values, reasons_timeout_table', 'required'),
 			array('name, code', 'length', 'max'=>512),
 			//array('mac', 'length', 'max'=>16),
@@ -72,8 +73,9 @@ class Machine extends CActiveRecord
                     ) + ($this->id ? array(':id' => $this->id) : array())
                 ),
                 'message' => 'MAC адрес должен быть уникальным!'
-            ),        
-			array('work_type', 'length', 'max'=>9),
+            ),
+            array('mac, name, code, pwd', 'filter', 'filter'=>'trim'),
+            array('work_type', 'length', 'max'=>9),
 			array('rec_type', 'length', 'max'=>8),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
