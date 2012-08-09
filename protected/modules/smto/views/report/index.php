@@ -33,7 +33,7 @@
             </td>
         </tr>
 
-        <tr>
+        <tr style="display: none;" >
             <td>
                 <?php echo $form->label($model,'graphReportType'); ?>
             </td>
@@ -58,15 +58,25 @@
  
 <?php $this->endWidget(); ?>
 </div><!-- form -->
-<?php foreach($chartData as $machineId => $data){  ?>
+
+<?php if ( isset($chartDataJSON['reports']) ) { ?>
+
+<!--<div id="fixme" >&nbsp;</div>-->
+<?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
+//    'id' => 'fixme',
+)); ?>
+
+<?php foreach($machineIds as $machineId){  ?>
 <!--<div style="margin-top:10px"></div>-->
 <div class="row" style="padding: 10px 0px;">
-    <div id="machine_chart_<?php echo $machineId; ?>" style="float:left"></div>
-    <div id="machine_chart_detail_<?php echo $machineId; ?>" style="float:left"></div>
-
-<!--        <div id="chart_states_work_--><?php //echo $machineId; ?><!--" style="float:left"></div>-->
-<!--        <div id="chart_states_not_work_--><?php //echo $machineId; ?><!--" style="float:left; padding-left: 10px"></div>-->
-    <div style="clear:both"></div>
+    <table style="border: 1px dashed gainsboro;" >
+        <tr>
+            <td><div id="machine_chart_report_main_<?php echo $machineId; ?>" style="width: 290px; height:340px;"></div></td>
+            <td><div id="machine_chart_report_work_<?php echo $machineId; ?>" style="width: 290px; height:340px;"></div></td>
+            <td><div id="machine_chart_report_not_work_<?php echo $machineId; ?>" style="width: 290px; height:340px;"></div></td>
+        </tr>
+    </table>
+<!--    <div style="clear:both"></div>-->
 </div>
 <?php } ?>
 
@@ -74,25 +84,97 @@
 //echo '<pre>' . print_r($chartDataJSON, true) . '</pre>';die();
 ?>
 <script type="text/javascript">
-    var machineIds = <?php echo json_encode(array_keys($chartData)); ?>;
-    var dataJsonStatesWork = <?php echo json_encode($chartDataJSON['states_work']) ?>;
-    var dataJsonStatesNotWork = <?php echo json_encode($chartDataJSON['states_not_work']) ?>;
+    var machineIds = <?php echo json_encode($machineIds); ?>;
+
+    var dataJsonStatesMain = <?php echo json_encode($chartDataJSON['reports']['report-main']) ?>;
+    var dataJsonStatesWork = <?php echo json_encode($chartDataJSON['reports']['report-work']) ?>;
+    var dataJsonStatesNotWork = <?php echo json_encode($chartDataJSON['reports']['report-not_work']) ?>;
 
     $(function() {
-        FusionCharts._fallbackJSChartWhenNoFlash();
-        //FusionCharts.setCurrentRenderer('javascript');
+        //2012-07-18 16:40
+        //$.datepicker.formatDate('yyyy-mm-dd', new Date());
+
+        //$( "#ReportConstructor_dtStart,#ReportConstructor_dtEnd" ).datepicker();
 
         for(var i in machineIds) {
-            var chartId = '_machine_chart_' + i;
-            var chartDetailId = '_machine_chart_detail_' + i;
-            var myChart = new FusionCharts('<?php echo $chartAssetsPath ?>/Charts/<?php echo $chartType ?>.swf', chartId, '350', '300', '0', '1');
-            myChart.setJSONData(dataJsonStatesNotWork[i]);
-            FusionCharts(chartId).configureLink ({
-                    //swfUrl : "../../../../Charts/Pie3D.swf",
-                    "renderAt" : chartDetailId,
-                    overlayButton: { show : false }
-            });
-            myChart.render('machine_chart_' + i);
+            var id = machineIds[i];
+
+            var options = {
+                series: {
+                    pie: {
+                        show: true,
+                        radius: '110',
+                        offset:{
+                            top:50,
+                            left:0
+                        },
+
+                        label: {
+                            show: true,
+                            radius: '90',
+                            threshold: 0.025,
+                            formatter: function(label, series){
+                                //return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+                                return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+Math.round(series.percent)+'%</div>';
+                            },
+                            background: {
+                                opacity: 0.5,
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                },
+                legend: {
+                    show: true
+                }
+            };
+
+//            var data = [];
+//            data[0] = { label: "Series 0", color: '#FF0000', data: 100 };
+//            data[1] = { label: "Series 1", color: '#00FF00', data: 150 };
+//            data[2] = { label: "Series 2", color: '#0000FF', data: 200 };
+//            $.plot($('#'+'machine_chart_report_main_' + id), data, options);
+
+            if (typeof dataJsonStatesMain[id] !== 'undefined' && dataJsonStatesMain[id]['data'].length > 0) {
+                var id_ = $('#'+'machine_chart_report_main_' + id);
+                id_.before('<label><b>Работа</b><br>' + dataJsonStatesMain[id]['chart']['caption'] + '</label>');
+                $.plot(id_, dataJsonStatesMain[id]['data'], options);
+
+//                function pieHover(event, pos, obj)
+//                {
+//                    if (!obj)
+//                        return;
+//                    percent = parseFloat(obj.series.percent).toFixed(2);
+//                    $("#hover").html('<span style="font-weight: bold; color: '+obj.series.color+'">'+obj.series.label+' ('+percent+'%)</span>');
+//                }
+//
+//                function pieClick(event, pos, obj)
+//                {
+//                    if (!obj)
+//                        return;
+//                    percent = parseFloat(obj.series.percent).toFixed(2);
+//                    alert(''+obj.series.label+': '+percent+'%');
+//                }
+
+//                id_.bind("plothover", pieHover);
+//                id_.bind("plotclick", pieClick);
+            }
+
+            if (typeof dataJsonStatesWork[id] !== 'undefined' && dataJsonStatesWork[id]['data'].length > 0) {
+                var id_ = $('#'+'machine_chart_report_work_' + id);
+                id_.before('<label><b>Работа / холостой ход</b><br>' + dataJsonStatesWork[id]['chart']['caption'] + '</label>');
+                $.plot(id_, dataJsonStatesWork[id]['data'], options);
+            }
+            if (typeof dataJsonStatesNotWork[id] !== 'undefined' && dataJsonStatesNotWork[id]['data'].length > 0) {
+                var id_ = $('#'+'machine_chart_report_not_work_' + id);
+                id_.before('<label><b>Простой</b><br>' + dataJsonStatesNotWork[id]['chart']['caption'] + '</label>');
+                $.plot(id_, dataJsonStatesNotWork[id]['data'], options);
+            }
         }
     });
+<?php } ?>
 </script>

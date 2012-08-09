@@ -10,13 +10,20 @@ class ReportConstructor extends ReportSearchForm {
     public $operatorInfo = null;
     public $timetableInfo = null;
     public $secTotal = null;
-    protected $output = array('separate' => array(), 'join' => array(), 'all' => array());
+    protected $output = array(
+        'machines' => array(),
+        'reports' => array(
+            'main' => array(),
+            'work' => array(),
+            'not_work' => array(),
+        )
+    );
 
     public function __construct() {
         $this->cr = new CDbCriteria();
         $this->cr->select = array();
         $this->cr->group = array();
-        
+
         $this->crNotWorking = new CDbCriteria();
         $this->crNotWorking->select = array();
         $this->crNotWorking->group = array();
@@ -45,7 +52,7 @@ class ReportConstructor extends ReportSearchForm {
         if ( $this->dtStart && $this->dtEnd ) {
             ;
         } else if ( $this->dtStart && !$this->dtEnd ) {
-            $this->dtEnd = date('Y.m.d H:i:s'); 
+            $this->dtEnd = date('Y.m.d H:i:s');
         } else if ( !$this->dtStart && $this->dtEnd) { // imposible case
             $this->dtStart = date('Y.m.d 00:00:00');
         } else if ( !$this->dtStart && !$this->dtEnd ){
@@ -59,7 +66,7 @@ class ReportConstructor extends ReportSearchForm {
         if ($this->dtEnd) {
             $this->dtEnd = str_replace('.', '-', $this->dtEnd);
         }
-        
+
         $this->cr->addBetweenCondition('t.dt', $this->dtStart, $this->dtEnd);
         $this->secTotal = strtotime($this->dtEnd) - strtotime($this->dtStart);
         //print_r($this->getAttributes());die;
@@ -88,12 +95,12 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         $this->crNotWorking = clone($this->cr);
-        
+
 //        if ($this->machineReportType == 'join') {
 //            //$this->cr->select [] = new CDbExpression('count(distinct t.machine_id) as cnt_machine');
 //            //$this->cr->group []= 't.state';
 //            //$this->crNotWorking->group []= 't.operator_last_fkey';
-//        } else if ($this->machineReportType == 'separate') {
+//        } else if ($this->machineReportType == 'machines') {
 //            //$this->cr->select [] = new CDbExpression('1 as cnt_machine');
 //        }
 
@@ -101,9 +108,9 @@ class ReportConstructor extends ReportSearchForm {
         $this->crNotWorking->group += array('t.machine_id', 't.operator_last_fkey');
 
         $this->crNotWorking->select [] = 't.operator_last_fkey';
-	    $this->cr->addInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
-	    $this->cr->addCondition('t.operator_last_fkey = 0');
-	
+        $this->cr->addInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
+        $this->cr->addCondition('t.operator_last_fkey = 0');
+
         //$this->crNotWorking->addInCondition('t.state', array(MachineState::STATE_MACHINE_OFF, MachineState::STATE_MACHINE_ON));
         $this->crNotWorking->addNotInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
         // Может быть state == 0|1, но оператор ничего не нажимал!
@@ -119,7 +126,7 @@ class ReportConstructor extends ReportSearchForm {
 
         $this->_processParams();
         //print_r($this->getAttributes());die;
-        
+
         $dataWork = MachineData::model()->findAll($this->cr);
         //print_r($dataWork);die;
 
@@ -138,21 +145,19 @@ class ReportConstructor extends ReportSearchForm {
 //            if ($this->machineReportType == 'join') {
 //                $currMachineId = 0;
 //            } else {
-                $currMachineId = $stateInfo['machine_id'];
+            $currMachineId = $stateInfo['machine_id'];
 //            }
 
             $this->initMachineOutput ($currMachineId, $processMachines);
-            $currMachineInfo = &$this->output['separate'][$currMachineId];
+            $currMachineInfo = &$this->output['machines'][$currMachineId];
 
             $machineState = MachineState::model()->findByPk($stateInfo['state']);
-            $currMachineInfo['states_work'] [$machineState->code] = array(
+            $currMachineInfo['states'] [$machineState->code] = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
                 'color' => EventColor::getColorByCode('machine_' . $stateInfo['state']),
-                //'color' => MachineState::getByColor($machineState->id),
                 'sec_duration' => $stateInfo['sec_duration'],
             );
-            //print_r($stateInfo->machine->getAttributes()); die;
         }
 
         $countMachines = count($processMachines);
@@ -161,11 +166,11 @@ class ReportConstructor extends ReportSearchForm {
 //            if ($this->machineReportType == 'join') {
 //                $currMachineId = 0;
 //            } else {
-                $currMachineId = $stateInfo['machine_id'];
+            $currMachineId = $stateInfo['machine_id'];
 //            }
 
             $this->initMachineOutput ($currMachineId, $processMachines);
-            $currMachineInfo = &$this->output['separate'][$currMachineId];
+            $currMachineInfo = &$this->output['machines'][$currMachineId];
 
             if (empty($stateInfo['operator_last_fkey'])) { // Оператор не жал кнопки Fkey
                 $machineState = MachineState::model()->findByPk($stateInfo['state']);
@@ -179,7 +184,7 @@ class ReportConstructor extends ReportSearchForm {
                 $color = $fkeyState->color;
             }
 
-            $currMachineInfo['states_not_work'] [$code] = array(
+            $currMachineInfo['states'] [$code] = array(
                 'code' => $code,
                 'name' => $name,
                 'color' => $color,
@@ -188,13 +193,10 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         // считаем для каждого станка не учтеное время
-        foreach($this->output['separate'] as $currMachineId => &$currMachineInfo) {
+        foreach($this->output['machines'] as $currMachineId => &$currMachineInfo) {
             $secTotalProcess = 0;
 
-            foreach($currMachineInfo['states_work'] as $stateInfo) {
-                $secTotalProcess += $stateInfo['sec_duration'];
-            }
-            foreach($currMachineInfo['states_not_work'] as $stateInfo) {
+            foreach($currMachineInfo['states'] as $stateInfo) {
                 $secTotalProcess += $stateInfo['sec_duration'];
             }
 
@@ -202,7 +204,7 @@ class ReportConstructor extends ReportSearchForm {
 
             if ( $timeIgnored > 10 ) {
                 $code = 'time_ignored';
-                $currMachineInfo['states_not_work'] [$code]= array(
+                $currMachineInfo['states'] [$code]= array(
                     'code' => $code,
                     'name' => 'Нет данных',
                     'color' => EventColor::getColorByCode('time_ignored'),
@@ -211,83 +213,149 @@ class ReportConstructor extends ReportSearchForm {
             }
         }
 
+        //echo '<pre>' . print_r($this->output, true) . '</pre>';die();
+
         // считаем объединенную информацию по всем станкам
-        if ($this->output['separate']) {
-            $joinMachineInfo = array(
-                'states_work' => array(),
-                'states_not_work' => array(),
-            );
+        if ($this->output['machines']) {
 
-            foreach ($this->output['separate'] as $currMachineId => &$currMachineInfo) {
+            //-----------------------------------------------------------------------------------
+            //Create data for report "main"
+            //-----------------------------------------------------------------------------------
+            $mainReportInfo = array( 'separate' => array(), 'join' => array() );
 
-                foreach ($currMachineInfo['states_work'] as $code => $stateInfo) {
-                    if (!isset($joinMachineInfo['states_work'][$code])) {
-                        $joinMachineInfo['states_work'][$code] = $stateInfo;
+            foreach ($this->output['machines'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo['states'] as $c => $stateInfo) {
+
+                    $code = 'not_work';
+                    if (in_array($c, array('idle', 'work'))) {
+                        $code = 'work';
+                    }
+
+                    if ($code == 'work') {
+                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
+                        $code = $machineState->code;
+                        $name = $machineState->name;
+                        //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+                        $color = '#2f940d'; //todo
                     } else {
-                        $joinMachineInfo['states_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_OFF );
+                        $code = $machineState->code;
+                        $name = $machineState->name;
+                        //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+                        $color = '#e8051b'; //todo
+                    }
+
+                    $sec_duration = 0;
+                    if (isset($mainReportInfo['separate'][$currMachineId][$code])) {
+                        $sec_duration = $mainReportInfo['separate'][$currMachineId][$code]['sec_duration'];
+                    }
+                    $sec_duration += $stateInfo['sec_duration'];
+
+                    $data = array(
+                        'code' => $code,
+                        'name' => $name,
+                        'color' => $color,
+                        'sec_duration' => $sec_duration,
+                    );
+
+                    $mainReportInfo['separate'][$currMachineId][$code] = $data;
+                }
+            }
+
+            foreach($mainReportInfo['separate'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo as $code => $stateInfo) {
+                    if (isset($mainReportInfo['join'][1][$code])) {
+                        $mainReportInfo['join'][1][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                    } else {
+                        $mainReportInfo['join'][1][$code] = $stateInfo;
                     }
                 }
+            }
 
-                foreach($currMachineInfo['states_not_work'] as $code => $stateInfo) {
-                    if (!isset($joinMachineInfo['states_not_work'][$code])) {
-                        $joinMachineInfo['states_not_work'][$code] = $stateInfo;
+            $this->output['reports']['main'] = $mainReportInfo;
+
+            //-----------------------------------------------------------------------------------
+            //Create data for report "work"
+            //-----------------------------------------------------------------------------------
+            $workReportInfo = array( 'separate' => array(), 'join' => array() );
+
+            foreach ($this->output['machines'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo['states'] as $c => $stateInfo) {
+
+                    if (!in_array($c, array('idle', 'work'))) {
+                         continue;
+                    }
+
+                    if (!isset($workReportInfo[$c])) {
+                        $workReportInfo['separate'][$currMachineId][$c] = $stateInfo;
                     } else {
-                        $joinMachineInfo['states_not_work'][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                        $workReportInfo['separate'][$currMachineId][$c]['sec_duration'] += $stateInfo['sec_duration'];
                     }
                 }
             }
 
-            $this->output['join']['machine'] = $joinMachineInfo;
-
-
-            $allMachineInfo = array(
-                'states_work' => array(),
-                'states_not_work' => array('off'=> array('sec_duration' => 0)),
-            );
-
-            $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
-            $code = $machineState->code;
-            $name = $machineState->name;
-            //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
-            $color = '#2f940d'; //todo
-
-
-            $allMachineInfo['states_work'] = array( 'work' => array(
-                    'code' => $code,
-                    'name' => $name,
-                    'color' => $color,
-                    'sec_duration' => 0,
-                )
-            );
-
-            $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_OFF );
-            $code = $machineState->code;
-            $name = $machineState->name;
-            //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
-            $color = '#e8051b'; //TODO
-
-            $allMachineInfo['states_not_work'] = array( 'off' => array(
-                    'code' => $code,
-                    'name' => $name,
-                    'color' => $color,
-                    'sec_duration' => 0,
-                )
-            );
-
-            foreach ($joinMachineInfo['states_work'] as $code => $stateInfo) {
-                $allMachineInfo['states_work']['work']['sec_duration'] += $stateInfo['sec_duration'];
+            foreach($workReportInfo['separate'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo as $code => $stateInfo) {
+                    if (isset($workReportInfo['join'][1][$code])) {
+                        $workReportInfo['join'][1][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                    } else {
+                        $workReportInfo['join'][1][$code] = $stateInfo;
+                    }
+                }
             }
 
-            foreach($joinMachineInfo['states_not_work'] as $code => $stateInfo) {
-                $allMachineInfo['states_not_work']['off']['sec_duration'] += $stateInfo['sec_duration'];
+            $this->output['reports']['work'] = $workReportInfo;
+
+            //-----------------------------------------------------------------------------------
+            //Create data for report "not work"
+            //-----------------------------------------------------------------------------------
+            $notWorkReportInfo = array( 'separate' => array(), 'join' => array() );
+
+            foreach ($this->output['machines'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo['states'] as $c => $stateInfo) {
+
+                    if (in_array($c, array('idle', 'work'))) {
+                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
+                        $code = $machineState->code;
+                        $name = $machineState->name;
+                        //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+                        $color = '#2f940d'; //todo
+                    } else {
+                        $code = $stateInfo['code'];
+                        $name = $stateInfo['name'];
+                        $color = $stateInfo['color'];
+                    }
+
+                    if (!isset($notWorkReportInfo['separate'][$currMachineId][$c])) {
+                        $data = array(
+                            'code' => $code,
+                            'name' => $name,
+                            'color' => $color,
+                            'sec_duration' => $stateInfo['sec_duration'],
+                        );
+                        $notWorkReportInfo['separate'][$currMachineId][$c] = $data;
+                    } else {
+                        $notWorkReportInfo['separate'][$currMachineId][$c]['sec_duration'] += $stateInfo['sec_duration'];
+                    }
+                }
             }
 
-            $this->output['all']['machine'] = $allMachineInfo;
+            foreach($notWorkReportInfo['separate'] as $currMachineId => &$currMachineInfo) {
+                foreach ($currMachineInfo as $code => $stateInfo) {
+                    if (isset($notWorkReportInfo['join'][1][$code])) {
+                        $notWorkReportInfo['join'][1][$code]['sec_duration'] += $stateInfo['sec_duration'];
+                    } else {
+                        $notWorkReportInfo['join'][1][$code] = $stateInfo;
+                    }
+                }
+            }
+
+            $this->output['reports']['not_work'] = $notWorkReportInfo;
         }
-         echo '<pre>' . print_r($this->output, true) . '</pre>';die();
+        //echo '<pre>' . print_r($this->output, true) . '</pre>';die();
 
         //echo $secTotalProcess . ' ' . $this->secTotal; die;
-        
+
         //var_export($this->output); die();
 
         return $this->output;
@@ -296,16 +364,15 @@ class ReportConstructor extends ReportSearchForm {
     private function initMachineOutput ($currMachineId, &$processMachines){
         if (!in_array($currMachineId, $processMachines)) {
             $processMachines []= $currMachineId;
-            $this->output['separate'][$currMachineId] = array(
+            $this->output['machines'][$currMachineId] = array(
                 'machine' => array(),
                 'operator' => array(),
-                'states_work' => array(),
-                'states_not_work' => array(),
+                'states' => array(),
             );
 
             $machineInfo = Machine::model()->findByPk($currMachineId);
             if ($machineInfo) {
-                $this->output['separate'][$currMachineId]['machine'] = array(
+                $this->output['machines'][$currMachineId]['machine'] = array(
                     'id' => $machineInfo->id,
                     'name' => $machineInfo->name,
                     'work_type' => $machineInfo->work_type,
@@ -313,7 +380,7 @@ class ReportConstructor extends ReportSearchForm {
             }
 
             if ( $this->operatorInfo ) {
-                $this->output['separate'] [$currMachineId]['operator'] = array(
+                $this->output['machines'] [$currMachineId]['operator'] = array(
                     'name' => $this->operatorInfo->full_name
                 );
             }
