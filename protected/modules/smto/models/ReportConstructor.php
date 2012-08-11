@@ -227,7 +227,7 @@ class ReportConstructor extends ReportSearchForm {
                 foreach ($currMachineInfo['states'] as $c => $stateInfo) {
 
                     $code = 'not_work';
-                    if (in_array($c, array('idle', 'work'))) {
+                    if (in_array($c, array('idle_run', 'work'))) {
                         $code = 'work';
                     }
 
@@ -282,7 +282,7 @@ class ReportConstructor extends ReportSearchForm {
             foreach ($this->output['machines'] as $currMachineId => &$currMachineInfo) {
                 foreach ($currMachineInfo['states'] as $c => $stateInfo) {
 
-                    if (!in_array($c, array('idle', 'work'))) {
+                    if (!in_array($c, array('idle_run', 'work'))) {
                          continue;
                     }
 
@@ -314,9 +314,10 @@ class ReportConstructor extends ReportSearchForm {
             foreach ($this->output['machines'] as $currMachineId => &$currMachineInfo) {
                 foreach ($currMachineInfo['states'] as $c => $stateInfo) {
 
-                    if (in_array($c, array('idle', 'work'))) {
+                    if (in_array($c, array('idle_run', 'work'))) {
                         $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
-                        $code = $machineState->code;
+                        $code = 'work';
+                        $c = 'work';
                         $name = $machineState->name;
                         //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
                         $color = '#2f940d'; //todo

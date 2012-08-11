@@ -212,7 +212,7 @@ class ReportController extends CController
                 if (isset($machineDataCurr[$machineAR->id])) {
                     $lineParser = $machineDataCurr[$machineAR->id];
                 } else {
-                    $filename = $path . 'cr' . $machineAR->mac . '.dat';
+                    $filename = $path . 'cr' . $machineAR->mac . '.cdt';
                     //echo $filename;
 
                     $fd = @fopen($filename, 'r');
@@ -220,14 +220,14 @@ class ReportController extends CController
                         continue;
                     }
                     while ( $line = fgets($fd) ) {
-                        if ( !isset($line[0]) || $line[0] != 'D') {
+
+                        if ( !isset($line[0]) || $line[0] != 'C' ) {
                             continue;
                         }
                         break;
                     }
                     fclose($fd);
                     $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
-
                     $lineParser->parseCSVLine($line);
 
                     //print_r($lineParser); die;
@@ -235,12 +235,12 @@ class ReportController extends CController
                     $machineDataCurr[$machineAR->id] = $lineParser;
                 }
 
-                if ($cond['dt_start'] < strtotime($lineParser->dt)) {
+//                if ($cond['dt_start'] < strtotime($lineParser->dt)) {
                     $output[$cond['machine_id']] [$cond['name']] []= array(
-                        strtotime($lineParser->dt),
+                        (strtotime($lineParser->dt)+7*60*60)*1000,
                         $lineParser->{$cond['name']},
-                    );
-                }
+                );
+//                }
             }
 
             echo json_encode($output);

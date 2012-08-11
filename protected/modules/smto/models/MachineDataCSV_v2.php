@@ -59,7 +59,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         if ( !in_array($lineType, array( 'D', 'C') ) ) {
             return false;
         }
-
+        
         $this->init();
 
         $arr = explode($this->separator, $line);
