@@ -22,8 +22,6 @@ DB_ENABLEPARAMLOGGING=1
 SVN.REPO.USERNAME=sks
 SVN.REPO.PWD=qazqaz
 
-MACHINE_DATA_PATH = ./protected/runtime/machine_data/
-
 ; Debug options
 LOG_LEVELS = error, warning
 SHOW_IN_FIREBUG = 1

@@ -3,7 +3,6 @@
 class SmtoModule extends CWebModule
 {
     public $max_duration;
-    public $machine_data_path;
 
 	public function init()
 	{

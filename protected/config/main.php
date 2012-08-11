@@ -99,8 +99,7 @@ return CMap::mergeArray(
             'adminEmail'=>'webmaster@example.com',
             'languages' => array(
                         'ru_ru' => "Русский",
-                        'en_us' => 'English'),
-            'machine_data_path' => './protected/runtime/machine_data/'
+                        'en_us' => 'English')
         ),
         //'language' => 'ru_ru'
     )
