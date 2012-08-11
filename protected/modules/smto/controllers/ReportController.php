@@ -24,7 +24,8 @@ class ReportController extends CController
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->getAssetManager()->publish($basePath . '/../js', true, -1, YII_DEBUG);
         Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
-        Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
+        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+        //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
 
 
         if (isset($_POST['ReportConstructor'])) {
@@ -67,7 +68,7 @@ class ReportController extends CController
                             foreach($currReportData as $row){
                                 //if ( ($row["sec_duration"] / $model->secTotal * 100) > 2) {
                                     $chartDataJSON_['reports']['report-' . $reportType][$machineId]["data"] []= array(
-                                        'label' => $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
+                                        'label' => $row['code'] . ', '. $row['name'] . ', ' . Helpers::secToTime($row["sec_duration"]),
                                         'color' => '#' . ltrim($row["color"], '#'),
                                         'data' => intval($row["sec_duration"]),
 
@@ -156,8 +157,8 @@ class ReportController extends CController
                 //echo '<pre>'.print_r($chartDataJSON_, true) . '<pre>'; die;
             }
         } else {
-            $model->dtStart = date('Y.m.d 00:00:00');
-            $model->dtEnd = date('Y.m.d H:i:s');
+            $model->dtStart = date('d.m.Y 00:00:00');
+            $model->dtEnd = date('d.m.Y H:i:s');
         }
 
 //        $chartDataView = array();
@@ -170,6 +171,9 @@ class ReportController extends CController
 //        }
 
         //echo '<pre>'.print_r($model->machineId, true) . '<pre>'; die;
+
+        $model->dtStart = date('d.m.Y H:i:s', strtotime($model->dtStart));
+        $model->dtEnd = date('d.m.Y H:i:s', strtotime($model->dtEnd));
 
         $machineIds = array_keys($machineIds);
 

@@ -50,11 +50,14 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         if ( $this->dtStart && $this->dtEnd ) {
-            ;
+            $this->dtStart = date('Y.m.d H:i:s', strtotime($this->dtStart));
+            $this->dtEnd = date('Y.m.d H:i:s', strtotime($this->dtEnd));
         } else if ( $this->dtStart && !$this->dtEnd ) {
+            $this->dtStart = date('Y.m.d H:i:s', strtotime($this->dtStart));
             $this->dtEnd = date('Y.m.d H:i:s');
-        } else if ( !$this->dtStart && $this->dtEnd) { // imposible case
+        } else if ( !$this->dtStart && $this->dtEnd) { // impossible case
             $this->dtStart = date('Y.m.d 00:00:00');
+            $this->dtEnd = date('Y.m.d H:i:s', strtotime($this->dtEnd));
         } else if ( !$this->dtStart && !$this->dtEnd ){
             $this->dtStart = date('Y.m.d 00:00:00');
             $this->dtEnd = date('Y.m.d H:i:s');

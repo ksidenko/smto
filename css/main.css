@@ -246,6 +246,10 @@ div.flash-success{
     border: 2px dotted green;
 }
 
+.machine_tabs{
+    width: 900px;
+}
+
 body, .widgetContent
 #page, .widgetContent
 
