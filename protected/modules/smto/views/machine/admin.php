@@ -64,12 +64,12 @@ $('.search-form form').submit(function(){
         'mac',
         //'s_values',
         //'reasons_timeout_table',
-//		array(
-//            'type'=>'raw',
-//            'name' => 'work_type',
-//            //'value' => CHtml::activeDropDownList($data,"work_type",Machine::$work_type)
-//            'value' => 'Machine::$work_type_list[$data->work_type]'
-//        ),
+		array(
+            'type'=>'raw',
+            'name' => 'reachable',
+            //'value' => 'if ( Helpers::checkHostReachable( "192.168.0.100", 80) !== false ) { return 1; } else { return 0; } ',
+            'value' => '"<div class=\"machine_reachable_" . Helpers::checkHostReachable( $data->ip, $data->port, 1) . "\" >&nbsp;</div>"',
+        ),
         
 		array(
 			'class'=>'CButtonColumn',

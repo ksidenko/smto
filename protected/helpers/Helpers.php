@@ -159,4 +159,10 @@ class Helpers {
 
         return $output;
     }
+
+    static function checkHostReachable( $host, $port, $timeout = 5 ) {
+        $res = @fsockopen($host, $port, $errno, $errstr, $timeout);
+
+        return intval($res !== false);
+    }
 }

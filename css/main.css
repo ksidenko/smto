@@ -250,6 +250,17 @@ div.flash-success{
     width: 900px;
 }
 
+
+.machine_reachable_0 {
+    width: 20px;
+    background: #ff0f26;
+}
+
+.machine_reachable_1 {
+    width: 20px;
+    background: #00ff14;
+}
+
 body, .widgetContent
 #page, .widgetContent
 

@@ -24,6 +24,7 @@ class Machine extends CActiveRecord
     static $MAX_DD = 4;
 
     private $isTemplate = null;
+    public $reachable;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -132,6 +133,7 @@ class Machine extends CActiveRecord
 			//'time_idle_run' => 'Время холостого хода, сек',
 			'rec_type' => 'Тип записи',
             'template_id' => 'Шаблон',
+            'reachable' => 'Доступен',
 		);
 	}
 
