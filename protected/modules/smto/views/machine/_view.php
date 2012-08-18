@@ -36,4 +36,12 @@
     <?php echo CHtml::encode($data->reasons_timeout_table); ?>
     <br />
 
+    <b><?php echo CHtml::encode($data->getAttributeLabel('data_fix_period')); ?>:</b>
+    <?php echo CHtml::encode($data->data_fix_period); ?>
+    <br />
+
+    <b><?php echo CHtml::encode($data->getAttributeLabel('peak_average_period')); ?>:</b>
+    <?php echo CHtml::encode($data->peak_average_period); ?>
+    <br />
+
 </div>

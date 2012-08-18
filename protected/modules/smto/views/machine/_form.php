@@ -85,6 +85,27 @@
 
     </div>
 
+    <div class="row">
+        <?php echo $form->labelEx($model,'data_fix_period'); ?>
+        <?php echo $form->textField($model,'data_fix_period',array('size'=>10)); ?>
+        <?php echo $form->error($model,'data_fix_period'); ?>
+        <p class="hint" >
+            Период фиксации данных в секундах (2...10), но рекомендуется не меньше 3
+        </p>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'peak_average_period'); ?>
+        <?php echo $form->textField($model,'peak_average_period',array('size'=>10)); ?>
+        <?php echo $form->error($model,'peak_average_period'); ?>
+        <p class="hint" >
+            Интервал интегрирования для вычисления квазипиковых ("максимальных")
+            значений в сотнях миллисекунд (1...50)
+            Рекомендуется, чтобы период фиксации был кратен интервалу интегрирования
+            (если не кратен - то обязательно период фиксации должен быть больше)
+        </p>
+    </div>
+
     <?php if (isset($machineConfigData) && is_array($machineConfigData)) {echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); } ?>
 
     <h2>F - кнопки</h2>

@@ -41,5 +41,7 @@ $this->menu []= array('label'=>'Управление событиями стан
 		'mac',
         's_values',
         'reasons_timeout_table',
+        'data_fix_period',
+        'peak_average_period',
 	),
 )); ?>

@@ -77,6 +77,12 @@ class Machine extends CActiveRecord
             array('mac, name, code, pwd', 'filter', 'filter'=>'trim'),
             array('work_type', 'length', 'max'=>9),
 			array('rec_type', 'length', 'max'=>8),
+
+            array('data_fix_period, peak_average_period', 'type', 'type' => 'integer'),
+
+            array('data_fix_period', 'numerical', 'min' => 2, 'max' => 10),
+            array('peak_average_period', 'numerical', 'min' => 1, 'max' => 50),
+
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			//array('id, name, code, ip, mac, work_type, time_idle_run, rec_type', 'safe', 'on'=>'search'),
@@ -393,6 +399,20 @@ class Machine extends CActiveRecord
         $line []= '';
         $line []= ';Каталог и префикс(опционально) для выходных файлов. Не может содержать пробелов:';
         $line []= 'OutFileDir=' . $this->getMachineDataPath() . '/pw';
+
+        $line []= '';
+        $line []= ';------------------------------------------------------------------';
+        $line []= ';Период фиксации данных в секундах (2...10), но рекомендуется не меньше 3';
+        $line []= ';по умолчанию - 10';
+        $line []= 'DataFixPeriod=' . $this->data_fix_period;
+
+        $line []= ';Интервал интегрирования для вычисления квазипиковых ("максимальных")';
+        $line []= ';значений в сотнях миллисекунд (1...50)';
+        $line []= ';По умолчанию - 1';
+        $line []= ';Рекомендуется, чтобы период фиксации был кратен интервалу интегрирования';
+        $line []= ';(если не кратен - то обязательно период фиксации должен быть больше)';
+        $line []= 'PeakAveragePeriod=' . $this->peak_average_period;
+
 
         $s = implode(PHP_EOL, $line);
         fwrite($fd, $s);
