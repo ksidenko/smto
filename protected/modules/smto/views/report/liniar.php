@@ -204,7 +204,6 @@
             options_machine_state
         );
 
-
         $.plot(
             $("#line_report_operator_last_fkey"),
             data_operator_last_fkey,
