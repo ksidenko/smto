@@ -41,6 +41,7 @@
                                 //array('label'=>'Цвета событий', 'url'=>array('/smto/eventColor/admin'), 'visible'=>!Yii::app()->user->isGuest),
                                 array('label'=>'Данные со станков', 'url'=>array('/smto/machineData/admin'), 'visible'=>!Yii::app()->user->isGuest),
                                 array('label'=>'Отчет', 'url'=>array('/smto/report'), 'visible'=>!Yii::app()->user->isGuest),
+                                array('label'=>'Лин. отчет', 'url'=>array('/smto/report/liniar'), 'visible'=>!Yii::app()->user->isGuest),
                                 array('label'=>'Мониторинг', 'url'=>array('/smto/report/monitoring'), 'visible'=>!Yii::app()->user->isGuest),
                                 //array('label'=>'Импорт', 'url'=>array('/smto/task/import'), 'visible'=>!Yii::app()->user->isGuest),
 				//array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),

@@ -267,30 +267,31 @@ class ReportController extends CController
         }
 	}
 
-	// Uncomment the following methods and override them if needed
-	/*
-	public function filters()
-	{
-		// return the filter configuration for this controller, e.g.:
-		return array(
-			'inlineFilterName',
-			array(
-				'class'=>'path.to.FilterClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
-	}
+    public function actionLiniar() {
 
-	public function actions()
-	{
-		// return external action classes, e.g.:
-		return array(
-			'action1'=>'path.to.ActionClass',
-			'action2'=>array(
-				'class'=>'path.to.AnotherActionClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
-	}
-	*/
+        $basePath=Yii::getPathOfAlias('application');
+        $baseUrl=Yii::app()->getAssetManager()->publish($basePath . '/../js', true, -1, YII_DEBUG);
+        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
+        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+
+
+        $model = new ReportLinearConstructor();
+        $chartData = array();
+
+        $model->dtStart = '18-08-2012 10:00:00';
+        $model->dtEnd = '18-08-2012 10:10:00';
+
+        if (isset($_POST['ReportLinearConstructor'])) {
+            $chartData = $model->getData();
+        } else {
+            $model->dtStart = date('d.m.Y 00:00:00');
+            $model->dtEnd = date('d.m.Y H:i:s');
+        }
+
+
+        $this->render('liniar', array(
+            'model' => $model,
+            'chartData' => $chartData,
+        ));
+    }
 }
