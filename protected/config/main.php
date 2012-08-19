@@ -68,6 +68,10 @@ return CMap::mergeArray(
                 'charset' => 'utf8',
                 'enableProfiling'=>1,
                 'enableParamLogging'=>1,
+                'queryCacheID' => 'cache',
+            ),
+            'cache'=>array(
+                'class'=>'system.caching.CFileCache',
             ),
             'errorHandler'=>array(
                 'errorAction'=>'site/error',

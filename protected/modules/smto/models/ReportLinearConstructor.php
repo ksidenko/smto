@@ -109,7 +109,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                 (int)$machineDataRow['state']
             );
 
-            $machineState = MachineState::model()->findByPk($machineDataRow['state']);
+            $machineState = MachineState::model()->cache(60)->findByPk($machineDataRow['state']);
             $data_ = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
@@ -184,10 +184,40 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $this->output['states']['operator_last_fkey'][$machineDataRow['operator_last_fkey']]['info'] = $data_;
             }
 
-            $this->output['states']['operator'][$machineDataRow['operator_id']] ['data'] []= array(
-                $this->toJsTimestamp($machineDataRow['dt']),
-                (int)$machineDataRow['operator_id']
-            );
+
+
+            //-----------------------------------------------------------------------------------
+            //Prepare chart data for operators
+            //-----------------------------------------------------------------------------------
+
+            if ($machineDataRow['operator_id'] > 0) {
+
+                // process break for machine states
+                if ( isset($lastTimeValues['operator'][$machineDataRow['operator_id']]) ) {
+                    $dtPrev = $lastTimeValues['operator'][$machineDataRow['operator_id']];
+                    $dt = $machineDataRow['dt'];
+                    if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
+                        $this->output['states']['operator'][$machineDataRow['operator_id']]['data'] [] = null;
+                    }
+                }
+                // save last dt value for current machine state
+                $lastTimeValues['operator'][$machineDataRow['operator_id']] = $machineDataRow['dt'];
+
+
+                $this->output['states']['operator'][$machineDataRow['operator_id']] ['data'] []= array(
+                    $this->toJsTimestamp($machineDataRow['dt']),
+                    ((int)$machineDataRow['operator_id'] + 10)
+                );
+
+                $operatorInfo = Operator::model()->cache(60)->findByPk($machineDataRow['operator_id']);
+                $data_ = array(
+                    'code' => '',
+                    'name' => $operatorInfo->full_name,
+                    'color' => '#FF22FF',
+                );
+
+                $this->output['states']['operator'][$machineDataRow['operator_id']]['info'] = $data_;
+            }
         }
 
         //echo '<pre>' . print_r($this->output, true) . '</pre>';die();
