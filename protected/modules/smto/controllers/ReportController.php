@@ -282,7 +282,11 @@ class ReportController extends CController
         $model->dtEnd = '18-08-2012 10:10:00';
 
         if (isset($_POST['ReportLinearConstructor'])) {
-            $chartData = $model->getData();
+            $model->attributes=$_POST['ReportLinearConstructor'];
+
+            //if ($model->validate()) {
+                $chartData = $model->getData();
+            //}
         } else {
             $model->dtStart = date('d.m.Y 00:00:00');
             $model->dtEnd = date('d.m.Y H:i:s');

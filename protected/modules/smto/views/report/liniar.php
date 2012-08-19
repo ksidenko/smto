@@ -14,6 +14,15 @@
                 <?php echo $form->textField($model,'dtEnd') ?>
             </td>
         </tr>
+        <tr>
+            <td>
+                <?php echo $form->label($model,'machineId'); ?>
+                <?php //echo $form->dropDownList($model,'machineReportType', $model::$arrMachineReportType) ?>
+            </td>
+            <td>
+                <?php echo $form->dropDownList($model, 'machineId', CHtml::listData( Machine::model()->real_records()->findAll(array('order' => 'name')), 'id', 'name') ); ?>
+            </td>
+        </tr>
     </table>
 
     <div class="row submit">
@@ -60,7 +69,7 @@
         };
         $.timepicker.setDefaults($.timepicker.regional['ru']);
 
-        $( "#ReportConstructor_dtStart,#ReportConstructor_dtEnd" ).datetimepicker({
+        $( "#ReportLinearConstructor_dtStart,#ReportLinearConstructor_dtEnd" ).datetimepicker({
                 changeMonth: true,
                 changeYear: true,
                 timeFormat: 'hh:mm:ss',
@@ -74,17 +83,19 @@
             }
         );
 
-        $("#ReportConstructor_dtStart").datetimepicker('setDate', $("#ReportConstructor_dtStart").val() );
-        $("#ReportConstructor_dtEnd").datetimepicker('setDate', $("#ReportConstructor_dtEnd").val() );
+        $("#ReportLinearConstructor_dtStart").datetimepicker('setDate', $("#ReportLinearConstructor_dtStart").val() );
+        $("#ReportLinearConstructor_dtEnd").datetimepicker('setDate', $("#ReportLinearConstructor_dtEnd").val() );
     });
 </script>
 
 <!--<div id="fixme" >&nbsp;</div>-->
 <?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
 //    'id' => 'fixme',
+//'excanvas.min.js',
+    'scriptFile'=>array('jquery.flot.js','jquery.flot.selection.js')
 )); ?>
 
-<?php if (count($chartData)) { ?>
+<?php if (count($chartData) && isset($chartData['states']) && $chartData['states']['machine_state']) { ?>
 
 <?php
     $plotData = array(
@@ -133,7 +144,6 @@
 
     $plotData['machine_state'] = array_merge($plotData['machine_state'], $plotData['machine_da_value']);
 
-    $i = 0;
     $yAxisTicks['operator_last_fkey'] []= array(0, '');
     foreach($chartData['states']['operator_last_fkey'] as $key => $machineStateInfo) {
         $arr = array();
@@ -147,7 +157,6 @@
 
         $plotData['operator_last_fkey'] []= $arr;
         $yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
-        $i++;
     }
     $yAxisTicks['operator_last_fkey'] []= array($key+1, '');
 
@@ -179,7 +188,8 @@
         ,
         grid: {
             backgroundColor: { colors: ["#fff", "#eee"] }
-        }
+        },
+        selection: { mode: "x" }
     };
 
     var options_machine_state = jQuery.extend(true, {}, options);
@@ -195,8 +205,29 @@
 
         var data_machine_state_ = data_machine_state;
         if (show == false) {
-            data_machine_state_ = data_machine_state_.slice(0, data_machine_state_.length-1);
+            data_machine_state_ = data_machine_state_.slice(0, data_machine_state.length-1);
         }
+
+        var placeholder1 = $("#line_report_machine_state");
+        var placeholder2 = $("#line_report_operator_last_fkey");
+
+        placeholder1.bind("plotselected", function (event, ranges) {
+
+            if ($('.show_da_values').is(':checked') == false) {
+                data_machine_state_ = data_machine_state.slice(0, data_machine_state.length-1);
+            }
+
+            $.plot(placeholder1, data_machine_state_,
+                $.extend(true, {}, options_machine_state, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
+
+
+            $.plot(placeholder2, data_operator_last_fkey,
+                $.extend(true, {}, options_operator_last_fkey, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
+        });
 
         $.plot(
             $("#line_report_machine_state"),
@@ -204,11 +235,35 @@
             options_machine_state
         );
 
+
+        placeholder2.bind("plotselected", function (event, ranges) {
+            $.plot(placeholder2, data_operator_last_fkey,
+                $.extend(true, {}, options_operator_last_fkey, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
+
+
+            if ($('.show_da_values').is(':checked') == false) {
+                data_machine_state_ = data_machine_state.slice(0, data_machine_state.length-1);
+            }
+
+            $.plot(placeholder1, data_machine_state_,
+                $.extend(true, {}, options_machine_state, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
+        });
+
         $.plot(
             $("#line_report_operator_last_fkey"),
             data_operator_last_fkey,
             options_operator_last_fkey
         );
+
+
+
+//        $("#clearSelection").click(function () {
+//            plot.clearSelection();
+//        });
     }
 
     $(function() {
