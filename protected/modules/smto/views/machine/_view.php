@@ -44,4 +44,12 @@
     <?php echo CHtml::encode($data->peak_average_period); ?>
     <br />
 
+    <b><?php echo CHtml::encode($data->getAttributeLabel('main_detector_digit')); ?>:</b>
+    <?php echo CHtml::encode($data->main_detector_digit); ?>
+    <br />
+
+    <b><?php echo CHtml::encode($data->getAttributeLabel('main_detector_analog')); ?>:</b>
+    <?php echo CHtml::encode($data->main_detector_analog); ?>
+    <br />
+
 </div>

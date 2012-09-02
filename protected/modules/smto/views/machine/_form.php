@@ -106,6 +106,20 @@
         </p>
     </div>
 
+    <div class="row">
+        <?php echo $form->labelEx($model,'main_detector_digit'); ?>
+        <?php echo $form->dropDownList($model,'main_detector_digit',range(0, 3, 1), array('size'=>1)); ?>
+        <?php echo $form->error($model,'main_detector_digit'); ?>
+        <p class="hint" ></p>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'main_detector_analog'); ?>
+        <?php echo $form->dropDownList($model,'main_detector_analog',range(0, 3, 1), array('size'=>1)); ?>
+        <?php echo $form->error($model,'main_detector_analog'); ?>
+        <p class="hint" ></p>
+    </div>
+
     <?php if (isset($machineConfigData) && is_array($machineConfigData)) {echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); } ?>
 
     <h2>F - кнопки</h2>

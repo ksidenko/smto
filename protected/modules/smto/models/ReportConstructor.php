@@ -237,13 +237,15 @@ class ReportConstructor extends ReportSearchForm {
                     if ($code == 'work') {
                         $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
                         $code = $machineState->code;
-                        $name = $machineState->name;
-                        //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
+                        //$name = $machineState->name;
+                        $name = 'Работа';
+                            //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
                         $color = '#2f940d'; //todo
                     } else {
                         $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_OFF );
                         $code = $machineState->code;
-                        $name = $machineState->name;
+                        //$name = $machineState->name;
+                        $name = 'Простой';
                         //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
                         $color = '#e8051b'; //todo
                     }

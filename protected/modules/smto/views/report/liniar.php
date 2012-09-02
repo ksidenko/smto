@@ -92,7 +92,7 @@
 <?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
 //    'id' => 'fixme',
 //'excanvas.min.js',
-    'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js')
+    'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js', 'jquery.flot.crosshair.js')
 )); ?>
 
 <?php if (count($chartData) && isset($chartData['states']) && $chartData['states']['machine_state']) { ?>
@@ -195,13 +195,19 @@
             show: true,
             position: "left",
             reserveSpace: true,
-            labelWidth: 40
+            labelWidth: 40,
+            color: '#FF0F0F'
         }]
         ,
         grid: {
             backgroundColor: { colors: ["#fff", "#eee"] }
         },
-        selection: { mode: "x" }
+        selection: { mode: "x" },
+        crosshair: {
+            mode: "x",
+            color: '#35331A',
+            lineWidth: 1
+        }
     };
 
     var options_machine_state = jQuery.extend(true, {}, options);

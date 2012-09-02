@@ -43,5 +43,7 @@ $this->menu []= array('label'=>'Управление событиями стан
         'reasons_timeout_table',
         'data_fix_period',
         'peak_average_period',
+        'main_detector_digit',
+        'main_detector_analog',
 	),
 )); ?>

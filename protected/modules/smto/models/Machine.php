@@ -84,6 +84,11 @@ class Machine extends CActiveRecord
             array('data_fix_period', 'numerical', 'min' => 2, 'max' => 10),
             array('peak_average_period', 'numerical', 'min' => 1, 'max' => 50),
 
+
+            array('main_detector_digit', 'numerical', 'min' => 0, 'max' => self::$MAX_DD - 1),
+            array('main_detector_analog', 'numerical', 'min' => 0, 'max' => self::$MAX_DA - 1),
+
+
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			//array('id, name, code, ip, mac, work_type, time_idle_run, rec_type', 'safe', 'on'=>'search'),
@@ -134,6 +139,8 @@ class Machine extends CActiveRecord
 			'rec_type' => 'Тип записи',
             'template_id' => 'Шаблон',
             'reachable' => 'Доступен',
+            'main_detector_analog' => 'Главный аналог. датчик',
+            'main_detector_digit' => 'Главный цифровой датчик'
 		);
 	}
 

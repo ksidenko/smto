@@ -32,6 +32,8 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public function _processParams() {
 
+        $this->machineInfo = Machine::model()->findByPk($this->machineId);
+
         if ($this->operatorId) {
             $this->operatorInfo = Operator::model()->findByPk($this->operatorId);
         }
@@ -62,7 +64,11 @@ class ReportLinearConstructor extends ReportSearchForm {
         //print_r($this->getAttributes());die;
         //print_r($this->secTotal);die;
 
-        $this->cr->select += array( 't.dt', 't.machine_id', 't.state', 't.operator_last_fkey', 't.operator_id', 't.da_avg1');
+        $this->cr->select += array( 't.dt', 't.machine_id', 't.state', 't.operator_last_fkey', 't.operator_id',);
+
+        $daAvg = 'da_avg' . strval(intval($this->machineInfo->main_detector_analog) + 1);
+        $this->cr->select []= new CDbExpression( 't.' . $daAvg . ' as da_avg');
+
         //$this->cr->select []= new CDbExpression("SUM(IFNULL(t.duration,10)) + 0  as sec_duration");
 
         $this->cr->compare('t.machine_id', $this->machineId);
@@ -136,12 +142,12 @@ class ReportLinearConstructor extends ReportSearchForm {
 
             $this->output['machine_da_value']['data'] []= array(
                 $this->toJsTimestamp($machineDataRow['dt']),
-                (int)$machineDataRow['da_avg1']
+                (int)$machineDataRow['da_avg']
             );
 
             $data_ = array(
                 'code' => '',
-                'name' => 'Нагрузка da_avg1',
+                'name' => 'Нагрузка da_avg',
                 'color' => '#FF0F0F',
             );
 

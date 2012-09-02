@@ -68,7 +68,10 @@ class MachineData extends CActiveRecord
     public $machine_work_avg4;
 
     public $cnt_machine;
-	/**
+
+    public $da_avg;
+
+    /**
 	 * Returns the static model of the specified AR class.
 	 * @return MachineData the static model class
 	 */
