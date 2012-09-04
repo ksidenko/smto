@@ -27,6 +27,9 @@
 
     <div class="row submit">
         <?php echo CHtml::submitButton('Отобразить'); ?>
+
+        <button id="reset_selection" style="display: none; float:right; " >Сбросить выделение</button>
+        <div style="clear:both;"></div>
     </div>
 
     <?php $this->endWidget(); ?>
@@ -127,17 +130,18 @@
         $arr = array();
         $arr['label'] = '';
         $arr['color'] = $chartData['machine_da_value']['info']['color'];
-        $arr['yaxis'] = 2;
+        $arr['yaxis'] = 1;
         $arr['lines'] = array(
             'show' => true,
             'lineWidth' => 2,
         );
         $arr['data'] = $chartData['machine_da_value']['data'];
 
-        $plotData['machine_da_value'] []= $arr;
+        $plotData['machine_detector_analog_value'] []= $arr;
+        //print_r($plotData['machine_detector_analog_value']); die;
     //}
 
-    $plotData['machine_state'] = array_merge($plotData['machine_state'], $plotData['machine_da_value']);
+    //$plotData['machine_state'] = array_merge($plotData['machine_state'], $plotData['machine_da_value']);
 
     $yAxisTicks['operator_last_fkey'] []= array(0, '');
     foreach($chartData['states']['operator_last_fkey'] as $key => $machineStateInfo) {
@@ -170,11 +174,12 @@
 //    }
 
     $yAxisTicks['operator_last_fkey'] []= array($key+1, '');
-
 ?>
 
 <script type="text/javascript">
-    var plot1, plot2;
+    var plot0, plot1, plot2;
+
+    var data_machine_detector_analog_value = <?php echo json_encode($plotData['machine_detector_analog_value']); ?>;
     var data_machine_state = <?php echo json_encode($plotData['machine_state']); ?>;
     var data_operator_last_fkey = <?php echo json_encode($plotData['operator_last_fkey']); ?>;
 
@@ -187,20 +192,16 @@
             //tickSize:[10, "second"],
 //                timeformat: "%H:%M:%S"
         },
-        yaxes: [{
+        yaxis: {
             position: "right",
             reserveSpace: true,
             labelWidth: 150
-        },{
-            show: true,
-            position: "left",
-            reserveSpace: true,
-            labelWidth: 40,
-            color: '#FF0F0F'
-        }]
-        ,
+        },
         grid: {
-            backgroundColor: { colors: ["#fff", "#eee"] }
+            backgroundColor: { colors: ["#fff", "#eee"] },
+            hoverable: true,
+            autoHighlight: false,
+            mouseActiveRadius: 200
         },
         selection: { mode: "x" },
         crosshair: {
@@ -210,14 +211,21 @@
         }
     };
 
+    var options_machine_detector_analog_value = jQuery.extend(true, {}, options);
     var options_machine_state = jQuery.extend(true, {}, options);
     var options_operator_last_fkey = jQuery.extend(true, {}, options);
 
+
+    function get_data_machine_detector_analog_value() {
+        var d = data_machine_detector_analog_value;
+        return d;
+    }
+
     function get_data_machine_state() {
         var d = data_machine_state;
-        if ($('.show_da_values').is(':checked') == false) {
-            d = data_machine_state.slice(0, data_machine_state.length-1);
-        }
+//        if ($('.show_da_values').is(':checked') == false) {
+//            d = data_machine_state.slice(0, data_machine_state.length-1);
+//        }
         return d;
     }
 
@@ -226,75 +234,191 @@
         return d;
     }
 
-    options_machine_state.yaxes[0].ticks = <?php echo json_encode($yAxisTicks['machine_state']); ?>;
-
-    options_operator_last_fkey.yaxes[0].ticks = <?php echo json_encode($yAxisTicks['operator_last_fkey']); ?>;
+    //options_machine_detector_analog_value.yaxis.ticks = [0,200];
+    options_machine_state.yaxis.ticks = <?php echo json_encode($yAxisTicks['machine_state']); ?>;
+    options_operator_last_fkey.yaxis.ticks = <?php echo json_encode($yAxisTicks['operator_last_fkey']); ?>;
 
     function plot_chart(show, options) {
 
-        //options_machine_state.yaxes[1].show = show;
-
+        var d0 = get_data_machine_detector_analog_value();
         var d1 = get_data_machine_state();
         var d2 = get_data_operator_last_fkey();
 
+        var placeholder0 = $("#line_report_machine_detector_analog_value");
         var placeholder1 = $("#line_report_machine_state");
         var placeholder2 = $("#line_report_operator_last_fkey");
 
+        var o0 = options_machine_detector_analog_value;
         var o1 = options_machine_state;
         var o2 = options_operator_last_fkey;
 
         if (options) {
+            o0 = $.extend(true, {}, o0, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
             o1 = $.extend(true, {}, o1, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
             o2 = $.extend(true, {}, o2, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
         }
+        plot0 = $.plot( placeholder0, d0, o0 );
         plot1 = $.plot( placeholder1, d1, o1 );
         plot2 = $.plot( placeholder2, d2, o2 );
 
         function bindSelection( event, ranges) {
+            var d0 = get_data_machine_detector_analog_value();
             var d1 = get_data_machine_state();
             var d2 = get_data_operator_last_fkey();
 
+            plot0 = $.plot( placeholder0, d0, $.extend(true, {}, options_machine_detector_analog_value,      { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
             plot1 = $.plot( placeholder1, d1, $.extend(true, {}, options_machine_state,      { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
             plot2 = $.plot( placeholder2, d2, $.extend(true, {}, options_operator_last_fkey, { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
 
             $("#reset_selection").show('fast');
+
+            return false;
         };
 
+        placeholder0.bind("plotselected", bindSelection);
         placeholder1.bind("plotselected", bindSelection);
         placeholder2.bind("plotselected", bindSelection);
 
         $("#reset_selection").click(function () {
+            var d0 = get_data_machine_detector_analog_value();
             var d1 = get_data_machine_state();
             var d2 = get_data_operator_last_fkey();
 
+            plot0 = $.plot( placeholder0, d0, options_machine_detector_analog_value );
             plot1 = $.plot( placeholder1, d1, options_machine_state );
             plot2 = $.plot( placeholder2, d2, options_operator_last_fkey );
+
             $("#reset_selection").hide('fast');
+
+            return false;
         });
     }
 
     $(function() {
         plot_chart(false);
 
+        var p0 = $("#line_report_machine_detector_analog_value");
+
         $('.show_da_values').click(function(){
-            var o1 = plot1.getOptions();
-            plot_chart( $(this).is(':checked'), o1);
+            p0.toggle();
+            //console.log(p0.is(':visible'));
+            //var o1 = plot1.getOptions();
+            //plot_chart( p0.is(':visible'), o1);
+        });
+
+        var updateLegendTimeout = null;
+        var latestPosition = null;
+
+        function updateLegend() {
+            updateLegendTimeout = null;
+
+            var pos = latestPosition;
+
+
+            var axes = plot0.getAxes();
+            if (pos.x < axes.xaxis.min || pos.x > axes.xaxis.max ||
+                pos.y < axes.yaxis.min || pos.y > axes.yaxis.max)
+                return;
+
+            var i, j, dataset = plot0.getData();
+            for (i = 0; i < dataset.length; ++i) {
+                var series = dataset[i];
+
+                // find the nearest points, x-wise
+                for (j = 0; j < series.data.length; ++j)
+                    if (series.data[j][0] > pos.x)
+                        break;
+
+                // now interpolate
+                var y, p1 = series.data[j - 1], p2 = series.data[j];
+                if (p1 == null)
+                    y = p2[1];
+                else if (p2 == null)
+                    y = p1[1];
+                else
+                    y = p1[1] + (p2[1] - p1[1]) * (pos.x - p1[0]) / (p2[0] - p1[0]);
+
+                //console.log(pos.y.toFixed(2));
+
+                if (latestItem) {
+                    //if (previousPoint != latestItem.dataIndex) {
+                    //    previousPoint = latestItem.dataIndex;
+
+                        $("#tooltip").remove();
+//                        var x = latestItem.datapoint[0].toFixed(2),
+//                            y = latestItem.datapoint[1].toFixed(2);
+
+                        showTooltip(latestItem.pageX, latestItem.pageY, y.toFixed(2));
+                    //}
+                } else {
+                   $("#tooltip").remove();
+                    previousPoint = null;
+                }
+
+                $('#legend').html(y.toFixed(2));
+            }
+        }
+
+        var previousPoint = null, latestItem = null;
+
+        $("#line_report_machine_detector_analog_value").bind("plothover",  function (event, pos, item) {
+            latestPosition = pos;
+            latestItem = item;
+            if (!updateLegendTimeout) {
+                $("#tooltip").remove();
+                previousPoint = null;
+                updateLegendTimeout = setTimeout(updateLegend, 50);
+            }
+
+//            if (item) {
+//                if (previousPoint != item.dataIndex) {
+//                    previousPoint = item.dataIndex;
+//
+//                    $("#tooltip").remove();
+//                    var x = item.datapoint[0].toFixed(2),
+//                        y = item.datapoint[1].toFixed(2);
+//
+//                    showTooltip(item.pageX, item.pageY, y);
+//                }
+//            } else {
+//                $("#tooltip").remove();
+//                previousPoint = null;
+//            }
         });
     });
 
+
+    function showTooltip(x, y, contents) {
+        $('<div id="tooltip">' + contents + '</div>').css( {
+            position: 'absolute',
+            display: 'none',
+            top: y + 5,
+            left: x + 5,
+            border: '1px solid #fdd',
+            padding: '2px',
+            'background-color': '#fee',
+            opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+    }
 </script>
 
 <?php
-    $h = 230;
+    $h = 200;
+    $w = 950;
     $h_slave = round($h / 1.6);
 ?>
 
-<p><label>Отобразить значения аналогового датчика <input type="checkbox" class="show_da_values" ></label><button id="reset_selection" style="display: none;" >Сбросить выделение</button></p>
+<p>
+<!--    <label>Отобразить значения аналогового датчика <input type="checkbox" class="show_da_values" ></label>-->
+<!--<div id="legend"></div>-->
+</p>
 
+<H3 style="padding: 0px 0 0px 50px; cursor: pointer; text-decoration: underline;" class="show_da_values" >Аналоговый сигнал</H3>
+<div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px; ;display:none;"></div>
 <H3 style="padding: 20px 0 0px 50px" >Состояния станка</H3>
-<div id="line_report_machine_state" style="width:800px;height:<?php echo $h; ?>px;"></div>
+<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
 <H3 style="padding: 40px 0 0px 50px" >События зарегистрированные оператором</H3>
-<div id="line_report_operator_last_fkey" style="width:800px;height:<?php echo $h_slave; ?>px;"></div>
+<div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave; ?>px;"></div>
 
 <?php }  ?>
 
