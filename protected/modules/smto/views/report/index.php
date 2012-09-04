@@ -69,10 +69,8 @@
             prevText: '<Пред',
             nextText: 'След>',
             currentText: 'Сегодня',
-            monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
-                'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-            monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
-                'Июл','Авг','Сен','Окт','Ноя','Дек'],
+            monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+            monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
             dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
             dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
             dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
@@ -231,7 +229,7 @@
 
             if (typeof dataJsonStatesMain[id] !== 'undefined' && dataJsonStatesMain[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_main_' + id);
-                //id_.before('<label><b>Работа</b><br>' + dataJsonStatesMain[id]['chart']['caption'] + '</label>');
+                id_.before('<label>' + dataJsonStatesMain[id]['chart']['caption'] + '</label>');
 
                 options.legend.container = $('#machine_chart_report_main_legend_'+id);
                 $.plot(id_, dataJsonStatesMain[id]['data'], options);
@@ -267,7 +265,7 @@
 
             if (typeof dataJsonStatesWork[id] !== 'undefined' && dataJsonStatesWork[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_work_' + id);
-                //id_.before('<label><b>Работа / холостой ход</b><br>' + dataJsonStatesWork[id]['chart']['caption'] + '</label>');
+                id_.before('<label>' + dataJsonStatesWork[id]['chart']['caption'] + '</label>');
 
                 options.legend.container = $('#machine_chart_report_work_legend_'+id);
                 $.plot(id_, dataJsonStatesWork[id]['data'], options);
@@ -275,7 +273,7 @@
 
             if (typeof dataJsonStatesNotWork[id] !== 'undefined' && dataJsonStatesNotWork[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_not_work_' + id);
-                //id_.before('<label><b>Простой</b><br>' + dataJsonStatesNotWork[id]['chart']['caption'] + '</label>');
+                id_.before('<label>' + dataJsonStatesNotWork[id]['chart']['caption'] + '</label>');
 
                 options.legend.container = $('#machine_chart_report_not_work_legend_'+id);
                 $.plot(id_, dataJsonStatesNotWork[id]['data'], options);
