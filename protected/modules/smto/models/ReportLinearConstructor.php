@@ -98,31 +98,41 @@ class ReportLinearConstructor extends ReportSearchForm {
             //Prepare chart data for machine states
             //-----------------------------------------------------------------------------------
 
+            $machineStateCode = $machineDataRow['state'];
+
+            if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
+                continue;
+            }
+
+            if ($machineStateCode == MachineState::STATE_MACHINE_IDLE_RUN) {
+                $machineStateCode = MachineState::STATE_MACHINE_WORK;
+            }
+
             // process break for machine states
-            if ( isset($lastTimeValues['machine_state'][$machineDataRow['state']]) ) {
-                $dtPrev = $lastTimeValues['machine_state'][$machineDataRow['state']];
+            if ( isset($lastTimeValues['machine_state'][$machineStateCode]) ) {
+                $dtPrev = $lastTimeValues['machine_state'][$machineStateCode];
                 $dt = $machineDataRow['dt'];
                 if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
-                    $this->output['states']['machine_state'][$machineDataRow['state']]['data'] [] = null;
+                    $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
                 }
             }
             // save last dt value for current machine state
-            $lastTimeValues['machine_state'][$machineDataRow['state']] = $machineDataRow['dt'];
+            $lastTimeValues['machine_state'][$machineStateCode] = $machineDataRow['dt'];
 
 
-            $this->output['states']['machine_state'][$machineDataRow['state']]['data'] []= array(
+            $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
                 $this->toJsTimestamp($machineDataRow['dt']),
-                (int)$machineDataRow['state']
+                (int)$machineStateCode
             );
 
-            $machineState = MachineState::model()->cache(60)->findByPk($machineDataRow['state']);
+            $machineState = MachineState::model()->cache(60)->findByPk($machineStateCode);
             $data_ = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
-                'color' => EventColor::getColorByCode('machine_' . $machineDataRow['state']),
+                'color' => EventColor::getColorByCode('machine_' . $machineStateCode),
             );
 
-            $this->output['states']['machine_state'][$machineDataRow['state']]['info'] = $data_;
+            $this->output['states']['machine_state'][$machineStateCode]['info'] = $data_;
 
             //-----------------------------------------------------------------------------------
             //Prepare chart data for machine analog values

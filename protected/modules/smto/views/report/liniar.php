@@ -185,6 +185,7 @@
 
     var options = {
         xaxis: {
+            show: false,
             mode: 'time',
             //minTickSize: [1, "second"]
             min: <?php echo $model->startDttoJsTimestamp(); ?>,
@@ -208,6 +209,9 @@
             mode: "x",
             color: '#35331A',
             lineWidth: 1
+        },
+        hooks: {
+            processDatapoints: [hide_axis]
         }
     };
 
@@ -215,6 +219,17 @@
     var options_machine_state = jQuery.extend(true, {}, options);
     var options_operator_last_fkey = jQuery.extend(true, {}, options);
 
+    options_operator_last_fkey.xaxis.show = true;
+
+    function hide_axis(plot, serie) {
+        function formatterEmpty(val, axis) {
+            return '';
+        }
+
+        if (serie.xaxis.options.show == false) {
+            serie.xaxis.options.tickFormatter = formatterEmpty;
+        }
+    }
 
     function get_data_machine_detector_analog_value() {
         var d = data_machine_detector_analog_value;
@@ -413,11 +428,8 @@
 <!--<div id="legend"></div>-->
 </p>
 
-<H3 style="padding: 0px 0 0px 50px; cursor: pointer; text-decoration: underline;" class="show_da_values" >Аналоговый сигнал</H3>
-<div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px; ;display:none;"></div>
-<H3 style="padding: 20px 0 0px 50px" >Состояния станка</H3>
-<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
-<H3 style="padding: 40px 0 0px 50px" >События зарегистрированные оператором</H3>
+<div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
+<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave; ?>px;"></div>
 <div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave; ?>px;"></div>
 
 <?php }  ?>
