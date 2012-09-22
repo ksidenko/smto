@@ -108,6 +108,9 @@
     $yAxisTicks = array();
 
     $yAxisTicks['machine_state'] []= array(-1, '');
+    $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_ON, 'Включен');
+    $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_WORK, 'Работает');
+
     foreach($chartData['states']['machine_state'] as $key => $machineStateInfo) {
         $arr = array();
         $arr['label'] = '';
@@ -121,10 +124,10 @@
 
         $plotData['machine_state'] []= $arr;
 
-        $yAxisTicks['machine_state'] []= array($key, $machineStateInfo['info']['name']);
+        //$yAxisTicks['machine_state'] []= array($key, $machineStateInfo['info']['name']);
     }
 
-    $yAxisTicks['machine_state'] []= array($key+2, '');
+    $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_WORK + 2, '');
 
     //foreach($chartData['machine_da_value'] as $key => $machineStateInfo) {
         $arr = array();
@@ -165,7 +168,8 @@
         $plotData['operator_last_fkey'] []= array('data' => array(1,1));
     }
 
-    //$yAxisTicks['operator_last_fkey'] =
+    $yAxisTicks['operator_last_fkey'] = $yAxisTicks['machine_state'];
+
     $eventsData = MachineEvent::getList();
 
     foreach($eventsData as $row) {
@@ -173,6 +177,9 @@
         $yAxisTicks['operator_last_fkey'] []= array($key, $row->name);
     }
     $yAxisTicks['operator_last_fkey'] []= array($key + 1, '');
+
+
+    $plotData['operator_last_fkey'] = array_merge($plotData['operator_last_fkey'], $plotData['machine_state']);
 
 //TODO
 //    foreach($chartData['states']['operator'] as $key => $machineStateInfo) {
@@ -252,13 +259,13 @@
         return d;
     }
 
-    function get_data_machine_state() {
-        var d = data_machine_state;
-//        if ($('.show_da_values').is(':checked') == false) {
-//            d = data_machine_state.slice(0, data_machine_state.length-1);
-//        }
-        return d;
-    }
+//    function get_data_machine_state() {
+//        var d = data_machine_state;
+////        if ($('.show_da_values').is(':checked') == false) {
+////            d = data_machine_state.slice(0, data_machine_state.length-1);
+////        }
+//        return d;
+//    }
 
     function get_data_operator_last_fkey() {
         var d = data_operator_last_fkey;
@@ -266,39 +273,39 @@
     }
 
     //options_machine_detector_analog_value.yaxis.ticks = [0,200];
-    options_machine_state.yaxis.ticks = <?php echo json_encode($yAxisTicks['machine_state']); ?>;
+    //options_machine_state.yaxis.ticks = <?php echo json_encode($yAxisTicks['machine_state']); ?>;
     options_operator_last_fkey.yaxis.ticks = <?php echo json_encode($yAxisTicks['operator_last_fkey']); ?>;
 
     function plot_chart(show, options) {
 
         var d0 = get_data_machine_detector_analog_value();
-        var d1 = get_data_machine_state();
+        //var d1 = get_data_machine_state();
         var d2 = get_data_operator_last_fkey();
 
         var placeholder0 = $("#line_report_machine_detector_analog_value");
-        var placeholder1 = $("#line_report_machine_state");
+        //var placeholder1 = $("#line_report_machine_state");
         var placeholder2 = $("#line_report_operator_last_fkey");
 
         var o0 = options_machine_detector_analog_value;
-        var o1 = options_machine_state;
+        //var o1 = options_machine_state;
         var o2 = options_operator_last_fkey;
 
         if (options) {
             o0 = $.extend(true, {}, o0, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
-            o1 = $.extend(true, {}, o1, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
+            //o1 = $.extend(true, {}, o1, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
             o2 = $.extend(true, {}, o2, { xaxis: { min: options.xaxis.min, max: options.xaxis.max } });
         }
         plot0 = $.plot( placeholder0, d0, o0 );
-        plot1 = $.plot( placeholder1, d1, o1 );
+        //plot1 = $.plot( placeholder1, d1, o1 );
         plot2 = $.plot( placeholder2, d2, o2 );
 
         function bindSelection( event, ranges) {
             var d0 = get_data_machine_detector_analog_value();
-            var d1 = get_data_machine_state();
+            //var d1 = get_data_machine_state();
             var d2 = get_data_operator_last_fkey();
 
             plot0 = $.plot( placeholder0, d0, $.extend(true, {}, options_machine_detector_analog_value,      { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
-            plot1 = $.plot( placeholder1, d1, $.extend(true, {}, options_machine_state,      { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
+            //plot1 = $.plot( placeholder1, d1, $.extend(true, {}, options_machine_state,      { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
             plot2 = $.plot( placeholder2, d2, $.extend(true, {}, options_operator_last_fkey, { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } } ));
 
             $("#reset_selection").show('fast');
@@ -307,16 +314,16 @@
         };
 
         placeholder0.bind("plotselected", bindSelection);
-        placeholder1.bind("plotselected", bindSelection);
+        //placeholder1.bind("plotselected", bindSelection);
         placeholder2.bind("plotselected", bindSelection);
 
         $("#reset_selection").click(function () {
             var d0 = get_data_machine_detector_analog_value();
-            var d1 = get_data_machine_state();
+            //var d1 = get_data_machine_state();
             var d2 = get_data_operator_last_fkey();
 
             plot0 = $.plot( placeholder0, d0, options_machine_detector_analog_value );
-            plot1 = $.plot( placeholder1, d1, options_machine_state );
+            //plot1 = $.plot( placeholder1, d1, options_machine_state );
             plot2 = $.plot( placeholder2, d2, options_operator_last_fkey );
 
             $("#reset_selection").hide('fast');
@@ -324,9 +331,9 @@
             return false;
         });
 
-        $.each([placeholder0, placeholder1, placeholder2], function(i, p) {
+        $.each([placeholder0, placeholder2], function(i, p) {
             p.bind("plothover", function (event, pos, item) {
-                var plots = [plot0, plot1, plot2];
+                var plots = [plot0, plot2];
                 plots.splice(i, 1);
                 $.each( plots, function(j, elem) {
                     elem.setCrosshair(pos);
@@ -334,7 +341,7 @@
             });
 
             p.bind("mouseout", function (event) {
-                var plots = [plot0, plot1, plot2];
+                var plots = [plot0, plot2];
                 plots.splice(i, 1);
                 $.each( plots, function(j, elem) {
                     elem.clearCrosshair();
@@ -342,10 +349,10 @@
             });
         });
 
-        $.each([placeholder0, placeholder1, placeholder2], function(i, p) {
+        $.each([placeholder0, placeholder2], function(i, p) {
             p.bind("plotselecting", function(event, ranges) {
                 if (ranges) {
-                    var plots = [plot0, plot1, plot2];
+                    var plots = [plot0, plot2];
                     plots.splice(i, 1);
                     $.each( plots, function(j, elem) {
                         elem.setSelection({ xaxis: ranges.xaxis }, true);
@@ -468,8 +475,8 @@
 <?php
     $h = 220;
     $w = 940;
-    $h_slave1 = round($h / 1.6);
-    $h_slave2 = round($h_slave1 / 1.6);
+    $h_slave1 = round($h / 1);
+    //$h_slave2 = round($h_slave1 / 1.6);
 ?>
 
 <p>
@@ -479,7 +486,7 @@
 
 <div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
 <div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave1; ?>px;"></div>
-<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave2; ?>px;"></div>
+<!--<div id="line_report_machine_state" style="width:<?php //echo $w; ?>px;height:<?php //echo $h_slave2; ?>px; display:none;"></div>-->
 
 
 <?php }  ?>
