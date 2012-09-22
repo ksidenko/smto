@@ -95,7 +95,7 @@
 <?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
 //    'id' => 'fixme',
 //'excanvas.min.js',
-    'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js', 'jquery.flot.crosshair.js')
+    'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js', 'jquery.flot.crosshair.js', 'jquery.flot.threshold.js')
 )); ?>
 
 <?php if (count($chartData) && isset($chartData['states']) && $chartData['states']['machine_state']) { ?>
@@ -124,7 +124,7 @@
         $yAxisTicks['machine_state'] []= array($key, $machineStateInfo['info']['name']);
     }
 
-    $yAxisTicks['machine_state'] []= array($key+1, '');
+    $yAxisTicks['machine_state'] []= array($key+2, '');
 
     //foreach($chartData['machine_da_value'] as $key => $machineStateInfo) {
         $arr = array();
@@ -136,6 +136,8 @@
             'lineWidth' => 2,
         );
         $arr['data'] = $chartData['machine_da_value']['data'];
+
+        $arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
 
         $plotData['machine_detector_analog_value'] []= $arr;
         //print_r($plotData['machine_detector_analog_value']); die;
@@ -155,8 +157,22 @@
         $arr['data'] = $machineStateInfo['data'];
 
         $plotData['operator_last_fkey'] []= $arr;
-        $yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
+        //$yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
     }
+
+
+    if (count($plotData['operator_last_fkey']) == 0) {
+        $plotData['operator_last_fkey'] []= array('data' => array(1,1));
+    }
+
+    //$yAxisTicks['operator_last_fkey'] =
+    $eventsData = MachineEvent::getList();
+
+    foreach($eventsData as $row) {
+        $key = $row->id + MachineEvent::$idOffset;
+        $yAxisTicks['operator_last_fkey'] []= array($key, $row->name);
+    }
+    $yAxisTicks['operator_last_fkey'] []= array($key + 1, '');
 
 //TODO
 //    foreach($chartData['states']['operator'] as $key => $machineStateInfo) {
@@ -173,7 +189,7 @@
 //        $yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
 //    }
 
-    $yAxisTicks['operator_last_fkey'] []= array($key+1, '');
+    //$yAxisTicks['operator_last_fkey'] []= array($key+1, '');
 ?>
 
 <script type="text/javascript">
@@ -219,7 +235,7 @@
     var options_machine_state = jQuery.extend(true, {}, options);
     var options_operator_last_fkey = jQuery.extend(true, {}, options);
 
-    options_operator_last_fkey.xaxis.show = true;
+    options_machine_state.xaxis.show = true;
 
     function hide_axis(plot, serie) {
         function formatterEmpty(val, axis) {
@@ -307,6 +323,38 @@
 
             return false;
         });
+
+        $.each([placeholder0, placeholder1, placeholder2], function(i, p) {
+            p.bind("plothover", function (event, pos, item) {
+                var plots = [plot0, plot1, plot2];
+                plots.splice(i, 1);
+                $.each( plots, function(j, elem) {
+                    elem.setCrosshair(pos);
+                });
+            });
+
+            p.bind("mouseout", function (event) {
+                var plots = [plot0, plot1, plot2];
+                plots.splice(i, 1);
+                $.each( plots, function(j, elem) {
+                    elem.clearCrosshair();
+                });
+            });
+        });
+
+        $.each([placeholder0, placeholder1, placeholder2], function(i, p) {
+            p.bind("plotselecting", function(event, ranges) {
+                if (ranges) {
+                    var plots = [plot0, plot1, plot2];
+                    plots.splice(i, 1);
+                    $.each( plots, function(j, elem) {
+                        elem.setSelection({ xaxis: ranges.xaxis }, true);
+                        elem.clearCrosshair();
+                    });
+                }
+            })
+        });
+
     }
 
     $(function() {
@@ -418,9 +466,10 @@
 </script>
 
 <?php
-    $h = 200;
-    $w = 950;
-    $h_slave = round($h / 1.6);
+    $h = 220;
+    $w = 940;
+    $h_slave1 = round($h / 1.6);
+    $h_slave2 = round($h_slave1 / 1.6);
 ?>
 
 <p>
@@ -429,8 +478,9 @@
 </p>
 
 <div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
-<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave; ?>px;"></div>
-<div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave; ?>px;"></div>
+<div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave1; ?>px;"></div>
+<div id="line_report_machine_state" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave2; ?>px;"></div>
+
 
 <?php }  ?>
 

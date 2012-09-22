@@ -108,31 +108,39 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $machineStateCode = MachineState::STATE_MACHINE_WORK;
             }
 
-            // process break for machine states
-            if ( isset($lastTimeValues['machine_state'][$machineStateCode]) ) {
-                $dtPrev = $lastTimeValues['machine_state'][$machineStateCode];
-                $dt = $machineDataRow['dt'];
-                if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
-                    $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
-                }
+            $arrStates = array($machineStateCode);
+            if ($machineStateCode == MachineState::STATE_MACHINE_WORK) {
+                $arrStates []= MachineState::STATE_MACHINE_ON;
             }
-            // save last dt value for current machine state
-            $lastTimeValues['machine_state'][$machineStateCode] = $machineDataRow['dt'];
+
+            foreach ($arrStates as $machineStateCode) {
+
+                // process break for machine states
+                if ( isset($lastTimeValues['machine_state'][$machineStateCode]) ) {
+                    $dtPrev = $lastTimeValues['machine_state'][$machineStateCode];
+                    $dt = $machineDataRow['dt'];
+                    if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
+                        $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
+                    }
+                }
+                // save last dt value for current machine state
+                $lastTimeValues['machine_state'][$machineStateCode] = $machineDataRow['dt'];
 
 
-            $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
-                $this->toJsTimestamp($machineDataRow['dt']),
-                (int)$machineStateCode
-            );
+                $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
+                    $this->toJsTimestamp($machineDataRow['dt']),
+                    (int)$machineStateCode
+                );
 
-            $machineState = MachineState::model()->cache(60)->findByPk($machineStateCode);
-            $data_ = array(
-                'code' => $machineState->code,
-                'name' => $machineState->name,
-                'color' => EventColor::getColorByCode('machine_' . $machineStateCode),
-            );
+                $machineState = MachineState::model()->cache(60)->findByPk($machineStateCode);
+                $data_ = array(
+                    'code' => $machineState->code,
+                    'name' => $machineState->name,
+                    'color' => EventColor::getColorByCode('machine_' . $machineStateCode),
+                );
 
-            $this->output['states']['machine_state'][$machineStateCode]['info'] = $data_;
+                $this->output['states']['machine_state'][$machineStateCode]['info'] = $data_;
+            }
 
             //-----------------------------------------------------------------------------------
             //Prepare chart data for machine analog values
@@ -158,11 +166,25 @@ class ReportLinearConstructor extends ReportSearchForm {
             $data_ = array(
                 'code' => '',
                 'name' => 'Нагрузка da_avg',
-                'color' => '#FF0F0F',
+                'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_WORK),
             );
 
-            $this->output['machine_da_value']['info'] = $data_;
+            $belowValue = null;
+            foreach($this->machineInfo->config as $machineConfig) {
+                if ( $machineConfig->condition_number == (12 + $this->machineInfo->main_detector_analog) &&
+                    $machineConfig->machine_state_id == MachineState::STATE_MACHINE_WORK
+                ) {
+                    $belowValue = $machineConfig->value;
+                }
+            }
+            if ($belowValue) {
+                $data_ ['threshold'] = array(
+                    'below' => $belowValue,
+                    'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN)
+                );
+            }
 
+            $this->output['machine_da_value']['info'] = $data_;
 
 
             //-----------------------------------------------------------------------------------
@@ -171,21 +193,24 @@ class ReportLinearConstructor extends ReportSearchForm {
 
             if ($machineDataRow['operator_last_fkey'] > 0) {
 
+                $operatorLastKey = $machineDataRow['operator_last_fkey'];
+                $operatorLastKey += MachineEvent::$idOffset;
+
                 // process break for machine states
-                if ( isset($lastTimeValues['operator_last_fkey'][$machineDataRow['operator_last_fkey']]) ) {
-                    $dtPrev = $lastTimeValues['operator_last_fkey'][$machineDataRow['operator_last_fkey']];
+                if ( isset($lastTimeValues['operator_last_fkey'][$operatorLastKey]) ) {
+                    $dtPrev = $lastTimeValues['operator_last_fkey'][$operatorLastKey];
                     $dt = $machineDataRow['dt'];
                     if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
-                        $this->output['states']['operator_last_fkey'][$machineDataRow['operator_last_fkey']]['data'] [] = null;
+                        $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] [] = null;
                     }
                 }
                 // save last dt value for current machine state
-                $lastTimeValues['operator_last_fkey'][$machineDataRow['operator_last_fkey']] = $machineDataRow['dt'];
+                $lastTimeValues['operator_last_fkey'][$operatorLastKey] = $machineDataRow['dt'];
 
 
-                $this->output['states']['operator_last_fkey'][$machineDataRow['operator_last_fkey']]['data'] []= array(
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
                     $this->toJsTimestamp($machineDataRow['dt']),
-                    (int)$machineDataRow['operator_last_fkey']
+                    (int)$operatorLastKey
                 );
 
 
@@ -197,7 +222,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                     'color' => $fkeyState->color,
                 );
 
-                $this->output['states']['operator_last_fkey'][$machineDataRow['operator_last_fkey']]['info'] = $data_;
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['info'] = $data_;
             }
 
 

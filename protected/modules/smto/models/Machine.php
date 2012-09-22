@@ -114,7 +114,7 @@ class Machine extends CActiveRecord
             'fkey'=>array(self::HAS_MANY, 'Fkey', 'machine_id', 'order' => 'number ASC'),
             'detector'=>array(self::HAS_MANY, 'Detector', 'machine_id', 'order' => 'type ASC, number ASC'),
             'amplitude'=>array(self::HAS_MANY, 'Amplitude', 'machine_id', 'order' => 'type ASC, number ASC'),
-            'config'=>array(self::HAS_ONE, 'MachineConfig', 'machine_id'),
+            'config'=>array(self::HAS_MANY, 'MachineConfig', 'machine_id'),
 		);
 	}
 

@@ -12,6 +12,7 @@
  */
 class MachineEvent extends CActiveRecord
 {
+    public static $idOffset = 0;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return MachineEvent the static model class

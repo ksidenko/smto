@@ -232,16 +232,29 @@
                 id_.before('<label>' + dataJsonStatesMain[id]['chart']['caption'] + '</label>');
 
                 options.legend.container = $('#machine_chart_report_main_legend_'+id);
-                $.plot(id_, dataJsonStatesMain[id]['data'], options);
+                var plot = $.plot(id_, dataJsonStatesMain[id]['data'], options);
 
 //                function pieHover(event, pos, obj)
 //                {
+//                    var o = plot.getOptions();
+//                    var c = o.legend.container;
 //                    if (!obj)
 //                        return;
-//                    percent = parseFloat(obj.series.percent).toFixed(2);
-//                    $("#hover").html('<span style="font-weight: bold; color: '+obj.series.color+'">'+obj.series.label+' ('+percent+'%)</span>');
-//                }
+//                    //percent = parseFloat(obj.series.percent).toFixed(2);
+//                    //$("#hover").html('<span style="font-weight: bold; color: '+obj.series.color+'">'+obj.series.label+' ('+percent+'%)</span>');
 //
+//                    var td = c.find('table .legendLabel:eq('+obj.seriesIndex+')');
+//                    if (td && !td.hasClass('selectLegend')) {
+//                        td.addClass('selectLegend');
+//                    }
+//                }
+
+//                options.legend.container.mouseover({a:12, b:"abc"}, function(e){
+//                    var b = 1;
+//                    b = b + 1;
+//
+//                });
+
                 function pieClick(event, pos, obj)
                 {
                     if (!obj)
@@ -259,7 +272,7 @@
                     //alert(''+obj.series.label+': '+percent+'%');
                 }
                 id_.bind("plotclick", pieClick);
-//                id_.bind("plothover", pieHover);
+                //id_.bind("plothover", pieHover);
 
             }
 
