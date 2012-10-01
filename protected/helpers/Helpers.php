@@ -161,8 +161,7 @@ class Helpers {
     }
 
     static function checkHostReachable( $host, $port, $timeout = 5 ) {
-        $res = @fsockopen($host, $port, $errno, $errstr, $timeout);
-
-        return intval($res !== false);
+        exec(sprintf('ping -c 1 -w 2 %s', escapeshellarg($host)), $res, $rval);
+        return $rval===0;
     }
 }
