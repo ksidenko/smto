@@ -1,3 +1,5 @@
+<?php $timeRange = $model->getTimeRanges();?>
+
 <div class="form">
     <?php $form=$this->beginWidget('CActiveForm'); ?>
 
@@ -6,7 +8,8 @@
     <table width="500px" >
         <tr>
             <td>
-                <?php echo $form->label($model,'dtStart'); ?>
+                <?php echo $form->dropDownList($model,'timeRange', $timeRange['labels']); ?>
+                <?php //echo $form->label($model,'dtStart'); ?>
             </td>
             <td>
                 <?php echo $form->textField($model,'dtStart') ?>
@@ -37,6 +40,7 @@
 
 <script>
     $(function() {
+
 
         $.datepicker.regional['ru'] = {
             closeText: 'Закрыть',
@@ -88,6 +92,17 @@
 
         $("#ReportLinearConstructor_dtStart").datetimepicker('setDate', $("#ReportLinearConstructor_dtStart").val() );
         $("#ReportLinearConstructor_dtEnd").datetimepicker('setDate', $("#ReportLinearConstructor_dtEnd").val() );
+
+        var timeRange = <?php echo json_encode($timeRange); ?>;
+
+        $('#ReportLinearConstructor_timeRange').change(function(){
+            var v = $(this).val();
+            var s = timeRange['values'][v]['start_date'];
+            var e = timeRange['values'][v]['end_date'];
+
+            $("#ReportLinearConstructor_dtStart").datetimepicker('setDate', s );
+            $("#ReportLinearConstructor_dtEnd").datetimepicker('setDate', e );
+        });
     });
 </script>
 
