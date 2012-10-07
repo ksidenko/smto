@@ -120,6 +120,23 @@
         <p class="hint" ></p>
     </div>
 
+    <div class="row">
+        <?php echo $form->labelEx($model,'groups'); ?>
+        <?php
+            $dataSelect = array();
+            foreach($model->groups as $group) {
+                $dataSelect[$group->id] = $group->name;
+            }
+            $data = CHtml::listData(MachineGroup::model()->findAll(array('order' => 'name')), 'id', 'name');
+
+            //print_r($dataSelect);print_r($data);die;
+
+            echo CHtml::dropDownList('Machine[groups][]', $dataSelect, $data, array('multiple'=>true, 'size' => 3));
+        ?>
+        <?php echo $form->error($model,'groups'); ?>
+        <p class="hint" ></p>
+    </div>
+
     <?php if (isset($machineConfigData) && is_array($machineConfigData)) {echo $this->renderPartial('machine_config', array('form' => $form, 'machineConfigData' => $machineConfigData, )); } ?>
 
     <h2>F - кнопки</h2>

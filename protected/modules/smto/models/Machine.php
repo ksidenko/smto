@@ -26,6 +26,9 @@ class Machine extends CActiveRecord
     private $isTemplate = null;
     public $reachable;
 
+    //public $groups = array();
+
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Machine the static model class
@@ -115,6 +118,7 @@ class Machine extends CActiveRecord
             'detector'=>array(self::HAS_MANY, 'Detector', 'machine_id', 'order' => 'type ASC, number ASC'),
             'amplitude'=>array(self::HAS_MANY, 'Amplitude', 'machine_id', 'order' => 'type ASC, number ASC'),
             'config'=>array(self::HAS_MANY, 'MachineConfig', 'machine_id'),
+            'groups'=>array(self::MANY_MANY, 'MachineGroup', 'machine_2_group(machine_id, group_id)'),
 		);
 	}
 
@@ -140,7 +144,8 @@ class Machine extends CActiveRecord
             'template_id' => 'Шаблон',
             'reachable' => 'Доступен',
             'main_detector_analog' => 'Главный аналог. датчик',
-            'main_detector_digit' => 'Главный цифровой датчик'
+            'main_detector_digit' => 'Главный цифровой датчик',
+            'groups' => 'Группы'
 		);
 	}
 
@@ -175,7 +180,7 @@ class Machine extends CActiveRecord
 		return array(
             'templates_list' => array(
                 'condition' => 'rec_type="template"',
-                'order' => 'id asc'
+                'order' => 't.id asc'
             ),
 
             'template_records' => array(
@@ -184,7 +189,7 @@ class Machine extends CActiveRecord
 
             'real_records' => array(
                 'condition' => 'rec_type="real"',
-                'order' => 'name asc'
+                'order' => 't.name asc'
             )
         );
 	}
@@ -212,7 +217,7 @@ class Machine extends CActiveRecord
         $this->fkey = $data['Fkey'];
         //$this->detector = $data['Detector'];
         //$this->amplitude = $data['Amplitude'];
-        $res = $this->saveWithRelated(array('fkey'/*, 'detector', 'amplitude'*/));
+        $res = $this->saveWithRelated(array('fkey', /*, 'detector', 'amplitude'*/));
 
         if (!$isNewRecord) {
             MachineConfig::model()->deleteAllByAttributes(array('machine_id' => $this->id));
@@ -241,7 +246,16 @@ class Machine extends CActiveRecord
             if (!file_exists($dataPath)) {
                 mkdir($this->getMachineDataPath(), 0777);
             }
+        }
 
+        if (isset($data['Machine']['groups'])) {
+            Machine2Group::model()->deleteAllByAttributes(array('machine_id' => $this->id));
+            foreach($data['Machine']['groups'] as $groupId) {
+                $rec = new Machine2Group();
+                $rec->machine_id =  $this->getPrimaryKey();
+                $rec->group_id =  $groupId;
+                $rec->save(false);
+            }
         }
 
         return $res;

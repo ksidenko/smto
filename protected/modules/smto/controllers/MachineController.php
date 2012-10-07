@@ -223,8 +223,8 @@ class MachineController extends Controller
         if ($resetScope) {
             $model->resetScope();
         }
-        $model=$model->findByPk($id);
-        
+        $model=$model->with('groups')->findByPk($id);
+
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;

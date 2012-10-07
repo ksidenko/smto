@@ -29,7 +29,20 @@
                 <?php //echo $form->dropDownList($model,'machineReportType', $model::$arrMachineReportType) ?>
             </td>
             <td>
-                <?php echo $form->dropDownList($model, 'machineId', array( 'separate' => 'Отдельный', 'join' => 'Объединенный', ) + CHtml::listData(Machine::model()->real_records()->findAll(array('order' => 'name')), 'id', 'name')) ?>
+                <?php
+                $machinesData = Machine::model()->real_records()->with('groups')->findAll();
+                $data = array();
+                foreach($machinesData as $machineData) {
+                    foreach($machineData->groups as $group) {
+                        $data[$group->name][$machineData->id] = $machineData->name;
+                    }
+                }
+                //$data=CHtml::listData($data, 'id', 'name', 'groups.name');
+                echo $form->dropDownList($model,'machineId',array( '_' => array('separate' => 'Отдельный', 'join' => 'Объединенный') ) + $data);
+
+                //echo $form->dropDownList($model, 'machineId', array( 'separate' => 'Отдельный', 'join' => 'Объединенный', ) + CHtml::listData(Machine::model()->real_records()->findAll(array('order' => 'name')), 'id', 'name'))
+
+                ?>
             </td>
         </tr>
 

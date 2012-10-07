@@ -18,6 +18,7 @@ if (!$model->getIsTemplate()) {
 }
 $this->breadcrumbs += array('Управление');
 $this->menu []= array('label'=>'Управление событиями станков', 'url'=>array('/smto/machineEvent/admin'));
+$this->menu []= array('label'=>'Управление группами станков', 'url'=>array('/smto/machineGroup/admin'));
 
 
 Yii::app()->clientScript->registerScript('search', "

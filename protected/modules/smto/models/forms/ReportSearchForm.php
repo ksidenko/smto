@@ -17,7 +17,28 @@ class ReportSearchForm extends CFormModel
         $row = Timetable::model()->find('cast(now() as time) between time_from and time_to');
 
         //echo $row['time_to'];die;
+        $currMonth = date('m');
+        //$currMonth = 11;
+        if ( 1 <= $currMonth && $currMonth <= 3 ) {
+            $prevQuarterStart = 10;
+        } else if ( 4 <= $currMonth && $currMonth <= 6 ) {
+            $prevQuarterStart = 1;
+        } else if ( 7 <= $currMonth && $currMonth <= 9 ) {
+            $prevQuarterStart = 4;
+        } else if ( 10 <= $currMonth && $currMonth <= 12 ) {
+            $prevQuarterStart = 7;
+        } else {
+            throw new Exception('Bad month: ' . $currMonth);
+        }
 
+        //$prevQuarterStart = 12 - $prevQuarterStart + 2;
+        $prevQuarterEnd = $prevQuarterStart + 2;
+
+        //$prevQuarterStart = (($currMonth%3)) * 3 - 2;
+        //$prevQuarterEnd = (($currMonth%3)) * 3;
+
+        //echo (floor($currMonth/4)) ; die;
+        //echo $prevQuarterStart . ' - ' . $prevQuarterEnd; die;
 
         $arr = array(
             'labels' => array(
@@ -40,7 +61,7 @@ class ReportSearchForm extends CFormModel
             ),
             'values' => array(
                 'custom' => array( 'start_date' => date('d.m.Y 00:00:00'), 'end_date' => date('d.m.Y H:i:s') ),
-                'current-turn' => array( 'start_date' => date('d.m.Y ' . $row['time_from'] . ':00'), 'end_date' => date('d.m.Y ' . $row['time_to'] . ':00') ),
+                'current-turn' => array( 'start_date' => date('d.m.Y ' . $row['time_from']), 'end_date' => date('d.m.Y ' . $row['time_to']) ),
                 'today' => array( 'start_date' => date('d.m.Y 00:00:00'), 'end_date' => date('d.m.Y H:i:s') ),
                 'yesterday' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('-1 day')), 'end_date' => date('d.m.Y 23:59:59', strtotime('-1 day')) ),
 
@@ -52,7 +73,7 @@ class ReportSearchForm extends CFormModel
 
                 'last-week' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('previous week')), 'end_date' => date('d.m.Y 23:59:59', strtotime('previous week +6 day')) ),
                 'last-month' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of previous month')), 'end_date' => date('d.m.Y 23:59:59', strtotime('last day of previous month')) ),
-                //'last-quarter' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of -4 month')), 'end_date' => date('d.m.Y 23:59:59', strtotime('last day of -1 month')) ),
+                //'last-quarter' => array( 'start_date' => date("01.{$prevQuarterStart}.Y 00:00:00"), 'end_date' => date("01.{$prevQuarterEnd}.Y ") ),
             )
         );
 
