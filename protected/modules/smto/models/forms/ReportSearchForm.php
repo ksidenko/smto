@@ -128,12 +128,12 @@ class ReportSearchForm extends CFormModel
     public function rules()
     {
         return array(
-            array('dtStart, graphReportType', 'required'),
+            array('dtStart', 'required'),
             //array('dtStart, dtEnd', 'date'),
             array('timeRange, dtStart, dtEnd', 'safe'),
             array('machineId, operatorId, timetableId', 'type', 'type' => 'int'),
-            array('graphReportType', 'in', 'range' => array_keys(self::$arrGraphType)),
-            array('machineReportType', 'in', 'range' => array_keys(self::$arrMachineReportType)),
+            //array('graphReportType', 'in', 'range' => array_keys(self::$arrGraphType)),
+            //array('machineReportType', 'in', 'range' => array_keys(self::$arrMachineReportType)),
         );
     }
 

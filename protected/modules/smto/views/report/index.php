@@ -1,3 +1,4 @@
+<?php $timeRange = $model->getTimeRanges();?>
 <div class="form">
     <?php $form=$this->beginWidget('CActiveForm'); ?>
  
@@ -5,24 +6,22 @@
 
     <table width="500px" >
         <tr>
-            <td>
-                <?php echo $form->label($model,'dtStart'); ?>
+            <td width="150" >
+                <?php echo $form->dropDownList($model,'timeRange', $timeRange['labels']); ?>
+                <?php //echo $form->label($model,'dtStart'); ?>
             </td>
-            <td>
+            <td width="400" >
                 <?php echo $form->textField($model,'dtStart') ?>
                 <?php //echo $form->label($model,'dtEnd'); ?>
                 <?php echo $form->textField($model,'dtEnd') ?>
             </td>
+            <td width="200" >
+                <?php echo $form->label($model,'timetableId'); ?>
+            </td>
+            <td width="200" >
+                <?php echo $form->dropDownList($model,'timetableId', array(0 => 'День') + CHtml::listData(Timetable::model()->findAll(array('order' => 'id asc')), 'id', 'name')) ?>
+            </td>
         </tr>
-        <tr>
-            <td>
-                <?php echo $form->label($model,'operatorId'); ?>
-            </td>
-            <td>
-                <?php echo $form->dropDownList($model,'operatorId', array(0 => 'Все', -1 => 'Не зарегистрированные') + CHtml::listData(Operator::model()->findAll(array('order' => 'full_name')), 'id', 'full_name')) ?>
-            </td>
-        <tr>
-
         <tr>
             <td>
                 <?php echo $form->label($model,'machineReportType'); ?>
@@ -44,24 +43,31 @@
 
                 ?>
             </td>
-        </tr>
 
-        <tr style="display: none;" >
             <td>
-                <?php echo $form->label($model,'graphReportType'); ?>
+                <?php echo $form->label($model,'operatorId'); ?>
             </td>
             <td>
-                <?php echo $form->dropDownList($model,'graphReportType', ReportConstructor::$arrGraphType) ?>
+                <?php echo $form->dropDownList($model,'operatorId', array(0 => 'Все', -1 => 'Не зарегистрированные') + CHtml::listData(Operator::model()->findAll(array('order' => 'full_name')), 'id', 'full_name')) ?>
             </td>
-        </tr>
 
-        <tr>
-            <td>
-                <?php echo $form->label($model,'timetableId'); ?>
-            </td>
-            <td>
-                <?php echo $form->dropDownList($model,'timetableId', array(0 => 'День') + CHtml::listData(Timetable::model()->findAll(array('order' => 'id asc')), 'id', 'name')) ?>
-            </td>
+<!--        <tr>-->
+<!---->
+<!--        <tr>-->
+<!--            -->
+<!--        </tr>-->
+<!---->
+<!--        <tr style="display: none;" >-->
+<!--            <td>-->
+<!--                --><?php //echo $form->label($model,'graphReportType'); ?>
+<!--            </td>-->
+<!--            <td>-->
+<!--                --><?php //echo $form->dropDownList($model,'graphReportType', ReportConstructor::$arrGraphType) ?>
+<!--            </td>-->
+<!--        </tr>-->
+<!---->
+<!--        <tr>-->
+
         </tr>
     </table>
 
@@ -125,6 +131,17 @@
 
         $("#ReportConstructor_dtStart").datetimepicker('setDate', $("#ReportConstructor_dtStart").val() );
         $("#ReportConstructor_dtEnd").datetimepicker('setDate', $("#ReportConstructor_dtEnd").val() );
+
+        var timeRange = <?php echo json_encode($timeRange); ?>;
+
+        $('#ReportConstructor_timeRange').change(function(){
+            var v = $(this).val();
+            var s = timeRange['values'][v]['start_date'];
+            var e = timeRange['values'][v]['end_date'];
+
+            $("#ReportConstructor_dtStart").datetimepicker('setDate', s );
+            $("#ReportConstructor_dtEnd").datetimepicker('setDate', e );
+        });
     });
 </script>
 

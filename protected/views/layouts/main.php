@@ -75,7 +75,7 @@
 	<?php echo $content; ?>
 
 	<div id="footer">
-		Copyright &copy; <?php echo date('Y'); ?> by sks.develop<br/>
+		Copyright &copy; <?php echo date('Y'); ?> SMTO <br/>
 	</div><!-- footer -->
 
 </div><!-- page -->
