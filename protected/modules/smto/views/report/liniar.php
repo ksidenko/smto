@@ -166,7 +166,9 @@
         );
         $arr['data'] = $chartData['machine_da_value']['data'];
 
-        $arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
+        if (isset($chartData['machine_da_value']['info']['threshold'])) {
+            $arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
+        }
 
         $plotData['machine_detector_analog_value'] []= $arr;
         //print_r($plotData['machine_detector_analog_value']); die;
@@ -268,7 +270,7 @@
     var options_machine_state = jQuery.extend(true, {}, options);
     var options_operator_last_fkey = jQuery.extend(true, {}, options);
 
-    options_machine_state.xaxis.show = true;
+    options_operator_last_fkey.xaxis.show = true;
 
     function hide_axis(plot, serie) {
         function formatterEmpty(val, axis) {
@@ -388,6 +390,15 @@
             })
         });
 
+
+        $("#line_report_operator_last_fkey").bind("plothover",  function (event, pos, item) {
+            $("#tooltip").remove();
+
+            var xaxis = plot2.getXAxes();
+            var x = pos.x;
+            var s = xaxis[0].tickFormatter(x, xaxis[0]);
+            showTooltip(pos.pageX, pos.pageY, s);
+        });
     }
 
     $(function() {
