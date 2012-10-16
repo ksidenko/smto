@@ -1,11 +1,7 @@
 <?php
 
-class MachineController extends Controller
+class MachineController extends SBaseController
 {
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
 	public $layout='//layouts/column2';
         
     public $menu = array();
@@ -13,22 +9,11 @@ class MachineController extends Controller
 
     public $isTemplate = false;
         
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
-
     public function beforeAction() {
         $this->isTemplate = isset($_REQUEST['template']) && $_REQUEST['template'] == true;
-
-        //echo '$template = ' . ($this->isTemplate ? '1' : '0');
         return true;
     }
+
 	/**
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed

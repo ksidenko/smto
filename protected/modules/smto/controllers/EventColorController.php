@@ -8,17 +8,9 @@ class EventColorController extends SBaseController
 	 */
 	public $layout='//layouts/column2';
 
-        public $menu = array();
-        public $breadcrumbs = array();
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
+    public $menu = array();
+    public $breadcrumbs = array();
+
 
 	/**
 	 * Displays a particular model.

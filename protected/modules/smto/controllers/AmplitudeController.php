@@ -1,6 +1,6 @@
 <?php
 
-class AmplitudeController extends SBaseController
+class AmplitudeController extends CController
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -10,16 +10,6 @@ class AmplitudeController extends SBaseController
 
     public $menu = array();
     public $breadcrumbs = array();
-
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
 
 	/**
 	 * Displays a particular model.

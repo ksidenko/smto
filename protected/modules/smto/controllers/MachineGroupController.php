@@ -1,6 +1,6 @@
 <?php
 
-class MachineGroupController extends Controller
+class MachineGroupController extends SBaseController
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -8,15 +8,8 @@ class MachineGroupController extends Controller
 	 */
 	public $layout='//layouts/column2';
 
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			//'accessControl', // perform access control for CRUD operations
-		);
-	}
+    public $menu = array();
+    public $breadcrumbs = array();
 
 	/**
 	 * Specifies the access control rules.
