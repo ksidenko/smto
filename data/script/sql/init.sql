@@ -296,41 +296,43 @@ INSERT INTO `timetable` (`id`, `name`, `time_from`, `time_to`) VALUES
 
 DROP TABLE IF EXISTS `machine_data`;
 CREATE TABLE IF NOT EXISTS `machine_data` (
-        `id` INT(10) NOT NULL AUTO_INCREMENT,
-        `number` int(10) NOT NULL,     
-        `dt` datetime NOT NULL,
-        `duration` int(10),            
-        `mac` VARCHAR(16) NOT NULL,
-        `machine_id` INT(10) NOT NULL,
-        `operator_id` INT(10) DEFAULT NULL,
-       
-        `da_max1` int(10) NOT NULL, `da_max2` int(10) NOT NULL, `da_max3` int(10) NOT NULL, `da_max4` int(10) NOT NULL,
+  `id` INT(10) NOT NULL AUTO_INCREMENT,
+  `number` int(10) NOT NULL,
+  `dt` datetime NOT NULL,
+  `duration` int(10),
+  `mac` VARCHAR(16) NOT NULL,
+  `machine_id` INT(10) NOT NULL,
+  `operator_id` INT(10) DEFAULT NULL,
 
-        `da_avg1` int(10) NOT NULL, `da_avg2` int(10) NOT NULL, `da_avg3` int(10) NOT NULL, `da_avg4` int(10) NOT NULL,
+  `da_max1` int(10) NOT NULL, `da_max2` int(10) NOT NULL, `da_max3` int(10) NOT NULL, `da_max4` int(10) NOT NULL,
 
-        `dd1` int(10) NOT NULL, `dd2` int(10) NOT NULL, `dd3` int(10) NOT NULL, `dd4` int(10) NOT NULL,
-               
-        `dd_change1` int(10) NOT NULL, `dd_change2` int(10) NOT NULL, `dd_change3` int(10) NOT NULL, `dd_change4` int(10) NOT NULL,
-       
-        `state` int(10) NOT NULL,
+  `da_avg1` int(10) NOT NULL, `da_avg2` int(10) NOT NULL, `da_avg3` int(10) NOT NULL, `da_avg4` int(10) NOT NULL,
 
-        `operator_last_fkey` int(10) NOT NULL,
-        `fkey_all` int(10) NOT NULL,
+  `dd1` int(10) NOT NULL, `dd2` int(10) NOT NULL, `dd3` int(10) NOT NULL, `dd4` int(10) NOT NULL,
 
-        `flags` int(10) NOT NULL,                              
+  `dd_change1` int(10) NOT NULL, `dd_change2` int(10) NOT NULL, `dd_change3` int(10) NOT NULL, `dd_change4` int(10) NOT NULL,
 
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `dt_mac` (`dt`,`mac`),
-        KEY `machine_id` (`machine_id`),
-        KEY `operator_id` (`operator_id`),
-        KEY `dt` (`dt`),
-        KEY `state` (`state`),
-        KEY `operator_last_fkey` (`operator_last_fkey`),
-        KEY `fkey_all` (`fkey_all`)
+  `state` int(10) NOT NULL,
+
+  `operator_last_fkey` int(10) NOT NULL,
+  `fkey_all` int(10) NOT NULL,
+
+  `flags` int(10) NOT NULL,
+
+  PRIMARY KEY (`id`, `dt`),
+  UNIQUE KEY `dt_mac` (`dt`,`mac`),
+  KEY `machine_id` (`machine_id`),
+  KEY `operator_id` (`operator_id`),
+  KEY `dt` (`dt`),
+  KEY `state` (`state`),
+  KEY `operator_last_fkey` (`operator_last_fkey`),
+  KEY `fkey_all` (`fkey_all`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-ROW_FORMAT=DEFAULT;
+PARTITION BY LINEAR HASH ( MONTH(dt) )
+PARTITIONS 12
+;
 
 
 #drop TABLE `machine_state`;

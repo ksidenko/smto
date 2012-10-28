@@ -277,7 +277,7 @@ class Machine extends CActiveRecord
                 );
                 $criteria->limit = 1;
 
-                $res = Machine::model()->find($criteria);
+                $res = Machine::model()->cache(600)->find($criteria);
                 if ($res) {
                     $ids[$mac] = $res;
                 } else {
@@ -294,7 +294,7 @@ class Machine extends CActiveRecord
     static function getList() {
         static $data = null;
         if (!$data) {
-            $data = Machine::model()->resetScope()->templates_list()->findAll();
+            $data = Machine::model()->resetScope()->templates_list()->cache(600)->findAll();
         }
         return $data;
     }

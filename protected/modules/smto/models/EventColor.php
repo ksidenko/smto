@@ -127,7 +127,7 @@ class EventColor extends CActiveRecord
 
             $res = false;
             try {
-                $rows = EventColor::model()->findAll();
+                $rows = EventColor::model()->cache(600)->findAll();
                 if ($rows) {
                     foreach($rows as $row) {
                         $date[$row->code] = '#' . str_replace('#', '', $row->color);

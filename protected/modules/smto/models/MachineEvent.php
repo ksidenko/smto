@@ -120,7 +120,7 @@ class MachineEvent extends CActiveRecord
     static function getList() {
         static $data = null;
         if (!$data) {
-            $data = MachineEvent::model()->findAll(array('order' => 'id asc'));
+            $data = MachineEvent::model()->cache(600)->findAll(array('order' => 'id asc'));
         }
         return $data;
     }
@@ -132,7 +132,7 @@ class MachineEvent extends CActiveRecord
 
             $res = false;
             try {
-                $rows = MachineEvent::model()->findAll();
+                $rows = MachineEvent::model()->cache(600)->findAll();
                 if ($rows) {
                     foreach($rows as $row) {
                         $date[$row->id] = $row;

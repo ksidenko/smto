@@ -66,9 +66,11 @@ return CMap::mergeArray(
                 'username' => 'root',
                 'password' => '1',
                 'charset' => 'utf8',
-                'enableProfiling'=>1,
-                'enableParamLogging'=>1,
+                'enableProfiling'=>0,
+                'enableParamLogging'=>0,
                 'queryCacheID' => 'cache',
+                'schemaCachingDuration' => 3600,
+                'schemaCacheID' => 'cache',
             ),
             'cache'=>array(
                 'class'=>'system.caching.CFileCache',

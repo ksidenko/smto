@@ -97,7 +97,7 @@ class Param extends CActiveRecord
         static $params = array();
 
         if ( count($params) == 0 ) {
-            $params_ = Param::model()->findAll();
+            $params_ = Param::model()->cache(600)->findAll();
             foreach($params_ as $par) {
                 $params[$par['key']] = $par['value'];
             }

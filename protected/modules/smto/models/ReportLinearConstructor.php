@@ -32,10 +32,10 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public function _processParams() {
 
-        $this->machineInfo = Machine::model()->findByPk($this->machineId);
+        $this->machineInfo = Machine::model()->cache(60)->findByPk($this->machineId);
 
         if ($this->operatorId) {
-            $this->operatorInfo = Operator::model()->findByPk($this->operatorId);
+            $this->operatorInfo = Operator::model()->cache(60)->findByPk($this->operatorId);
         }
 
         if ( $this->dtStart && $this->dtEnd ) {
@@ -72,6 +72,7 @@ class ReportLinearConstructor extends ReportSearchForm {
         //$this->cr->select []= new CDbExpression("SUM(IFNULL(t.duration,10)) + 0  as sec_duration");
 
         $this->cr->compare('t.machine_id', $this->machineId);
+        $this->cr->addCondition('t.state>0');
 
         //$this->cr->group += array('t.machine_id', 't.state');
         $this->cr->group = implode(', ', $this->cr->group);
@@ -132,7 +133,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                     (int)$machineStateCode
                 );
 
-                $machineState = MachineState::model()->cache(60)->findByPk($machineStateCode);
+                $machineState = MachineState::getRec($machineStateCode);
                 $data_ = array(
                     'code' => $machineState->code,
                     'name' => $machineState->name,

@@ -281,8 +281,8 @@ class ReportController extends SBaseController
         $model->dtStart = '18-08-2012 10:00:00';
         $model->dtEnd = '18-08-2012 10:10:00';
 
-        if (isset($_POST['ReportLinearConstructor'])) {
-            $model->attributes=$_POST['ReportLinearConstructor'];
+        if (isset($_REQUEST['ReportLinearConstructor'])) {
+            $model->attributes=$_REQUEST['ReportLinearConstructor'];
 
             //if ($model->validate()) {
                 $chartData = $model->getData();

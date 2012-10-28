@@ -93,10 +93,30 @@ class MachineState extends CActiveRecord
 	}
 
     static public function getByColor($stateId) {
-        $row = MachineState::model()->findByPk($stateId);
+        $row = MachineState::model()->cache(600)->findByPk($stateId);
         if ($row) {
             return '#' . str_replace('#', '', $row->color);
         }
         return '';
+    }
+
+    public static function getRec($id)  {
+        static $date = array();
+
+        if ( !isset($date[$id]) ) {
+            $res = false;
+            try {
+                $rows = MachineState::model()->cache(600)->findAll();
+                if ($rows) {
+                    foreach($rows as $row) {
+                        $date[$row->id] = $row;
+                    }
+                }
+            } catch (Exception $e) {
+                //print_r($e->getMessage());
+            }
+        }
+
+        return isset($date[$id]) ? $date[$id] : false;
     }
 }
