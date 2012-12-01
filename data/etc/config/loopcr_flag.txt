@@ -1,0 +1,1 @@
+Delete this file to stop getcr_loop.sh

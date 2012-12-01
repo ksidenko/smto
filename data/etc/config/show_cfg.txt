@@ -1,0 +1,4 @@
+;
+CurrFileDir=/var/pw/cr_out/cr
+
+

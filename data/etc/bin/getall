@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+for name in /etc/pw/config/*.cfg
+do
+if test -f $name # it is really a file
+then
+ echo -----------------------------
+ echo $name
+ /etc/pw/bin/getdata /etc/pw/config/allcfg1.txt /etc/pw/config/allcfg2.txt $name "$name"1
+ sleep 1
+fi
+done
+#
+

@@ -1,0 +1,2 @@
+1,41  * * * * /etc/pw/bin/start_all1.sh >/dev/null 2>/dev/null
+25,55  * * * * /etc/pw/bin/start_all2.sh >/dev/null 2>/dev/null
