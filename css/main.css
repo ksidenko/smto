@@ -265,6 +265,26 @@ div.flash-success{
     color:red;
 }
 
+fieldset.monitor-group {
+    border: 1px solid;
+    margin: 10px;
+    padding: 10px;
+}
+
+    fieldset.monitor-group .monitor-group-machine {
+        border: 1px solid;
+        padding: 10px;
+        margin-right: 10px;
+        width: 200px;
+        cursor: pointer;
+        float:left;
+    }
+
+    fieldset.monitor-group .monitor-group-machine .monitor-group-machine-name {
+        color: black;
+        font-weight: 800;
+    }
+
 body, .widgetContent
 #page, .widgetContent
 

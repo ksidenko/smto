@@ -42,6 +42,7 @@
                                 array('label'=>'Данные со станков', 'url'=>array('/smto/machineData/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineDataAdministrating')),
                                 array('label'=>'Отчет', 'url'=>array('/smto/report/index'), 'visible'=>Yii::app()->user->checkAccess('smto-ReportIndex')),
                                 array('label'=>'Лин. отчет', 'url'=>array('/smto/report/liniar'), 'visible'=>Yii::app()->user->checkAccess('smto-ReportLiniar')),
+                                array('label'=>'Монитор', 'url'=>array('/smto/monitoring/monitor'), 'visible'=>Yii::app()->user->checkAccess('smto-MonitoringMonitor')),
                                 array('label'=>'Мониторинг', 'url'=>array('/smto/report/monitoring'), 'visible'=>Yii::app()->user->checkAccess('smto-ReportAdministrating')),
                                 //array('label'=>'Импорт', 'url'=>array('/smto/task/import'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineEventAdministrating')),
 				//array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
