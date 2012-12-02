@@ -52,4 +52,7 @@
     <?php echo CHtml::encode($data->main_detector_analog); ?>
     <br />
 
+    <b><?php echo CHtml::encode($data->getAttributeLabel('groups')); ?>:</b>
+    <?php echo CHtml::encode($data->getGroupsText()); ?>
+    <br />
 </div>

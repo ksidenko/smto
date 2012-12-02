@@ -45,5 +45,6 @@ $this->menu []= array('label'=>'Управление событиями стан
         'peak_average_period',
         'main_detector_digit',
         'main_detector_analog',
+        array('label'=>'Группы', 'value'=> $model->getGroupsText())
 	),
 )); ?>

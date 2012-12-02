@@ -83,4 +83,15 @@ class MachineGroup extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+    static function getListShort() {
+        static $data = null;
+        if (!$data) {
+            $data_ = MachineGroup::model()->resetScope()->cache(600)->findAll();
+            foreach($data_ as $row) {
+                $data[$row['id']] = $row['name'];
+            }
+        }
+        return $data;
+    }
 }

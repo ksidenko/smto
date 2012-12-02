@@ -26,6 +26,8 @@ class Machine extends CActiveRecord
     private $isTemplate = null;
     public $reachable;
 
+    public $group_id;
+
     //public $groups = array();
 
 
@@ -167,15 +169,32 @@ class Machine extends CActiveRecord
 		$criteria->compare('work_type',$this->work_type,true);
 		$criteria->compare('time_idle_run',$this->time_idle_run);
 		$criteria->compare('rec_type',$this->rec_type,true);
+        $criteria->compare('group.id',$this->group_id,true);
 
-		return new CActiveDataProvider($this, array(
+        //$criteria->with = array(
+        //    'groups'=>array('select'=>'group.id'),
+        //);
+
+
+
+        return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
             'pagination'=>array(
                   'pageSize'=>50,
             ),
 		));
 	}
-    
+
+    public function getGroupsText() {
+        $s = array();
+
+        foreach($this->groups as $group) {
+            $s []= $group->name;
+        }
+
+        return implode(', ', $s);
+    }
+
     public function scopes() {
 		return array(
             'templates_list' => array(
