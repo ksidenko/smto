@@ -57,12 +57,12 @@
 			'links'=>$this->breadcrumbs,
 		)); ?><!-- breadcrumbs -->
 	<?php endif?>
-        <div class="flash-success" style="<?php echo (Yii::app()->user->hasFlash('success') ? '':'display:none;');?>">
-            <?php echo Yii::app()->user->getFlash('success'); ?>
-        </div>
-        <div class="flash-error" style="<?php echo (Yii::app()->user->hasFlash('error') ? '':'display:none;');?>">
-            <?php echo Yii::app()->user->getFlash('error'); ?>
-        </div>
+    <div class="flash-success" style="<?php echo (Yii::app()->user->hasFlash('success') ? '':'display:none;');?>">
+        <?php echo Yii::app()->user->getFlash('success'); ?>
+    </div>
+    <div class="flash-error" style="<?php echo (Yii::app()->user->hasFlash('error') ? '':'display:none;');?>">
+        <?php echo Yii::app()->user->getFlash('error'); ?>
+    </div>
 	<?php echo $content; ?>
 
 	<div id="footer">

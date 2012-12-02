@@ -526,5 +526,8 @@
 <!--<div id="line_report_machine_state" style="width:<?php //echo $w; ?>px;height:<?php //echo $h_slave2; ?>px; display:none;"></div>-->
 
 
-<?php }  ?>
+<?php } else if ($isRunSearch) {
+    echo "Нет данных за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+}
+?>
 

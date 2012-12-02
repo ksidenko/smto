@@ -27,7 +27,7 @@ class ReportController extends SBaseController
         Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
         //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
 
-
+        $isRunSearch = false;
         if (isset($_POST['ReportConstructor'])) {
             $model->attributes=$_POST['ReportConstructor'];
 
@@ -154,6 +154,7 @@ class ReportController extends SBaseController
                     //}
 
                 }
+                $isRunSearch = true;
                 //echo '<pre>'.print_r($chartDataJSON_, true) . '<pre>'; die;
             }
         } else {
@@ -184,7 +185,8 @@ class ReportController extends SBaseController
             //'chartAssetsPath' => $chartAssetsPath,
             'chartType' => $chartType,
             'machineIds' => $machineIds,
-            "chartDataJSON" => $chartDataJSON_
+            "chartDataJSON" => $chartDataJSON_,
+            'isRunSearch' => $isRunSearch,
         ));
 	}
 
@@ -270,10 +272,9 @@ class ReportController extends SBaseController
     public function actionLiniar() {
 
         $basePath=Yii::getPathOfAlias('application');
-        $baseUrl=Yii::app()->getAssetManager()->publish($basePath . '/../js', true, -1, YII_DEBUG);
-        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
-        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
-
+        $baseUrl=Yii::app()->assetManager->publish($basePath . '/../js', true, -1, YII_DEBUG);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
 
         $model = new ReportLinearConstructor();
         $chartData = array();
@@ -281,21 +282,23 @@ class ReportController extends SBaseController
         $model->dtStart = '18-08-2012 10:00:00';
         $model->dtEnd = '18-08-2012 10:10:00';
 
+        $isRunSearch = false;
         if (isset($_REQUEST['ReportLinearConstructor'])) {
             $model->attributes=$_REQUEST['ReportLinearConstructor'];
 
             //if ($model->validate()) {
                 $chartData = $model->getData();
+                $isRunSearch = true;
             //}
         } else {
             $model->dtStart = date('d.m.Y 00:00:00');
             $model->dtEnd = date('d.m.Y H:i:s');
         }
 
-
         $this->render('liniar', array(
             'model' => $model,
             'chartData' => $chartData,
+            'isRunSearch' => $isRunSearch,
         ));
     }
 }
