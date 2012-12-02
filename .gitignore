@@ -1,3 +1,5 @@
-
-.idea
-./protected/runtime/*
+.idea/
+lib
+*.sh
+assets/
+protected/runtime/
