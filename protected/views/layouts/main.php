@@ -19,7 +19,7 @@
 
     <title><?php echo CHtml::encode(Param::getParamValue('title')); ?></title>
         
-        <?php Yii::app()->clientScript->registerCoreScript('jquery'); ?>
+    <?php Yii::app()->clientScript->registerCoreScript('jquery'); ?>
 </head>
 
 <body>
@@ -61,16 +61,12 @@
 			'links'=>$this->breadcrumbs,
 		)); ?><!-- breadcrumbs -->
 	<?php endif?>
-    <?php if(Yii::app()->user->hasFlash('success')):?>
-        <div class="flash-success">
+        <div class="flash-success" style="<?php echo (Yii::app()->user->hasFlash('success') ? '':'display:none;');?>">
             <?php echo Yii::app()->user->getFlash('success'); ?>
         </div>
-    <?php endif; ?>
-    <?php if(Yii::app()->user->hasFlash('error')):?>
-        <div class="flash-error">
+        <div class="flash-error" style="<?php echo (Yii::app()->user->hasFlash('error') ? '':'display:none;');?>">
             <?php echo Yii::app()->user->getFlash('error'); ?>
         </div>
-    <?php endif; ?>
 	<?php echo $content; ?>
 
 	<div id="footer">

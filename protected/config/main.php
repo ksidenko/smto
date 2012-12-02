@@ -24,6 +24,7 @@ return CMap::mergeArray(
             'application.modules.srbac.controllers.SBaseController',
             'application.modules.smto.models.*',
             'application.modules.smto.models.forms.*',
+            'application.modules.smto.widgets.*',
             //'application.vendors.*',
         ),
 

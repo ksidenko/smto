@@ -1,9 +1,26 @@
 <?php
 class Monitoring {
 
+    private $errors = array();
+
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    public function hasErrors()
+    {
+        return count($this->errors) > 0;
+    }
+
     public function getMonitorData() {
 
-        $output = array();
+        $output = array('machines' => array(), 'groups' => array());
 
         $path = Machine::getMachineDataPathCurr();
 
@@ -36,6 +53,11 @@ class Monitoring {
             //echo '<pre>' . print_r($lineParser, true) . '</pre>'; die;
 
             $machineState = MachineState::getRec($lineParser->state);
+            if (!$machineState) {
+                $this->errors[] = 'Не корректный статус станка (mac: '.$machineAR->mac.'): ' . $lineParser->state;
+                continue;
+            }
+
             $dataState = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,

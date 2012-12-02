@@ -265,6 +265,10 @@ div.flash-success{
     color:red;
 }
 
+#monitor-refresh-period {
+    width: 20px;
+}
+
 fieldset.monitor-group {
     border: 1px solid;
     margin: 10px;
