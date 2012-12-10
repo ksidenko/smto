@@ -67,12 +67,12 @@ $('.search-form form').submit(function(){
         //'local_port',
         //'pwd',
         'mac',
-//        array(
-//            'name'=>'group_id',
-//            'header'=>'Группы',
+        array(
+            'name'=>'group_id',
+            'header'=>'Группы',
 //            'filter'=>MachineGroup::getListShort(),
-//            'value'=>'$data->getGroupsText()',
-//        ),
+            'value'=>'$data->getGroupsText()',
+        ),
         //'s_values',
         //'reasons_timeout_table',
 		array(

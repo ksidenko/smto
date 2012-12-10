@@ -10,6 +10,7 @@ class MonitoringController extends SBaseController
     
 	public function actionMonitor()
 	{
+	//die(1);
         $monitoring = new Monitoring();
 
         $data = $monitoring->getMonitorData();

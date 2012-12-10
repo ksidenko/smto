@@ -35,3 +35,5 @@ foreach($this->data['groups'] as $groupId => $groupName) {
     </fieldset>
     <?php
 }
+?>
+<div style="clear:both;"></div>

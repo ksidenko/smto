@@ -88,7 +88,7 @@ class MachineDataImport {
     
     public function parseFile ($filename, &$lastDateTime = null) {
         
-        $file = fopen($filename, 'r');
+        $file = @fopen($filename, 'r');
         
         if (!$file) {
             return false;

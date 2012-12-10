@@ -24,7 +24,7 @@ class Monitoring {
 
         $path = Machine::getMachineDataPathCurr();
 
-        $machinesAR = Machine::model()->findAll();
+        $machinesAR = Machine::model()->cache(600)->findAll();
         $groups = array();
 
         foreach($machinesAR as $machineAR) {
@@ -65,7 +65,7 @@ class Monitoring {
             );
 
             $groupIds = array();
-            foreach ($machineAR->groups as $group) {
+            foreach ($machineAR->cache(600)->groups as $group) {
                 $groups[$group->id] = $group->name;
                 $groupIds [] = $group->id;
             }

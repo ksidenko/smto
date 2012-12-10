@@ -85,7 +85,7 @@ return CMap::mergeArray(
                     array(
                         'class'=>'CFileLogRoute',
                         'levels'=>'error, warning',
-                        'categories'=>'system.db.CDbCommand.*',
+                        //'categories'=>'system.db.CDbCommand.*',
                     ),
                     array(
                         'class'=>'CWebLogRoute',
