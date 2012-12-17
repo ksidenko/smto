@@ -12,7 +12,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public $secTotal;
 
-    public $maxDeltaDt = 15; // in seconds
+    public $maxDeltaDt = 240; // in seconds
 
     protected $output = array(
         'states' => array(
@@ -152,7 +152,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $dtPrev = $lastTimeValues['machine_da_value'];
                 $dt = $machineDataRow['dt'];
                 if (strtotime($dt) - strtotime($dtPrev) > $this->maxDeltaDt) {
-                    $this->output['machine_da_value'] []= null;
+                    $this->output['machine_da_value']['data'] []= null;
                 }
             }
             // save last dt value for current machine state

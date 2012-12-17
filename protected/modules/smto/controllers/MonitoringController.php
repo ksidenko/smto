@@ -24,7 +24,7 @@ class MonitoringController extends SBaseController
             Yii::app()->clientScript->registerCoreScript('jquery');
 
             $basePath=Yii::getPathOfAlias('application.modules.smto.views.monitoring.js');
-            $baseUrl=Yii::app()->assetManager->publish($basePath, true, 0, YII_DEBUG);
+            $baseUrl=Yii::app()->assetManager->publish($basePath, true, -1, true/*YII_DEBUG*/); //todo
             Yii::app()->clientScript->registerScriptFile($baseUrl . '/monitor.js', CClientScript::POS_END);
         }
 
