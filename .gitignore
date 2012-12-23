@@ -3,3 +3,4 @@ lib
 *.sh
 assets/
 protected/runtime/
+*.patch
