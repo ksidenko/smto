@@ -65,7 +65,7 @@ class ReportSearchForm extends CFormModel
                 'today' => array( 'start_date' => date('d.m.Y 00:00:00'), 'end_date' => date('d.m.Y H:i:s') ),
                 'yesterday' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('-1 day')), 'end_date' => date('d.m.Y 23:59:59', strtotime('-1 day')) ),
 
-                'week' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of +0 week')), 'end_date' => date('d.m.Y 23:59:59') ),
+                'week' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('this week last monday')), 'end_date' => date('d.m.Y 23:59:59') ),
                 'month' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of this month')), 'end_date' => date('d.m.Y 23:59:59') ),
                 'quarter' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of -3 month')), 'end_date' => date('d.m.Y 23:59:59') ),
                 'half-year' => array( 'start_date' => date('d.m.Y 00:00:00', strtotime('first day of -5 month')), 'end_date' => date('d.m.Y 23:59:59') ),

@@ -90,7 +90,6 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         $this->cr->select += array( 't.machine_id', 't.state');
-        $this->cr->select []= new CDbExpression("SUM(IFNULL(t.duration,10)) + 0  as sec_duration");
 
 
         if (is_numeric($this->machineId)) {
@@ -98,6 +97,10 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         $this->crNotWorking = clone($this->cr);
+
+        $this->cr->select []= new CDbExpression("SUM(IFNULL(t.duration,10)) + 0  as sec_duration");
+        $this->crNotWorking->select []= new CDbExpression("SUM(IFNULL(t.duration,0)) + 0  as sec_duration");
+
 
 //        if ($this->machineReportType == 'join') {
 //            //$this->cr->select [] = new CDbExpression('count(distinct t.machine_id) as cnt_machine');
@@ -114,8 +117,8 @@ class ReportConstructor extends ReportSearchForm {
         $this->cr->addInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
         $this->cr->addCondition('t.operator_last_fkey = 0');
 
-        //$this->crNotWorking->addInCondition('t.state', array(MachineState::STATE_MACHINE_OFF, MachineState::STATE_MACHINE_ON));
-        $this->crNotWorking->addNotInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
+        $this->crNotWorking->addInCondition('t.state', array(MachineState::STATE_MACHINE_OFF));
+        //$this->crNotWorking->addNotInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
         // Может быть state == 0|1, но оператор ничего не нажимал!
         //$this->crNotWorking->addCondition('t.operator_last_fkey != 0');
 
