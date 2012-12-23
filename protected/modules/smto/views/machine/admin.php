@@ -57,7 +57,11 @@ $('.search-form form').submit(function(){
 	'columns'=>array(
 		'id',
 		'name',
-		'code',
+        'number',
+        'span_number',
+        'place_number',
+
+        'code',
         array(
             'type'=>'raw',
             'name' => 'ip',

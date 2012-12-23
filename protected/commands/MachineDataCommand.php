@@ -8,7 +8,7 @@ class MachineDataCommand extends CConsoleCommand {
         //$oper = Operator::model()->findByPk(1);
         //print_r(Operator::getRecByCode($oper->c1, $oper->c2, $oper->c3)->full_name);
 
-        $machines = Machine::model()->real_records()->cache(600)->findAll();
+        $machines = Machine::model()->real_records()->cache(60)->findAll();
         //$cnt = count($machines);echo "$cnt".PHP_EOL;die;
 
         $dir = realpath(dirname(__FILE__ ) . '/../');

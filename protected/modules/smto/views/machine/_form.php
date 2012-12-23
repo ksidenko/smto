@@ -21,12 +21,36 @@
     </div>
     <?php } ?>
 
+    <div class="row">
+        <?php echo $form->labelEx($model,'full_name'); ?>
+        <?php echo $form->textField($model,'full_name',array('size'=>30,'maxlength'=>1024)); ?>
+        <?php echo $form->error($model,'full_name'); ?>
+    </div>
+
 	<div class="row">
 		<?php echo $form->labelEx($model,'name'); ?>
 		<?php echo $form->textField($model,'name',array('size'=>30,'maxlength'=>512)); ?>
 		<?php echo $form->error($model,'name'); ?>
 	</div>
 
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'number'); ?>
+        <?php echo $form->textField($model,'number',array('size'=>16,'maxlength'=>512)); ?>
+        <?php echo $form->error($model,'number'); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'span_number'); ?>
+        <?php echo $form->textField($model,'span_number',array('size'=>16,'maxlength'=>512)); ?>
+        <?php echo $form->error($model,'span_number'); ?>
+    </div>
+
+    <div class="row">
+        <?php echo $form->labelEx($model,'place_number'); ?>
+        <?php echo $form->textField($model,'place_number',array('size'=>16,'maxlength'=>512)); ?>
+        <?php echo $form->error($model,'place_number'); ?>
+    </div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'code'); ?>

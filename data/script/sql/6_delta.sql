@@ -1,0 +1,8 @@
+USE smto_07.07.2012;
+
+ALTER TABLE `machine`
+  ADD COLUMN `full_name` TEXT NOT NULL,
+  ADD COLUMN `number` VARCHAR(128) NOT NULL DEFAULT '',
+  ADD COLUMN `place_number` VARCHAR(128) NOT NULL DEFAULT '',
+  ADD COLUMN `span_number` VARCHAR(128) NOT NULL DEFAULT ''
+;

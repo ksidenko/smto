@@ -66,6 +66,9 @@ class Machine extends CActiveRecord
             array('port, local_port', 'type', 'type' => 'integer'),
 			array('s_values, reasons_timeout_table', 'required'),
 			array('name, code', 'length', 'max'=>512),
+
+            array('full_name, number, place_number, span_number', 'required'),
+
 			//array('mac', 'length', 'max'=>16),
             array('mac', 'unique', 
                 'allowEmpty' => false, 
@@ -131,7 +134,11 @@ class Machine extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'name' => 'Название',
+            'full_name' => 'Наименование позиции',
+			'name' => 'Модель',
+            'number' => 'Инв. номер',
+            'span_number' => 'Номер пролета',
+            'place_number' => 'Место на плане',
 			'code' => 'Код',
 			'ip' => 'IP',
             'port' => 'port',

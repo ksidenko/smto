@@ -32,7 +32,11 @@ $this->menu []= array('label'=>'Управление событиями стан
 	'data'=>$model,
 	'attributes'=>array(
 		'id',
+        'full_name',
 		'name',
+        'number',
+        'span_number',
+        'place_number',
 		'code',
 		'ip',
         'port',
