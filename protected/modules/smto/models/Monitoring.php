@@ -48,8 +48,9 @@ class Monitoring {
             $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
             $lineParser->parseCSVLine($line);
 
-            //$lineParser->state = 2;
-            //print_r($lineParser); die;
+            // debug info
+            //$lineParser->state = 2; $lineParser->operatorId = '222';
+
             //echo '<pre>' . print_r($lineParser, true) . '</pre>'; die;
 
             $machineState = MachineState::getRec($lineParser->state);
@@ -64,6 +65,22 @@ class Monitoring {
                 'color' => EventColor::getColorByCode('machine_' . $lineParser->state),
             );
 
+            if ( !empty($lineParser->operatorId) ) {
+                $operatorInfo = Operator::getRec($lineParser->operatorId);
+                if (!$operatorInfo) {
+                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ' . $lineParser->operatorId;
+                    $operatorInfo = new stdClass();
+                    $operatorInfo->full_name = 'Не авторизован';
+                }
+            } else {
+                $operatorInfo = new stdClass();
+                $operatorInfo->full_name = 'Не авторизован';
+            }
+
+            $dataOperator = array(
+                'full_name' => $operatorInfo->full_name,
+            );
+
             $groupIds = array();
             foreach ($machineAR->cache(600)->groups as $group) {
                 $groups[$group->id] = $group->name;
@@ -71,10 +88,15 @@ class Monitoring {
             }
 
             $output['machines'][$machineAR->id] = array(
+                'full_name' => $machineAR->full_name,
                 'name' => $machineAR->name,
+                'number' => $machineAR->number,
+                'span_number' => $machineAR->span_number,
+                'place_number' => $machineAR->place_number,
                 'ip' => $machineAR->ip,
                 'mac' => $machineAR->mac,
                 'state' => $dataState,
+                'operator' => $dataOperator,
                 'groups' => array_values($groupIds),
             );
         }

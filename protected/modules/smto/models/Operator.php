@@ -114,7 +114,7 @@ class Operator extends CActiveRecord
                 );
                 $criteria->limit = 1;
 
-                $res = Operator::model()->find($criteria);
+                $res = Operator::model()->cache(60)->find($criteria);
                 if ($res) {
                     $ids[$code] = $res;
                 }
@@ -124,5 +124,25 @@ class Operator extends CActiveRecord
         }
 
         return isset($ids[$code]) ? $ids[$code] : false;
+    }
+
+    public static function getRec($id)  {
+        static $date = array();
+
+        if ( !isset($date[$id]) ) {
+            $res = false;
+            try {
+                $rows = Operator::model()->cache(600)->findAll();
+                if ($rows) {
+                    foreach($rows as $row) {
+                        $date[$row->id] = $row;
+                    }
+                }
+            } catch (Exception $e) {
+                //print_r($e->getMessage());
+            }
+        }
+
+        return isset($date[$id]) ? $date[$id] : false;
     }
 }
