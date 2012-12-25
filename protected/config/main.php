@@ -106,7 +106,8 @@ return CMap::mergeArray(
             'adminEmail'=>'webmaster@example.com',
             'languages' => array(
                         'ru_ru' => "Русский",
-                        'en_us' => 'English')
+                        'en_us' => 'English'),
+            'isSaveProcessFiles' => false,
         ),
         //'language' => 'ru_ru'
     )

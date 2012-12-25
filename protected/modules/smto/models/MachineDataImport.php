@@ -27,8 +27,8 @@ class MachineDataImport {
             
             $res = $this->parseFile($filename, $lastDateTime);
             if (!$res) {
-                echo 'bad file ' . $filename . PHP_EOL;;
-                unlink($filename);
+                //echo 'bad file ' . $filename . PHP_EOL;;
+                //unlink($filename);
                 continue;
             }
             $sql = $this->getSql(); //die($sql);
@@ -48,7 +48,7 @@ class MachineDataImport {
                 $filename_ = basename($filename);
                 $processFiles [$cnt]= $filename;
 
-                $isSaveProcessFiles = false;
+                $isSaveProcessFiles = Yii::app()->params['isSaveProcessFiles'];
                 if ($isSaveProcessFiles) {
                     $path = dirname($filename) . '/process/';
                     if (!file_exists($path)) {
