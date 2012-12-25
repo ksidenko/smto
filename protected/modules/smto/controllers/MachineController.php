@@ -47,6 +47,7 @@ class MachineController extends SBaseController
 
                 if ($res !== false) {
                     Yii::app()->user->setFlash('success',"Данные успешно добавлены");
+                    Yii::app()->cache->flush();
                     $this->redirect(array('update','id'=>$model->id));
                 }
             } catch(Exception $e) {
@@ -95,6 +96,7 @@ class MachineController extends SBaseController
                 $res = $model->saveMachine($_POST, false);
                 if ($res !== false) {
                     Yii::app()->user->setFlash('success',"Данные успешно от редактированы");
+                    Yii::app()->cache->flush();
                     $param = array('admin','template' => intval($model->getIsTemplate()));
                     $this->redirect($param);
                 }
@@ -140,6 +142,7 @@ class MachineController extends SBaseController
 			// we only allow deletion via POST request
 			$this->loadModel($id, false)->delete();
 
+            Yii::app()->cache->flush();
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
