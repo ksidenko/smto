@@ -27,17 +27,15 @@ $this->menu []= array('label'=>'Управление событиями стан
 <?php } ?>
 
 
-
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
 		'id',
         'full_name',
 		'name',
-        'number',
+        'code',
         'span_number',
         'place_number',
-		'code',
 		'ip',
         'port',
         'local_port',

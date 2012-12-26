@@ -67,7 +67,7 @@ class Machine extends CActiveRecord
 			array('s_values, reasons_timeout_table', 'required'),
 			array('name, code', 'length', 'max'=>512),
 
-            array('full_name, number, place_number, span_number', 'required'),
+            array('full_name, place_number, span_number', 'required'),
 
 			//array('mac', 'length', 'max'=>16),
             array('mac', 'unique', 
@@ -136,10 +136,9 @@ class Machine extends CActiveRecord
 			'id' => 'ID',
             'full_name' => 'Наименование позиции',
 			'name' => 'Модель',
-            'number' => 'Инв. №',
-            'span_number' => 'Пролета №',
+            'code' => 'Инв. №',
+            'span_number' => 'Пролет №',
             'place_number' => 'Место на плане',
-			'code' => 'Код',
 			'ip' => 'IP',
             'port' => 'port',
             'local_port' => 'local port',

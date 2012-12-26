@@ -13,7 +13,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
 
             $fullName = $machineInfo['full_name'];
             $name = $machineInfo['name'];
-            $number = $machineInfo['number'];
+            $code = $machineInfo['code'];
             $spanNumber = $machineInfo['span_number'];
             $placeNumber = $machineInfo['place_number'];
             $ip = $machineInfo['ip'];
@@ -21,10 +21,22 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $state = $machineInfo['state'];
             $operatorFullName = $machineInfo['operator']['full_name'];
 
+            $code_ = '';
+            if (!empty($code)) {
+                 $code_ = 'инв. №: ' . $code;
+            }
+
+            $spanNumber_ = $spanNumber;
+
+            $placeNumber_ = '';
+            if (!empty($placeNumber)) {
+                $placeNumber_ = 'место: ' . $placeNumber;
+            }
+
             $div1 = CHtml::tag('div', array('class' => 'monitor-group-machine-name'), $name);
             $div2 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $state['name']);
-            //$div3 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $number);
-            $arr = array($number, $spanNumber, $placeNumber);
+            //$div3 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $code);
+            $arr = array($code_, $spanNumber_, $placeNumber_);
             foreach ($arr as $key => $value) {
                 if (empty($value)) {
                     unset($arr[$key]);
@@ -39,13 +51,18 @@ foreach($this->data['groups'] as $groupId => $groupName) {
 
             $title  = 'Наименование: ' . $fullName . PHP_EOL;
             $title .= 'Модель: ' . $name . PHP_EOL;
-            $title .= 'Инв. №: ' . $number . PHP_EOL;
+            $title .= 'Инв. №: ' . $code . PHP_EOL;
             $title .= 'Пролет №: ' . $spanNumber . PHP_EOL;
             $title .= 'Место на плане: ' . $placeNumber . PHP_EOL;
             $title .= 'Состояние: ' . $state['name'] . PHP_EOL;
-            $title .= 'IP: ' . $ip . PHP_EOL;
-            $title .= 'MAC: ' . $mac . PHP_EOL;
             $title .= 'Оператор: ' . $operatorFullName . PHP_EOL;
+
+            if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
+                $title .= '---------------' . PHP_EOL;
+                $title .= 'IP: ' . $ip . PHP_EOL;
+                $title .= 'MAC: ' . $mac . PHP_EOL;
+            }
+
 
             $divMachineInfo = CHtml::tag('div', array('class' => 'monitor-group-machine', 'style' => 'background-color:' . $state['color'], 'title' => $title), $div_ );
 

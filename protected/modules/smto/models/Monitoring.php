@@ -90,7 +90,7 @@ class Monitoring {
             $output['machines'][$machineAR->id] = array(
                 'full_name' => $machineAR->full_name,
                 'name' => $machineAR->name,
-                'number' => $machineAR->number,
+                'code' => $machineAR->code,
                 'span_number' => $machineAR->span_number,
                 'place_number' => $machineAR->place_number,
                 'ip' => $machineAR->ip,

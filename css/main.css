@@ -271,17 +271,16 @@ div.flash-success{
 
 fieldset.monitor-group {
     border: 1px solid;
-    margin: 10px;
-    padding: 10px;
+    margin: 5px 5px 5px 5px;
+    padding: 5px 5px 5px 5px;
     float:left;
 }
 
     fieldset.monitor-group .monitor-group-machine {
         border: 1px solid;
-        padding: 10px;
-        margin-right: 10px;
-        margin-bottom:10px;
-        width: 130px;
+        padding: 5px;
+        margin: 5px;
+        width: 150px;
         cursor: pointer;
         float: left;
     }

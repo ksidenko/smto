@@ -12,8 +12,8 @@
 	<?php echo CHtml::encode($data->name); ?>
 	<br />
 
-    <b><?php echo CHtml::encode($data->getAttributeLabel('number')); ?>:</b>
-    <?php echo CHtml::encode($data->name); ?>
+    <b><?php echo CHtml::encode($data->getAttributeLabel('code')); ?>:</b>
+    <?php echo CHtml::encode($data->code); ?>
     <br />
 
     <b><?php echo CHtml::encode($data->getAttributeLabel('span_number')); ?>:</b>
@@ -24,9 +24,6 @@
     <?php echo CHtml::encode($data->name); ?>
     <br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('code')); ?>:</b>
-	<?php echo CHtml::encode($data->code); ?>
-	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('ip')); ?>:</b>
 	<?php echo CHtml::encode($data->ip); ?>

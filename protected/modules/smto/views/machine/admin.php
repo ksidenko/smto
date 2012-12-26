@@ -57,7 +57,7 @@ $('.search-form form').submit(function(){
 	'columns'=>array(
 		'id',
 		'name',
-        'number',
+        'code',
         'span_number',
         'place_number',
 

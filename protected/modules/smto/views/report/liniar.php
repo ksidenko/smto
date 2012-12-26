@@ -24,11 +24,11 @@
             </td>
             <td>
                 <?php
-                    $machinesData = Machine::model()->real_records()->with('groups')->findAll();
+                    $machinesData = Machine::model()->real_records()->with('groups')->cache(600)->findAll(array('order' => 't.name, t.code'));
                     $data = array();
                     foreach($machinesData as $machineData) {
                         foreach($machineData->groups as $group) {
-                            $data[$group->name][$machineData->id] = $machineData->name;
+                            $data[$group->name][$machineData->id] = $machineData->place_number . ' ' . $machineData->name;
                         }
                     }
                     //$data=CHtml::listData($data, 'id', 'name', 'groups.name');

@@ -33,11 +33,10 @@
 		<?php echo $form->error($model,'name'); ?>
 	</div>
 
-
     <div class="row">
-        <?php echo $form->labelEx($model,'number'); ?>
-        <?php echo $form->textField($model,'number',array('size'=>16,'maxlength'=>512)); ?>
-        <?php echo $form->error($model,'number'); ?>
+        <?php echo $form->labelEx($model,'code'); ?>
+        <?php echo $form->textField($model,'code',array('size'=>30,'maxlength'=>512)); ?>
+        <?php echo $form->error($model,'code'); ?>
     </div>
 
     <div class="row">
@@ -51,13 +50,6 @@
         <?php echo $form->textField($model,'place_number',array('size'=>16,'maxlength'=>512)); ?>
         <?php echo $form->error($model,'place_number'); ?>
     </div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'code'); ?>
-		<?php echo $form->textField($model,'code',array('size'=>30,'maxlength'=>512)); ?>
-		<?php echo $form->error($model,'code'); ?>
-	</div>
-
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'ip'); ?>
