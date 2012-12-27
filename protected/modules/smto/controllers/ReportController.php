@@ -28,8 +28,8 @@ class ReportController extends SBaseController
         //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
 
         $isRunSearch = false;
-        if (isset($_POST['ReportConstructor'])) {
-            $model->attributes=$_POST['ReportConstructor'];
+        if (isset($_REQUEST['ReportConstructor'])) {
+            $model->attributes=$_REQUEST['ReportConstructor'];
 
             if ($model->validate()) {
                 $chartData = $model->getData();

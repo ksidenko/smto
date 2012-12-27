@@ -14,7 +14,7 @@ class ReportSearchForm extends CFormModel
 
     static public function getTimeRanges() {
 
-        $row = Timetable::model()->find('cast(now() as time) between time_from and time_to');
+        $row = Timetable::model()->cache(60)->find('cast(now() as time) between time_from and time_to');
 
         //echo $row['time_to'];die;
         $currMonth = date('m');

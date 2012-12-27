@@ -63,8 +63,12 @@ foreach($this->data['groups'] as $groupId => $groupName) {
                 $title .= 'MAC: ' . $mac . PHP_EOL;
             }
 
-
-            $divMachineInfo = CHtml::tag('div', array('class' => 'monitor-group-machine', 'style' => 'background-color:' . $state['color'], 'title' => $title), $div_ );
+            $divMachineInfo = CHtml::tag('div', array(
+                'class' => 'monitor-group-machine',
+                'style' => 'background-color:' . $state['color'],
+                'title' => $title,
+                'onclick' => "document.location.href='" . $this->getUrlReport($machineId) . "'"
+            ), $div_ );
 
             echo $divMachineInfo;
         }

@@ -255,9 +255,22 @@
 //            data[2] = { label: "Series 2", color: '#0000FF', data: 200 };
 //            $.plot($('#'+'machine_chart_report_main_' + id), data, options);
 
+            var s = $("#ReportConstructor_dtStart");
+            var e = $("#ReportConstructor_dtEnd");
+            var url = '';
+            url += '/smto/report/liniar/?ReportLinearConstructor[dtStart]='+ s.val();
+            url += '&ReportLinearConstructor[dtEnd]='+ e.val();
+            url += '&ReportLinearConstructor[machineId]='+id;
+            var link2Report = $('<a></a>');
+            link2Report.attr('title', 'Посмотреть на линейном отчете');
+            link2Report.attr('href', url);
+            link2Report.attr('target', 'blank_');
+
+            link2Report.html(dataJsonStatesMain[id]['chart']['caption']);
+
             if (typeof dataJsonStatesMain[id] !== 'undefined' && dataJsonStatesMain[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_main_' + id);
-                id_.before('<label>' + dataJsonStatesMain[id]['chart']['caption'] + '</label>');
+                id_.before(link2Report);
 
                 options.legend.container = $('#machine_chart_report_main_legend_'+id);
                 var plot = $.plot(id_, dataJsonStatesMain[id]['data'], options);
@@ -306,7 +319,7 @@
 
             if (typeof dataJsonStatesWork[id] !== 'undefined' && dataJsonStatesWork[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_work_' + id);
-                id_.before('<label>' + dataJsonStatesWork[id]['chart']['caption'] + '</label>');
+                id_.before(link2Report.clone());
 
                 options.legend.container = $('#machine_chart_report_work_legend_'+id);
                 $.plot(id_, dataJsonStatesWork[id]['data'], options);
@@ -314,7 +327,7 @@
 
             if (typeof dataJsonStatesNotWork[id] !== 'undefined' && dataJsonStatesNotWork[id]['data'].length > 0) {
                 var id_ = $('#'+'machine_chart_report_not_work_' + id);
-                id_.before('<label>' + dataJsonStatesNotWork[id]['chart']['caption'] + '</label>');
+                id_.before(link2Report.clone());
 
                 options.legend.container = $('#machine_chart_report_not_work_legend_'+id);
                 $.plot(id_, dataJsonStatesNotWork[id]['data'], options);
