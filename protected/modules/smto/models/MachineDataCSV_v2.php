@@ -81,7 +81,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
             if ($lastDateTime != null) {
                 $this->duration = strtotime($this->dt) - strtotime($lastDateTime);
-                if ($this->duration < 0 || $this->duration > 100) {
+                if ($this->duration < 0 || $this->duration > Yii::app()->smto->max_time_between_machine_records ) {
                     $this->duration = null;
                 }
             }
@@ -134,11 +134,11 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $c2 = trim(array_shift($arr));
             $c3 = trim(array_shift($arr));
 
-            $opearatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
-            if (!$opearatorRec) {
+            $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+            if (!$operatorRec) {
                 //echo 'no operator: ' . $c1 . ', ' . $c2 . ', '. $c3;
             }
-            $this->operatorId = $opearatorRec ? $opearatorRec['id'] : null;
+            $this->operatorId = $operatorRec ? $operatorRec['id'] : null;
 
             $res = true;
         } else {

@@ -40,6 +40,7 @@ return CMap::mergeArray(
             ),
             'smto' => array(
                 'max_duration' => 100,
+                'max_time_between_machine_records' => 10,
             )
         ),
         'onBeginRequest' =>function($event){
