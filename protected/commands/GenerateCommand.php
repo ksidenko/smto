@@ -3,12 +3,9 @@
 class GenerateCommand extends CConsoleCommand {
 
     public function actionIndex($machineId = 1, $mac = null, $deltaSec = 2, $countFiles = 1, $countLines = 50, $formatVersion = '2.0') {
-        echo 'run ' .  __METHOD__ . ' command' . PHP_EOL;
-
         //Yii::import('application.modules.smto.models.*');
-        $dir = YiiBase::getPathOfAlias('application.runtime.import.machine_data');
 
-        if($mac){
+        if ($mac) {
             $machine = Machine::model()->findByAttributes(array('mac' => $mac));
             $machineId = $machine->id;
         } else {
@@ -19,59 +16,112 @@ class GenerateCommand extends CConsoleCommand {
             }
             $mac = $machine['mac'];
         }
-        echo "machineId = $machineId, mac = $mac" . PHP_EOL;
+        $dir = $machine->getMachineDataPath();
 
-        $dt_start = date(DATE_ATOM, strtotime(date(DATE_ATOM) . " -10 seconds"));
-        $number=0;
+        exec("rm $dir/*.dat");
+        //echo "machineId = $machineId, mac = $mac, dir = $dir" . PHP_EOL; die();
+
+        $dt_start = date("Y-m-d\T07:00:00P");
+        $number = 0;
         for ($counter=0; $counter<$countFiles; $counter++) {
             echo '.';
             $filename = 'pw' . $mac . '_' . uniqid('random_') . '.dat';
             $fd = fopen($dir . '/' . $filename, 'w+');
 
-            $dt_file = date("d.m.Y,H:i:s", strtotime($dt_start . " +" . ($counter*$countLines*$deltaSec) . " seconds"));
+            $dt_file = date("d.m.Y,H:i:s", strtotime($dt_start . " +" . ($counter * $countLines * $deltaSec) . " seconds"));
 
-            for($i = 0; $i< $countLines ; $i++) {
+            for($i = 0; $i < $countLines ; $i++) {
                 if ($i%10 == 0) {
                     fwrite($fd, ";P" . PHP_EOL);
                 }
 
-                $dt = date("d.m.Y,H:i:s", strtotime($dt_file . " +" . ( $i * $deltaSec) . " seconds"));
+                $dt = date("d.m.Y,H:i:s", strtotime($dt_file . " +" . ( $i * $deltaSec ) . " seconds"));
 
                 echo $dt . PHP_EOL;
-                
-                $da_max1 = 974 + rand(0,10);
-                $da_max2 = 974 + rand(0,10);
-                $da_max3 = 974 + rand(0,10);
-                $da_max4 = 974 + rand(0,10);
 
-                $da_avg1 = 974 + rand(0,10);
-                $da_avg2 = 750 + rand(0,10);
-                $da_avg3 = 466 + rand(0,10);
-                $da_avg4 = 723 + rand(0,10);
+                $randomize = false;
 
-                $dd1 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd2 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd3 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd4 = (rand(0,1) > 0.5) ? 1 : 0;
+                $da_max1 = 0;
+                $da_max2 = 0;
+                $da_max3 = 0;
+                $da_max4 = 0;
 
-                $dd_change1 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd_change2 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd_change3 = (rand(0,1) > 0.5) ? 1 : 0;
-                $dd_change4 = (rand(0,1) > 0.5) ? 1 : 0;
+                $da_avg1 = 974;
+                $da_avg2 = 750;
+                $da_avg3 = 466;
+                $da_avg4 = 723;
 
-                $state = rand(0,3);
+                $dd1 = 0;
+                $dd2 = 0;
+                $dd3 = 0;
+                $dd4 = 0;
 
-                $operator_last_fkey = ($state <= 1 ? rand(1,16) : 0);
+                $dd_change1 = 0;
+                $dd_change2 = 0;
+                $dd_change3 = 0;
+                $dd_change4 = 0;
+
+                if ($randomize) {
+                    $da_max1 += rand(0,10);
+                    $da_max2 += rand(0,10);
+                    $da_max3 += rand(0,10);
+                    $da_max4 += rand(0,10);
+
+                    $da_avg1 += rand(0,10);
+                    $da_avg2 += rand(0,10);
+                    $da_avg3 += rand(0,10);
+                    $da_avg4 += rand(0,10);
+
+                    $dd1 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd2 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd3 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd4 += (rand(0,1) > 0.5) ? 1 : 0;
+
+                    $dd_change1 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd_change2 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd_change3 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd_change4 += (rand(0,1) > 0.5) ? 1 : 0;
+                }
+
+                $t = strtotime($dt);
+                if ( $t < strtotime(date('Y-m-d\T07:10:00P'))) {
+                    $state = 0;
+                    $da_max1 = 0;
+                    $dd1 = 0;
+                } else if ( $t < strtotime(date('Y-m-d\T07:15:00P')) ) {
+                    $state = 1;
+                    $da_max1 = 5;
+                    $dd1 = 1;
+                } else if ( $t < strtotime(date('Y-m-d\T07:20:00P')) ) {
+                    $state = 2;
+                    $da_max1 = 40;
+                    $dd1 = 1;
+                } else if ( $t < strtotime(date('Y-m-d\T07:30:00P')) ) {
+                    $state = 3;
+                    $da_max1 = 90;
+                    $dd1 = 1;
+                } else if ( $t < strtotime(date('Y-m-d\T07:40:00P')) ) {
+                    $state = 1;
+                    $da_max1 = 7;
+                    $dd1 = 1;
+                } else {
+                    $state = 0;
+                    $da_max1 = 2;
+                    $dd1 = 1;
+                }
+
+                $operator_last_fkey = ($state <= 1 ? 0 : 0);
                 $fkey_all = 0;
                 $flags = 0;
 
-                $operatorInfo = Operator::model()->findBySql('select * from operator order by rand() limit 1');
+                //$operatorInfo = Operator::model()->findBySql('select * from operator order by rand() limit 1');
+                $operatorInfo = Operator::model()->findBySql('select * from operator where id = 1');
                 $c1 = $operatorInfo->c1;
                 $c2 = $operatorInfo->c2;
                 $c3 = $operatorInfo->c3;
                 fwrite($fd,"D,$mac,$number, $dt, $da_max1,$da_max2,$da_max3,$da_max4, $da_avg1,$da_avg2,$da_avg3,$da_avg4, $dd1,$dd2,$dd3,$dd4, $dd_change1,$dd_change2,$dd_change3,$dd_change4, $state,$operator_last_fkey, $fkey_all,$flags, $c1,$c2,$c3" . PHP_EOL);
                 $number++;
-                if($number > 1000) $number = 0;
+                if ($number > 1000) $number = 0;
             }
             fclose($fd);
         }
