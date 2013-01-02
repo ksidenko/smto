@@ -41,6 +41,7 @@ return CMap::mergeArray(
             'smto' => array(
                 'max_duration' => 100,
                 'max_time_between_machine_records' => 10,
+                'is_save_process_files' => false,
             )
         ),
         'onBeginRequest' =>function($event){
@@ -108,7 +109,6 @@ return CMap::mergeArray(
             'languages' => array(
                         'ru_ru' => "Русский",
                         'en_us' => 'English'),
-            'isSaveProcessFiles' => false,
         ),
         //'language' => 'ru_ru'
     )

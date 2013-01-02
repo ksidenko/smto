@@ -21,14 +21,13 @@ class MachineDataImport {
 
         $processFiles = array();
         foreach((array)$filenames as $filename) {
-            $filename = rtrim($dir, '\\') . '/' . $filename;
 
+            $filename = rtrim($dir, '\\') . '/' . $filename;
             //echo $filename . PHP_EOL;
             
             $res = $this->parseFile($filename, $lastDateTime);
             if (!$res) {
-                //echo 'bad file ' . $filename . PHP_EOL;;
-                //unlink($filename);
+                // file is empty, we think so...
                 continue;
             }
             $sql = $this->getSql(); //die($sql);
@@ -48,7 +47,7 @@ class MachineDataImport {
                 $filename_ = basename($filename);
                 $processFiles [$cnt]= $filename;
 
-                $isSaveProcessFiles = Yii::app()->params['isSaveProcessFiles'];
+                $isSaveProcessFiles = Yii::app()->smto->is_save_process_files;
                 if ($isSaveProcessFiles) {
                     $path = dirname($filename) . '/process/';
                     if (!file_exists($path)) {
