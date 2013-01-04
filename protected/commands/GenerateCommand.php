@@ -25,7 +25,7 @@ class GenerateCommand extends CConsoleCommand {
         $number = 0;
         for ($counter=0; $counter<$countFiles; $counter++) {
             echo '.';
-            $filename = 'pw' . $mac . '_' . uniqid('random_') . '.dat';
+            $filename = 'pw' . $mac . '_' . $number . '_' . uniqid('random_') . '.dat';
             $fd = fopen($dir . '/' . $filename, 'w+');
 
             $dt_file = date("d.m.Y,H:i:s", strtotime($dt_start . " +" . ($counter * $countLines * $deltaSec) . " seconds"));
@@ -46,10 +46,10 @@ class GenerateCommand extends CConsoleCommand {
                 $da_max3 = 0;
                 $da_max4 = 0;
 
-                $da_avg1 = 974;
-                $da_avg2 = 750;
-                $da_avg3 = 466;
-                $da_avg4 = 723;
+                $da_avg1 = 0;
+                $da_avg2 = 0;
+                $da_avg3 = 0;
+                $da_avg4 = 0;
 
                 $dd1 = 0;
                 $dd2 = 0;
@@ -86,27 +86,31 @@ class GenerateCommand extends CConsoleCommand {
                 $t = strtotime($dt);
                 if ( $t < strtotime(date('Y-m-d\T07:10:00P'))) {
                     $state = 0;
-                    $da_max1 = 0;
+                    $da_avg1 = 0;
                     $dd1 = 0;
                 } else if ( $t < strtotime(date('Y-m-d\T07:15:00P')) ) {
                     $state = 1;
-                    $da_max1 = 5;
+                    $da_avg1 = 5;
                     $dd1 = 1;
                 } else if ( $t < strtotime(date('Y-m-d\T07:20:00P')) ) {
                     $state = 2;
-                    $da_max1 = 40;
+                    $da_avg1 = 40;
                     $dd1 = 1;
                 } else if ( $t < strtotime(date('Y-m-d\T07:30:00P')) ) {
                     $state = 3;
-                    $da_max1 = 90;
+                    $da_avg1 = 90;
                     $dd1 = 1;
                 } else if ( $t < strtotime(date('Y-m-d\T07:40:00P')) ) {
                     $state = 1;
-                    $da_max1 = 7;
+                    $da_avg1 = 7;
+                    $dd1 = 1;
+                } else if ( $t < strtotime(date('Y-m-d\T07:50:00P')) ) {
+                    $state = 0;
+                    $da_avg1 = 2;
                     $dd1 = 1;
                 } else {
-                    $state = 0;
-                    $da_max1 = 2;
+                    $state = 3;
+                    $da_avg1 = 90;
                     $dd1 = 1;
                 }
 

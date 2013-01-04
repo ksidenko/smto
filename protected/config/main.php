@@ -40,7 +40,7 @@ return CMap::mergeArray(
             ),
             'smto' => array(
                 'max_duration' => 100,
-                'max_time_between_machine_records' => 10,
+                'max_time_between_machine_records' => 60,
                 'is_save_process_files' => false,
             )
         ),
@@ -84,12 +84,12 @@ return CMap::mergeArray(
             'log'=>array(
                 'class'=>'CLogRouter',
                 'routes'=>array(
-                    array(
+                    'CFileLogRoute'=> array(
                         'class'=>'CFileLogRoute',
                         'levels'=>'error, warning',
                         //'categories'=>'system.db.CDbCommand.*',
                     ),
-                    array(
+                    'CWebLogRoute'=> array(
                         'class'=>'CWebLogRoute',
                         'levels'=>'error, warning',
                         'showInFireBug'=>1,

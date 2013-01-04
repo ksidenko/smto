@@ -6,17 +6,21 @@
  */
 
 class MachineDataCSV {
+    public $id = null;
     public $separator = ',';
     public $countColumns = 0;
 
     public $dt = null;
 
+    public $mac = null;
     public $machineId = null;
-    public $operatorId = null;
+    public $operator_id = null;
 
     public $_machine = null;
     public $_operator = null;
     public $errors = null;
+
+    static protected $ignoreInsertDublicates = false;
 
     public function init() {
         if ($this->_machine == null) {
@@ -30,8 +34,10 @@ class MachineDataCSV {
 
     static public function getSqlInsertPart () { }
     
-    public function parseCSVLine($line, &$lastDateTime = null) { }
+    public function parseCSVLine($line, &$lastMachineDataRec = null) { }
 
     public function getSqlPart() { }
+
+    public function isIdentityRecords($lastMachineDataRec) { }
 }
  

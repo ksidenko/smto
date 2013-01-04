@@ -14,31 +14,31 @@ class MachineDataCommand extends CConsoleCommand {
         $dir = realpath(dirname(__FILE__ ) . '/../');
         //echo "$dir".PHP_EOL;die;
 	
-	shuffle($machines);
+    	shuffle($machines);
 	
         foreach($machines as $machineAR) {
-        
-        
-    	    $check = "ps ax | grep -v grep | grep -i 'MachineData import' | grep -v grep ";
-            //echo "$check" . PHP_EOL;
 
-            exec($check, $output);
+//TODO
+//            // Check max running import processes
+//    	    $check = "ps ax | grep -v grep | grep -i 'MachineData import' | grep -v grep ";
+//            //echo "$check" . PHP_EOL;
+//
+//            exec($check, $output);
+//
+//            $c = count($output);
+//
+//            if ( $c > 2 ) {
+//                echo 'Running machines is too match!' . PHP_EOL;
+//                return false;
+//            }
 
-	    $c = count($output);
-
-	    //if ( $c > 2 ) {
-        //	echo 'Machines too match!' . PHP_EOL;
-        //	return false;
-          //  }
-            
-        
-        
+            //Check is process import with $mac running?
             $check = "ps ax | grep -v grep | grep -i 'MachineData import --mac=" . $machineAR->mac . "'";
             //echo "$check" . PHP_EOL;
             $output = array();
             exec($check, $output);
 
-	    $c = count($output);
+	        $c = count($output);
             if ($c > 0) {
                 echo "Machine with MAC {$machineAR->mac} is all ready processing..." . PHP_EOL;
                 continue;
@@ -50,7 +50,7 @@ class MachineDataCommand extends CConsoleCommand {
             $cmd[] = "$dir/yiic";
             $cmd[] = "MachineData import";
             $cmd[] = "--mac=" . $machineAR->mac;
-            $cmd[] = "--maxProcessDataFiles=" . 200;
+            $cmd[] = "--maxProcessDataFiles=" . 20;
             $cmd[] = "> /dev/null 2>/dev/null &";
             $cmd = implode(' ', $cmd);
 
@@ -69,13 +69,13 @@ class MachineDataCommand extends CConsoleCommand {
             Yii::app()->end();
         }
 
-        $import = new MachineDataImport();
+        $import = new MachineDataImport($mac, '2.0');
         $dir = $machineAR->getMachineDataPath();
 
         //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");
         //$output = Helpers::scandirFast($dir,"", true, 2);
         //echo print_r($output, true) . PHP_EOL; die();
 
-        $import->run($dir, $machineAR->mac, $maxProcessDataFiles);
+        $import->run($dir, $maxProcessDataFiles);
     }
 }

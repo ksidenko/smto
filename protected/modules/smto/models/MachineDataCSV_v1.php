@@ -28,8 +28,12 @@ class MachineDataCSV_v1 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert ignore into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
-                values ' . PHP_EOL;
+        $ignore = '';
+        if (self::$ignoreInsertDublicates) {
+            $ignore = 'ignore';
+        }
+        $sql = "insert $ignore into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
+                values " . PHP_EOL;
 
         return $sql;
     }
@@ -45,7 +49,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
 8 	Пропуск 	целое 	Номер карточки оператора 	240584
 */
 
-    public function parseCSVLine($line, &$lastDateTime = null) {
+    public function parseCSVLine($line, &$lastMachineDataRec = null) {
 
         $this->init();
 
@@ -59,9 +63,11 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             $date = trim(array_shift($arr));
             $time = trim(array_shift($arr));
             $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
-            if ($lastDateTime != null) {
-                $this->duration = strtotime($this->dt) - strtotime($lastDateTime);
-                if ($this->duration < 0 || $this->duration > Yii::app()->smto->max_duration ) {
+            if ( $lastMachineDataRec ) {
+                $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+                $m = Yii::app()->getModules();
+                $maxDuration = $m['smto']['max_duration'];
+                if ($this->duration < 0 || $this->duration > $maxDuration ) {
                     $this->duration = null;
                 }
             }
@@ -106,7 +112,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             if (!$opearatorRec) {
                 //echo 'no operator: ' . $c1 . ', ' . $c2 . ', '. $c3;
             }
-            $this->operatorId = $opearatorRec ? $opearatorRec['id'] : null;
+            $this->operator_id = $opearatorRec ? $opearatorRec['id'] : null;
 
             $res = true;
         } else {
@@ -125,7 +131,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
                 ($this->duration == null || $this->duration < 0 ? "null" : $this->duration),
                 '"' . $this->mac . '"',
                 ( !empty($this->machineId) ? $this->machineId : 'null'),
-                ( !empty($this->operatorId) ? $this->operatorId : 'null'),
+                ( !empty($this->operator_id) ? $this->operator_id : 'null'),
                 $this->da_max1,
                 $this->operator_last_fkey,
                 $this->state,

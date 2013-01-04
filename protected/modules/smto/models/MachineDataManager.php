@@ -21,13 +21,13 @@ class MachineDataManager {
             $s = 'log1.txt_*';
         } else if ($this->version == '2.0') {
             //$s = 'pw' . $mac . '*.dat';
-            $s = '';
+            $s = '*.dat';
         }
 
         return $s;
     }
 
-    function getLineParser($mac) {
+    function getLineParser() {
         $res = null;
 
         if ($this->version == '1.0') {
@@ -35,20 +35,20 @@ class MachineDataManager {
         } else if ($this->version == '2.0') {
             $res = new MachineDataCSV_v2();
         }
-        $res->mac = $mac;
 
         return $res;
     }
 
     public function getSqlInsertPart () {
-        $ret = '';
+        $res = '';
+
         if ($this->version == '1.0') {
-            $ret = MachineDataCSV_v1::getSqlInsertPart();
+            $res = MachineDataCSV_v1::getSqlInsertPart();
         } else if ($this->version == '2.0') {
-            $ret = MachineDataCSV_v2::getSqlInsertPart();
+            $res = MachineDataCSV_v2::getSqlInsertPart();
         }
 
-        return $ret;
+        return $res;
     }
 
 }

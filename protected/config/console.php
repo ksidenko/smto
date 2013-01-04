@@ -8,21 +8,24 @@ return CMap::mergeArray(
         'name'=>'My Console Application',
         // application components
         'components'=>array(
+            'db'=>array(
+                'enableProfiling'=>0,
+                'enableParamLogging'=>1,
+            ),
+
             'log'=>array(
                 'class'=>'CLogRouter',
                 'routes'=>array(
-                    array(
+                    'CFileLogRoute' => array(
                         'class'=>'CFileLogRoute',
                         'levels'=>'error, warning',
                     ),
-                    array(
+                    'CWebLogRoute' => array(
                         'class'=>'CWebLogRoute',
-                        'levels'=>'errors',
-                        //'showInFireBug'=>false,
-
-                        //'categories'=>'system.db.CDbCommand.*',
+                        'levels'=>'error, warning',
+                        'showInFireBug'=>0,
+                        'categories'=>'system.db.CDbCommand.*',
                         //'filter'=>'CLogFilter',
-                        //'enabled' => false
                     ),
                 ),
             ),

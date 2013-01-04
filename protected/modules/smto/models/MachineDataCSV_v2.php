@@ -45,13 +45,18 @@ class MachineDataCSV_v2 extends MachineDataCSV {
     }
 
     static public function getSqlInsertPart () {
-        $sql = 'insert ignore into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `operator_last_fkey`, `fkey_all`, `flags`)
-                values ' . PHP_EOL;
+        $ignore = '';
+        if (self::$ignoreInsertDublicates) {
+            $ignore = 'ignore';
+        }
+
+        $sql = "insert $ignore into machine_data (`number`, `dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `da_max2`, `da_max3`, `da_max4`, `da_avg1`, `da_avg2`, `da_avg3`, `da_avg4`, `dd1`, `dd2`, `dd3`, `dd4`, `dd_change1`, `dd_change2`, `dd_change3`, `dd_change4`, `state`, `operator_last_fkey`, `fkey_all`, `flags`)
+                values " . PHP_EOL;
 
         return $sql;
     }
 
-    public function parseCSVLine($line, &$lastDateTime = null) {
+    public function parseCSVLine($line, &$lastMachineDataRec = null) {
         if ( !isset($line[0])  ) {
             return false;
         }
@@ -70,7 +75,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             // D,00BD3B330571,9462, 03.06.2011,21:43:46, 
             // 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
 
-            array_shift($arr); //skip type record - only D-type
+            array_shift($arr); //skip type record - only C|D-type
             $this->mac = trim(array_shift($arr));
             $machineRec = $this->_machine->getRecByMAC($this->mac);
             $this->machineId = $machineRec ? $machineRec['id'] : null;
@@ -79,9 +84,11 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $time = trim(array_shift($arr));
 
             $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
-            if ($lastDateTime != null) {
-                $this->duration = strtotime($this->dt) - strtotime($lastDateTime);
-                if ($this->duration < 0 || $this->duration > Yii::app()->smto->max_time_between_machine_records ) {
+            if ( $lastMachineDataRec ) {
+                $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+                $m = Yii::app()->getModules();
+                $t = $m['smto']['max_time_between_machine_records'];
+                if ($this->duration < 0 || $this->duration > $t ) {
                     $this->duration = null;
                 }
             }
@@ -138,7 +145,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             if (!$operatorRec) {
                 //echo 'no operator: ' . $c1 . ', ' . $c2 . ', '. $c3;
             }
-            $this->operatorId = $operatorRec ? $operatorRec['id'] : null;
+            $this->operator_id = $operatorRec ? $operatorRec['id'] : null;
 
             $res = true;
         } else {
@@ -158,8 +165,8 @@ class MachineDataCSV_v2 extends MachineDataCSV {
                 ($this->duration == null || $this->duration < 0 ? 'null': $this->duration),
                 '"' . $this->mac . '"',
 
-                ( !empty($this->machineId) ? $this->machineId : 'null'),
-                ( !empty($this->operatorId) ? $this->operatorId : 'null'),
+                ( !empty($this->machineId) ? $this->machineId : 'null' ),
+                ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
 
                 $this->da_max1,$this->da_max2,$this->da_max3,$this->da_max4,
 

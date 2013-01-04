@@ -65,10 +65,10 @@ class Monitoring {
                 'color' => EventColor::getColorByCode('machine_' . $lineParser->state),
             );
 
-            if ( !empty($lineParser->operatorId) ) {
-                $operatorInfo = Operator::getRec($lineParser->operatorId);
+            if ( !empty($lineParser->operator_id) ) {
+                $operatorInfo = Operator::getRec($lineParser->operator_id);
                 if (!$operatorInfo) {
-                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ' . $lineParser->operatorId;
+                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ' . $lineParser->operator_id;
                     $operatorInfo = new stdClass();
                     $operatorInfo->full_name = 'Не авторизован';
                 }
