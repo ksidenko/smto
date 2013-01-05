@@ -71,9 +71,14 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $res = false;
 
         if ( 1 || count($arr) == 28) {
-            // format example
+            // format *.dat example
             // D,00BD3B330571,9462, 03.06.2011,21:43:46, 
             // 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
+
+            // format *.cdt example
+            // C,1275AD210D84,51368, 26.12.2011,14:16:08,
+            // 1,1,1,1, 2,2,1,992, 1,1,1,504, 0,0,1,1, 0,0,0,1, 0,0,0,0, 0,44,0,0,0, 0,0,0,330, 59,16,48508, 8810A879
+
 
             array_shift($arr); //skip type record - only C|D-type
             $this->mac = trim(array_shift($arr));
