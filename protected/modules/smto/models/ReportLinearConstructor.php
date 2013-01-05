@@ -12,8 +12,6 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public $secTotal;
 
-    public $maxDeltaDt = 240; // in seconds
-
     protected $output = array(
         'states' => array(
             'machine_state' => array(),
@@ -38,6 +36,14 @@ class ReportLinearConstructor extends ReportSearchForm {
             $this->operatorInfo = Operator::model()->cache(60)->findByPk($this->operatorId);
         }
 
+        if ($this->dtEnd) {
+            $curr = strtotime( date('d.m.Y H:i:s') );
+            $dtEnd = strtotime( $this->dtEnd );
+            if ($dtEnd > $curr) { // its future
+                $this->dtEnd = date('d.m.Y H:i:s');
+            }
+        }
+
         if ( $this->dtStart && $this->dtEnd ) {
             $this->dtStart = date('Y.m.d H:i:s', strtotime($this->dtStart));
             $this->dtEnd = date('Y.m.d H:i:s', strtotime($this->dtEnd));
@@ -50,14 +56,6 @@ class ReportLinearConstructor extends ReportSearchForm {
         } else if ( !$this->dtStart && !$this->dtEnd ){
             $this->dtStart = date('Y.m.d 00:00:00');
             $this->dtEnd = date('Y.m.d H:i:s');
-        }
-
-        if ($this->dtEnd) {
-            $curr = strtotime( date('Y.m.d H:i:s') );
-            $dtEnd = strtotime($this->dtEnd);
-            if ($dtEnd > $curr) { // its future
-                $this->dtEnd = date('Y.m.d H:i:s');
-            }
         }
 
         if ($this->dtStart) {

@@ -36,17 +36,25 @@ class ReportConstructor extends ReportSearchForm {
 
         if ($this->machineId && is_numeric($this->machineId)) {
             $this->machineReportType = 'separate';
-            $this->machineInfo = Machine::model()->findByPk($this->machineId);
+            $this->machineInfo = Machine::model()->cache(600)->findByPk($this->machineId);
         } else if (is_string($this->machineId)) {
             $this->machineReportType = $this->machineId;
         }
 
         if ($this->operatorId) {
-            $this->operatorInfo = Operator::model()->findByPk($this->operatorId);
+            $this->operatorInfo = Operator::model()->cache(60)->findByPk($this->operatorId);
         }
 
         if ($this->timetableId) {
-            $this->timetableInfo = Timetable::model()->findByPk($this->timetableId);
+            $this->timetableInfo = Timetable::model()->cache(600)->findByPk($this->timetableId);
+        }
+
+        if ($this->dtEnd) {
+            $curr = strtotime( date('d.m.Y H:i:s') );
+            $dtEnd = strtotime( $this->dtEnd );
+            if ($dtEnd > $curr) { // its future
+                $this->dtEnd = date('d.m.Y H:i:s');
+            }
         }
 
         if ( $this->dtStart && $this->dtEnd ) {
@@ -70,7 +78,12 @@ class ReportConstructor extends ReportSearchForm {
             $this->dtEnd = str_replace('.', '-', $this->dtEnd);
         }
 
-        $this->cr->addBetweenCondition('t.dt', $this->dtStart, $this->dtEnd);
+        //$this->cr->addBetweenCondition('t.dt', $this->dtStart, $this->dtEnd);
+
+        $this->cr->addCondition( new CDbExpression("'{$this->dtStart}' < t.dt") );
+        //$this->cr->addCondition( new CDbExpression("UNIX_TIMESTAMP('{$this->dtEnd}') > UNIX_TIMESTAMP(t.dt) - t.duration") );
+        $this->cr->addCondition( new CDbExpression("'{$this->dtEnd}' > DATE_SUB(t.dt, INTERVAL t.duration SECOND)") );
+
         $this->secTotal = strtotime($this->dtEnd) - strtotime($this->dtStart);
         //print_r($this->getAttributes());die;
         //print_r($this->secTotal);die;
@@ -84,9 +97,8 @@ class ReportConstructor extends ReportSearchForm {
         }
 
         if ($this->timetableInfo) {
-            $this->cr->addCondition('cast(t.dt as time) between :dtStartTimeTable and :dtEndTimeTable');
-            $this->cr->params[':dtStartTimeTable'] = $this->timetableInfo->time_from;
-            $this->cr->params[':dtEndTimeTable'] = $this->timetableInfo->time_to;
+            $this->cr->addCondition( new CDbExpression("'{$this->timetableInfo->time_from}' < t.dt") );
+            $this->cr->addCondition( new CDbExpression("'{$this->timetableInfo->time_to}' > DATE_SUB(t.dt, INTERVAL t.duration SECOND)") );
         }
 
         $this->cr->select += array( 't.machine_id', 't.state');
@@ -96,11 +108,23 @@ class ReportConstructor extends ReportSearchForm {
             $this->cr->compare('t.machine_id', $this->machineId);
         }
 
+        $this->cr->select []= new CDbExpression("SUM(
+            UNIX_TIMESTAMP(
+            IF(
+                '{$this->dtEnd}' < t.dt,
+                '{$this->dtEnd}',
+                t.dt
+            ))
+            -
+            UNIX_TIMESTAMP(
+            IF(
+                '{$this->dtStart}' < DATE_SUB(t.dt, INTERVAL t.duration SECOND),
+                DATE_SUB(t.dt, INTERVAL t.duration SECOND),
+                '{$this->dtStart}'
+            ))
+        ) + 0  as sec_duration");
+
         $this->crNotWorking = clone($this->cr);
-
-        $this->cr->select []= new CDbExpression("SUM(IFNULL(t.duration,10)) + 0  as sec_duration");
-        $this->crNotWorking->select []= new CDbExpression("SUM(IFNULL(t.duration,0)) + 0  as sec_duration");
-
 
 //        if ($this->machineReportType == 'join') {
 //            //$this->cr->select [] = new CDbExpression('count(distinct t.machine_id) as cnt_machine');
@@ -111,14 +135,18 @@ class ReportConstructor extends ReportSearchForm {
 //        }
 
         $this->cr->group += array('t.machine_id', 't.state');
-        $this->crNotWorking->group += array('t.machine_id', 't.operator_last_fkey');
+        $this->crNotWorking->group += array('t.machine_id', 't.state', 't.operator_last_fkey');
 
         $this->crNotWorking->select [] = 't.operator_last_fkey';
         $this->cr->addInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
         $this->cr->addCondition('t.operator_last_fkey = 0');
 
-        $this->crNotWorking->addInCondition('t.state', array(MachineState::STATE_MACHINE_OFF));
-        //$this->crNotWorking->addNotInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
+        // плохой вариант ограничения!
+        //$this->crNotWorking->addInCondition('t.state', array(MachineState::STATE_MACHINE_OFF));
+
+        // Правильный вариант ограничения!
+        $this->crNotWorking->addNotInCondition('t.state', array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK));
+
         // Может быть state == 0|1, но оператор ничего не нажимал!
         //$this->crNotWorking->addCondition('t.operator_last_fkey != 0');
 

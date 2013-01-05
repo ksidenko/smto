@@ -21,7 +21,7 @@ class GenerateCommand extends CConsoleCommand {
         exec("rm $dir/*.dat");
         //echo "machineId = $machineId, mac = $mac, dir = $dir" . PHP_EOL; die();
 
-        $dt_start = date("Y-m-d\T07:00:00P");
+        $dt_start = date("Y-m-d\T17:00:00P");
         $number = 0;
         for ($counter=0; $counter<$countFiles; $counter++) {
             echo '.';
@@ -84,27 +84,27 @@ class GenerateCommand extends CConsoleCommand {
                 }
 
                 $t = strtotime($dt);
-                if ( $t < strtotime(date('Y-m-d\T07:10:00P'))) {
+                if ( $t < strtotime(date('Y-m-d\T17:10:00P'))) {
                     $state = 0;
                     $da_avg1 = 0;
                     $dd1 = 0;
-                } else if ( $t < strtotime(date('Y-m-d\T07:15:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T17:15:00P')) ) {
                     $state = 1;
                     $da_avg1 = 5;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T07:20:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T17:20:00P')) ) {
                     $state = 2;
                     $da_avg1 = 40;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T07:30:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T17:30:00P')) ) {
                     $state = 3;
                     $da_avg1 = 90;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T07:40:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T17:40:00P')) ) {
                     $state = 1;
                     $da_avg1 = 7;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T07:50:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T17:50:00P')) ) {
                     $state = 0;
                     $da_avg1 = 2;
                     $dd1 = 1;
