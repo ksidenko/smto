@@ -108,11 +108,12 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             $c1 = trim(array_shift($arr));
             $c2 = $c3 = '';
 
-            $opearatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
-            if (!$opearatorRec) {
-                //echo 'no operator: ' . $c1 . ', ' . $c2 . ', '. $c3;
+            $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+
+            $this->operator_id = null;
+            if ($operatorRec) {
+                $this->operator_id = $operatorRec['id'];
             }
-            $this->operator_id = $opearatorRec ? $opearatorRec['id'] : null;
 
             $res = true;
         } else {
@@ -130,8 +131,8 @@ class MachineDataCSV_v1 extends MachineDataCSV {
                 '"' . str_replace(':', '^', $this->dt) . '"',
                 ($this->duration == null || $this->duration < 0 ? "null" : $this->duration),
                 '"' . $this->mac . '"',
-                ( !empty($this->machineId) ? $this->machineId : 'null'),
-                ( !empty($this->operator_id) ? $this->operator_id : 'null'),
+                ( !empty($this->machineId) ? $this->machineId : 'null' ),
+                ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
                 $this->da_max1,
                 $this->operator_last_fkey,
                 $this->state,

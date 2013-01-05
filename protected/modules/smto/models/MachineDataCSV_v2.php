@@ -142,10 +142,11 @@ class MachineDataCSV_v2 extends MachineDataCSV {
             $c3 = trim(array_shift($arr));
 
             $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
-            if (!$operatorRec) {
-                //echo 'no operator: ' . $c1 . ', ' . $c2 . ', '. $c3;
+
+            $this->operator_id = null;
+            if ($operatorRec) {
+                $this->operator_id = $operatorRec['id'];
             }
-            $this->operator_id = $operatorRec ? $operatorRec['id'] : null;
 
             $res = true;
         } else {

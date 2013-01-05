@@ -116,7 +116,7 @@ class Amplitude extends CActiveRecord
                     ':number' => 1
                 );
 
-                $rows = Amplitude::model()->findAll($criteria);
+                $rows = Amplitude::model()->cache(600)->findAll($criteria);
                 if ($rows) {
                     $res = array('zero' => null, 'idle_run' => null);
 
