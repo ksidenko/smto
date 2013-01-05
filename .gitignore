@@ -1,6 +1,6 @@
 .idea/
 lib
 *.sh
-assets/
+./assets/
 protected/runtime/
 *.patch
