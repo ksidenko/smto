@@ -13,6 +13,8 @@
  */
 class Operator extends CActiveRecord
 {
+    public static $idOffset = 17;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Operator the static model class

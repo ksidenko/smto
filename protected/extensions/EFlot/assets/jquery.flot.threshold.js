@@ -76,6 +76,10 @@ events.
                     p.push(below);
                     for (m = 2; m < ps; ++m)
                         p.push(origpoints[i + m]);
+                } else if (addCrossingPoints && prevp != p && x != null
+                    && i > 0 && origpoints[i - ps] == null) {
+                    newpoints.push(null);
+                    newpoints.push(null);
                 }
 
                 p.push(x);
@@ -98,6 +102,6 @@ events.
         init: init,
         options: options,
         name: 'threshold',
-        version: '1.0'
+        version: '1.0.patched'
     });
 })(jQuery);

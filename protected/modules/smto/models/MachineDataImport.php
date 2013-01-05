@@ -19,7 +19,7 @@ class MachineDataImport {
     function __construct($mac, $version = '2.0') {
         $this->_db = Yii::app()->db;
         //DEBUG
-        //$this->_db->createCommand('truncate machine_data')->execute();
+        $this->_db->createCommand('truncate machine_data')->execute();
 
         $this->_mac = $mac;
         $this->_machine = Machine::getRecByMAC($this->_mac);

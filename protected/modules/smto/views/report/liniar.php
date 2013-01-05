@@ -133,7 +133,9 @@
     );
     $yAxisTicks = array();
 
+    // Состояния станка
     $yAxisTicks['machine_state'] []= array(-1, '');
+    //$yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_OFF, 'Выключен');
     $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_ON, 'Включен');
     $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_WORK, 'Работает');
 
@@ -155,6 +157,8 @@
 
     $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_WORK + 2, '');
 
+    // Значения со станков
+
     //foreach($chartData['machine_da_value'] as $key => $machineStateInfo) {
         $arr = array();
         $arr['label'] = '';
@@ -175,6 +179,9 @@
     //}
 
     //$plotData['machine_state'] = array_merge($plotData['machine_state'], $plotData['machine_da_value']);
+
+
+    //События введеные оператором
 
     $yAxisTicks['operator_last_fkey'] []= array(0, '');
     foreach($chartData['states']['operator_last_fkey'] as $key => $machineStateInfo) {
@@ -206,25 +213,35 @@
     }
     $yAxisTicks['operator_last_fkey'] []= array($key + 1, '');
 
-
+    $lastKey = $key+2;
     $plotData['operator_last_fkey'] = array_merge($plotData['operator_last_fkey'], $plotData['machine_state']);
 
-//TODO
-//    foreach($chartData['states']['operator'] as $key => $machineStateInfo) {
-//        $arr = array();
-//        $arr['label'] = '';
-//        // $arr['color'] = isset($machineStateInfo['info']['color']) ? $machineStateInfo['info']['color'] : '';
-//        $arr['lines'] = array(
-//            'show' => true,
-//            'lineWidth' => 7,
-//        );
-//        $arr['data'] = $machineStateInfo['data'];
-//
-//        $plotData['operator_last_fkey'] []= $arr;
-//        $yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
-//    }
 
-    //$yAxisTicks['operator_last_fkey'] []= array($key+1, '');
+    //Зарегистрированные операторы
+
+    if (isset($chartData['states']['operator'])) {
+        $plotData['operator'] = array();
+        foreach($chartData['states']['operator'] as $key => $machineStateInfo) {
+            $key = $machineStateInfo['info']['id'] + Operator::$idOffset;
+            $name = $machineStateInfo['info']['name'];
+            $arr = array();
+            $arr['label'] = '';
+            $arr['color'] = $machineStateInfo['info']['color'];
+            $arr['lines'] = array(
+                'show' => true,
+                'lineWidth' => 4,
+            );
+            $arr['data'] = $machineStateInfo['data'];
+
+            $plotData['operator'] []= $arr;
+            $yAxisTicks['operator_last_fkey'] []= array($key, $machineStateInfo['info']['name']);
+            $lastKey++;
+        }
+
+        $plotData['operator_last_fkey'] = array_merge($plotData['operator_last_fkey'], $plotData['operator']);
+
+        $yAxisTicks['operator_last_fkey'] []= array($key + 1, '');
+    }
 ?>
 
 <script type="text/javascript">

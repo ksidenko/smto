@@ -12,6 +12,8 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public $secTotal;
 
+    public $maxDeltaDt = 240; // in seconds
+
     protected $output = array(
         'states' => array(
             'machine_state' => array(),
@@ -79,7 +81,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
 
         $this->cr->compare('t.machine_id', $this->machineId);
-        //$this->cr->addCondition('t.state>0');
+        $this->cr->addCondition('t.state>0');
 
         //$this->cr->group += array('t.machine_id', 't.state');
         $this->cr->group = implode(', ', $this->cr->group);
@@ -99,9 +101,18 @@ class ReportLinearConstructor extends ReportSearchForm {
 
         //print_r(count($dataMachineInfo ));die;
 
-
+        $lastTimeValues = array();
         foreach ($dataMachineInfo as $machineDataRow) {
+
+            //-----------------------------------------------------------------------------------
+            //Prepare chart data for machine states
+            //-----------------------------------------------------------------------------------
+
             $machineStateCode = $machineDataRow['state'];
+
+            if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
+                continue;
+            }
 
             if ($machineStateCode == MachineState::STATE_MACHINE_IDLE_RUN) {
                 $machineStateCode = MachineState::STATE_MACHINE_WORK;
@@ -109,7 +120,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
             $arrStates = array($machineStateCode);
             if ($machineStateCode == MachineState::STATE_MACHINE_WORK) {
-                $arrStates []= MachineState::STATE_MACHINE_ON;
+                //$arrStates []= MachineState::STATE_MACHINE_ON;
             }
 
             foreach ($arrStates as $machineStateCode) {
@@ -118,11 +129,19 @@ class ReportLinearConstructor extends ReportSearchForm {
                 //Prepare chart data for machine states
                 //-----------------------------------------------------------------------------------
 
-                //print_r($machineDataRow); die;
-//                $t1 = strtotime($machineDataRow['dt']);
-//                $t0 = strtotime($machineDataRow['dt']) - $machineDataRow['duration'];
-//                $dt = $t1 - $t0;
-//                echo "$t1 - $t0 = $dt"; die;
+                // process break for machine states
+                if ( isset($lastTimeValues['machine_state'][$machineStateCode]) ) {
+                    $dtPrev = $lastTimeValues['machine_state'][$machineStateCode];
+                    $dt = $machineDataRow['dt'];
+
+                    if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
+                        $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
+                    }
+                }
+                // save last dt value for current machine state
+                $lastTimeValues['machine_state'][$machineStateCode] = $machineDataRow['dt'];
+
+
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
                     $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
                     (int)$machineStateCode
@@ -131,7 +150,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                     $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
                     (int)$machineStateCode
                 );
-                $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
+                //$this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
 
                 $machineState = MachineState::getRec($machineStateCode);
                 $data_ = array(
@@ -141,103 +160,135 @@ class ReportLinearConstructor extends ReportSearchForm {
                 );
 
                 $this->output['states']['machine_state'][$machineStateCode]['info'] = $data_;
+            }
 
+            //-----------------------------------------------------------------------------------
+            //Prepare chart data for machine analog values
+            //-----------------------------------------------------------------------------------
 
-                //-----------------------------------------------------------------------------------
-                //Prepare chart data for machine analog values
-                //-----------------------------------------------------------------------------------
+            // process break for machine states
+            if ( isset($lastTimeValues['machine_da_value']) ) {
+                $dtPrev = $lastTimeValues['machine_da_value'];
+                $dt = $machineDataRow['dt'];
+                if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
+                    $this->output['machine_da_value']['data'] []= null;
+                }
+            }
+            // save last dt value for current machine state
+            $lastTimeValues['machine_da_value'] = $machineDataRow['dt'];
 
-                $this->output['machine_da_value']['data'] []= array(
-                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
-                    (int)$machineDataRow['da_avg']
+            $this->output['machine_da_value']['data'] []= array(
+                $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                (int)$machineDataRow['da_avg']
+            );
+            $this->output['machine_da_value']['data'] []= array(
+                $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                (int)$machineDataRow['da_avg']
+            );
+
+            $data_ = array(
+                'code' => '',
+                'name' => 'Нагрузка da_avg',
+                'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_WORK),
+            );
+
+            $belowValue = null;
+            foreach($this->machineInfo->cache(600)->config as $machineConfig) {
+                if ( $machineConfig->condition_number == (12 + $this->machineInfo->main_detector_analog) &&
+                    $machineConfig->machine_state_id == MachineState::STATE_MACHINE_WORK
+                ) {
+                    $belowValue = $machineConfig->value;
+                }
+            }
+            if ($belowValue) {
+                $data_ ['threshold'] = array(
+                    'below' => $belowValue,
+                    'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN)
                 );
-                $this->output['machine_da_value']['data'] []= array(
-                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
-                    (int)$machineDataRow['da_avg']
-                );
-                $this->output['machine_da_value']['data'] []= null;
+            }
 
-                $data_ = array(
-                    'code' => '',
-                    'name' => 'Нагрузка da_avg',
-                    'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_WORK),
-                );
+            $this->output['machine_da_value']['info'] = $data_;
 
-                $belowValue = null;
-                foreach($this->machineInfo->config as $machineConfig) {
-                    if ( $machineConfig->condition_number == (12 + $this->machineInfo->main_detector_analog) &&
-                        $machineConfig->machine_state_id == MachineState::STATE_MACHINE_WORK
-                    ) {
-                        $belowValue = $machineConfig->value;
+
+            //-----------------------------------------------------------------------------------
+            //Prepare chart data for operator last keys
+            //-----------------------------------------------------------------------------------
+
+            if ($machineDataRow['operator_last_fkey'] > 0) {
+
+                $operatorLastKey = $machineDataRow['operator_last_fkey'];
+                $operatorLastKey += MachineEvent::$idOffset;
+
+                // process break for machine states
+                if ( isset($lastTimeValues['operator_last_fkey'][$operatorLastKey]) ) {
+                    $dtPrev = $lastTimeValues['operator_last_fkey'][$operatorLastKey];
+                    $dt = $machineDataRow['dt'];
+                    if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
+                        $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] [] = null;
                     }
                 }
-                if ($belowValue) {
-                    $data_ ['threshold'] = array(
-                        'below' => $belowValue,
-                        'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN)
-                    );
+                // save last dt value for current machine state
+                $lastTimeValues['operator_last_fkey'][$operatorLastKey] = $machineDataRow['dt'];
+
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
+                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                    (int)$operatorLastKey
+                );
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
+                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                    (int)$operatorLastKey
+                );
+
+                $fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
+
+                $data_ = array(
+                    'code' => $fkeyState->code,
+                    'name' => $fkeyState->name,
+                    'color' => $fkeyState->color,
+                );
+
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['info'] = $data_;
+            }
+
+
+            //-----------------------------------------------------------------------------------
+            //Prepare chart data for operators
+            //-----------------------------------------------------------------------------------
+
+            if ($machineDataRow['operator_id'] > 0) {
+
+                $operatorId = $machineDataRow['operator_id'];
+                $operatorId += Operator::$idOffset;
+
+                // process break for machine states
+                if ( isset($lastTimeValues['operator'][$operatorId]) ) {
+                    $dtPrev = $lastTimeValues['operator'][$operatorId];
+                    $dt = $machineDataRow['dt'];
+                    if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
+                        $this->output['states']['operator'][$operatorId]['data'] [] = null;
+                    }
                 }
+                // save last dt value for current machine state
+                $lastTimeValues['operator'][$operatorId] = $machineDataRow['dt'];
 
-                $this->output['machine_da_value']['info'] = $data_;
+                $this->output['states']['operator'][$operatorId] ['data'] []= array(
+                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                    (int)$operatorId
+                );
+                $this->output['states']['operator'][$operatorId] ['data'] []= array(
+                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                    (int)$operatorId
+                );
 
+                $operatorInfo = Operator::model()->cache(60)->findByPk($machineDataRow['operator_id']);
+                $data_ = array(
+                    'code' => '',
+                    'id' => $operatorInfo->id,
+                    'name' => $operatorInfo->full_name,
+                    'color' => '#FBC2C4',
+                );
 
-                //-----------------------------------------------------------------------------------
-                //Prepare chart data for operator last keys
-                //-----------------------------------------------------------------------------------
-
-                if ($machineDataRow['operator_last_fkey'] > 0) {
-
-                    $operatorLastKey = $machineDataRow['operator_last_fkey'];
-                    $operatorLastKey += MachineEvent::$idOffset;
-
-                    $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
-                        $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
-                        (int)$operatorLastKey
-                    );
-                    $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
-                        $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
-                        (int)$operatorLastKey
-                    );
-                    $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= null;
-
-
-                    $fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
-
-                    $data_ = array(
-                        'code' => $fkeyState->code,
-                        'name' => $fkeyState->name,
-                        'color' => $fkeyState->color,
-                    );
-
-                    $this->output['states']['operator_last_fkey'][$operatorLastKey]['info'] = $data_;
-                }
-
-
-                //-----------------------------------------------------------------------------------
-                //Prepare chart data for operators
-                //-----------------------------------------------------------------------------------
-
-                if ($machineDataRow['operator_id'] > 0) {
-                    $this->output['states']['operator'][$machineDataRow['operator_id']] ['data'] []= array(
-                        $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
-                        ((int)$machineDataRow['operator_id'] + 10)
-                    );
-                    $this->output['states']['operator'][$machineDataRow['operator_id']] ['data'] []= array(
-                        $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
-                        ((int)$machineDataRow['operator_id'] + 10)
-                    );
-
-                    $this->output['states']['operator'][$machineDataRow['operator_id']] ['data'] []= null;
-
-                    $operatorInfo = Operator::model()->cache(60)->findByPk($machineDataRow['operator_id']);
-                    $data_ = array(
-                        'code' => '',
-                        'name' => $operatorInfo->full_name,
-                        'color' => '#FF22FF',
-                    );
-
-                    $this->output['states']['operator'][$machineDataRow['operator_id']]['info'] = $data_;
-                }
+                $this->output['states']['operator'][$operatorId]['info'] = $data_;
             }
         }
 
@@ -261,9 +312,18 @@ class ReportLinearConstructor extends ReportSearchForm {
 
 
     private function toJsTimestamp($dt, $useTimezone = true) {
+        if (!is_numeric($dt)) {
+             $dt = strtotime($dt);
+        }
+        $ret = '';
         if ($useTimezone)
-            return ($dt + 7 * 60 * 60) * 1000;
+            $ret = ($dt + 7 * 60 * 60) * 1000;
         else
-            return ($dt + 17 * 60 * 60) * 1000;
+            $ret = ($dt + 17 * 60 * 60) * 1000;
+
+        //debug
+        //$ret = date("d.m.Y H:i:s", $dt);
+
+        return $ret;
     }
 }
