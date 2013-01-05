@@ -2,10 +2,17 @@
 
 class MachineDataManager {
 
-    public $version = null;
+    private $_version = null;
+    private $_mac = null;
 
-    function __construct($version = '2.0') {
-        $this->version = $version;
+
+    function __construct($version = '2.0', $mac = null) {
+        $this->_version = $version;
+        $this->_mac = $mac;
+    }
+
+    public function getVersion() {
+        return $this->_version;
     }
 
     function getFileFormat($mac) {
@@ -17,9 +24,9 @@ class MachineDataManager {
 //            $s = '/^pw' . $mac . '.*\.dat$/i';
 //        }
 
-        if ($this->version == '1.0') {
+        if ($this->_version == '1.0') {
             $s = 'log1.txt_*';
-        } else if ($this->version == '2.0') {
+        } else if ($this->_version == '2.0') {
             //$s = 'pw' . $mac . '*.dat';
             $s = '*.dat';
         }
@@ -30,9 +37,10 @@ class MachineDataManager {
     function getLineParser() {
         $res = null;
 
-        if ($this->version == '1.0') {
+        if ($this->_version == '1.0') {
             $res = new MachineDataCSV_v1();
-        } else if ($this->version == '2.0') {
+            $res->mac = $this->_mac;
+        } else if ($this->_version == '2.0') {
             $res = new MachineDataCSV_v2();
         }
 
@@ -42,9 +50,9 @@ class MachineDataManager {
     public function getSqlInsertPart () {
         $res = '';
 
-        if ($this->version == '1.0') {
+        if ($this->_version == '1.0') {
             $res = MachineDataCSV_v1::getSqlInsertPart();
-        } else if ($this->version == '2.0') {
+        } else if ($this->_version == '2.0') {
             $res = MachineDataCSV_v2::getSqlInsertPart();
         }
 

@@ -6,6 +6,8 @@
  */
 
 class MachineDataCSV_v2 extends MachineDataCSV {
+    public $version = '2.0';
+
     private $arrLineTypes = array( 'C', 'D' );
     private $lineColumnCounts = array( 'C' => 42, 'D' => 28 );
 

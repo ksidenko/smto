@@ -22,7 +22,7 @@ return CMap::mergeArray(
                     ),
                     'CWebLogRoute' => array(
                         'class'=>'CWebLogRoute',
-                        'levels'=>'error, warning',
+                        'levels'=>'',
                         'showInFireBug'=>0,
                         'categories'=>'system.db.CDbCommand.*',
                         //'filter'=>'CLogFilter',

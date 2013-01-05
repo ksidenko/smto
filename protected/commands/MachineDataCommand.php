@@ -1,6 +1,9 @@
 <?php
 
 class MachineDataCommand extends CConsoleCommand {
+    private $oldVersionFormatMACs = array(
+        'E67C3F93E858'
+    );
 
     public function actionCheck() {
         //Yii::import('application.modules.smto.models.*');
@@ -69,7 +72,12 @@ class MachineDataCommand extends CConsoleCommand {
             Yii::app()->end();
         }
 
-        $import = new MachineDataImport($mac, '2.0');
+        $versionFormat = '2.0';
+        if ( in_array($mac, $this->oldVersionFormatMACs) ) {
+            $versionFormat = '1.0';
+        }
+
+        $import = new MachineDataImport($versionFormat, $mac);
         $dir = $machineAR->getMachineDataPath();
 
         //$output = Helpers::scandir($dir, $exp="/^cr.*$/i");

@@ -81,7 +81,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
 
         $this->cr->compare('t.machine_id', $this->machineId);
-        $this->cr->addCondition('t.state>0');
+        //$this->cr->addCondition('t.state>0');
 
         //$this->cr->group += array('t.machine_id', 't.state');
         $this->cr->group = implode(', ', $this->cr->group);
@@ -111,7 +111,7 @@ class ReportLinearConstructor extends ReportSearchForm {
             $machineStateCode = $machineDataRow['state'];
 
             if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
-                continue;
+                //continue;
             }
 
             if ($machineStateCode == MachineState::STATE_MACHINE_IDLE_RUN) {

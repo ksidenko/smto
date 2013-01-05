@@ -135,7 +135,7 @@
 
     // Состояния станка
     $yAxisTicks['machine_state'] []= array(-1, '');
-    //$yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_OFF, 'Выключен');
+    $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_OFF, 'Выключен');
     $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_ON, 'Включен');
     $yAxisTicks['machine_state'] []= array(MachineState::STATE_MACHINE_WORK, 'Работает');
 

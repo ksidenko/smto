@@ -108,9 +108,13 @@ class GenerateCommand extends CConsoleCommand {
                     $state = 0;
                     $da_avg1 = 2;
                     $dd1 = 1;
+                } else if ( $t < strtotime(date('Y-m-d\T18:00:00P')) ) {
+                    $state = 3;
+                    $da_avg1 = 80;
+                    $dd1 = 1;
                 } else {
                     $state = 3;
-                    $da_avg1 = 90;
+                    $da_avg1 = 120;
                     $dd1 = 1;
                 }
 
@@ -118,8 +122,12 @@ class GenerateCommand extends CConsoleCommand {
                 $fkey_all = 0;
                 $flags = 0;
 
-                //$operatorInfo = Operator::model()->findBySql('select * from operator order by rand() limit 1');
-                $operatorInfo = Operator::model()->findBySql('select * from operator where id = 1');
+                if ( $t < strtotime(date('Y-m-d\T17:30:00P')) ) {
+                    $operatorInfo = Operator::model()->findBySql('select * from operator where id = 1');
+                } else {
+                    $operatorInfo = Operator::model()->findBySql('select * from operator where id = 2');
+                }
+
                 $c1 = $operatorInfo->c1;
                 $c2 = $operatorInfo->c2;
                 $c3 = $operatorInfo->c3;

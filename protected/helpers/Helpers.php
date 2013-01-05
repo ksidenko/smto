@@ -137,10 +137,10 @@ class Helpers {
     /*
      * Fast list of files ordered by its ctime
      */
-    static function scandirFast($dir, $exp = "", $desc = false, $limit = null) {
+    static function scandirFast($dir, $exp = "", $desc = false, $limit = null, $sortType = '-t') {
 
         $dir = rtrim($dir, '/') . '/';
-        $order = $desc == false ? '-t' : '-tr';
+        $order = $desc == false ? $sortType : $sortType . 'r';
 
         $sLimit = '';
 //        if ($limit) {
@@ -148,7 +148,7 @@ class Helpers {
 //        }
 
         $cmd = "cd $dir; ls $exp $order -1$sLimit";
-        //echo $cmd . PHP_EOL;
+        echo $cmd . PHP_EOL;
 
         exec($cmd, $output);
 

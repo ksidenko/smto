@@ -6,6 +6,7 @@
  */
 
 class MachineDataCSV {
+    public $version = '';
     public $id = null;
     public $separator = ',';
 

@@ -16,14 +16,15 @@ class MachineDataImport {
     private $_mac = '';
     private $_machine = null;
 
-    function __construct($mac, $version = '2.0') {
+    function __construct($version = '2.0', $mac) {
         $this->_db = Yii::app()->db;
         //DEBUG
-        $this->_db->createCommand('truncate machine_data')->execute();
+        //$this->_db->createCommand('truncate machine_data')->execute();
 
         $this->_mac = $mac;
+
         $this->_machine = Machine::getRecByMAC($this->_mac);
-        $this->_manager = new MachineDataManager($version);
+        $this->_manager = new MachineDataManager($version, $this->_mac);
 
         //TODO
         ini_set("max_execution_time", "300");
@@ -131,7 +132,14 @@ class MachineDataImport {
     
     protected function getFilenames($dir, $mac, $limit) {
         $format = $this->_manager->getFileFormat($mac);
-        $filenames = Helpers::scandirFast($dir, $format, true, $limit);
+
+        $desc = true;
+        $sortType = '-tr';
+        if ($this->_manager->getVersion() == '1.0'){
+            $sortType = '-X';
+            $desc = false;
+        }
+        $filenames = Helpers::scandirFast($dir, $format, $desc , $limit, $sortType);
 
 //        $filenames = Helpers::scandir($dir, $format, 'ctime', true);
 //
@@ -154,8 +162,8 @@ class MachineDataImport {
             //echo 'line: ' . $line . PHP_EOL;
             $line = trim(str_replace(array("\r\n", "\n"), '', $line));
 
-            if ( !isset($line[0]) || $line[0] != 'D' ) {
-                continue; // skip comment or incorrect line
+            if ( isset($line[0]) && $line[0] == ';' ) {
+                continue; // skip comment
             }
 
             $lineParser = $this->_manager->getLineParser();
