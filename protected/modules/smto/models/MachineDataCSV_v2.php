@@ -6,6 +6,9 @@
  */
 
 class MachineDataCSV_v2 extends MachineDataCSV {
+    private $arrLineTypes = array( 'C', 'D' );
+    private $lineColumnCounts = array( 'C' => 42, 'D' => 28 );
+
     // in fields
     public $number = null;
     public $dt = null;
@@ -41,7 +44,6 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 
     public function init() {
         parent::init();
-        $this->countColumns = 28;
     }
 
     static public function getSqlInsertPart () {
@@ -57,140 +59,137 @@ class MachineDataCSV_v2 extends MachineDataCSV {
     }
 
     public function parseCSVLine($line, &$lastMachineDataRec = null) {
+        $this->init();
+
         if ( !isset($line[0])  ) {
             return false;
         }
         $lineType = $line[0];
-        if ( !in_array($lineType, array( 'D', 'C') ) ) {
+        if ( !in_array($lineType, $this->arrLineTypes ) ) {
+            $errors = 'Incorrect line type: ' . $lineType;
+            Yii::log("$errors", 'info', __METHOD__);
             return false;
         }
-        
-        $this->init();
 
         $arr = explode($this->separator, $line);
-        $res = false;
 
-        if ( 1 || count($arr) == 28) {
-            // format *.dat example
-            // D,00BD3B330571,9462, 03.06.2011,21:43:46, 
-            // 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
-
-            // format *.cdt example
-            // C,1275AD210D84,51368, 26.12.2011,14:16:08,
-            // 1,1,1,1, 2,2,1,992, 1,1,1,504, 0,0,1,1, 0,0,0,1, 0,0,0,0, 0,44,0,0,0, 0,0,0,330, 59,16,48508, 8810A879
-
-
-            array_shift($arr); //skip type record - only C|D-type
-            $this->mac = trim(array_shift($arr));
-            $machineRec = $this->_machine->getRecByMAC($this->mac);
-            $this->machineId = $machineRec ? $machineRec['id'] : null;
-            $this->number = trim(array_shift($arr));
-            $date = trim(array_shift($arr));
-            $time = trim(array_shift($arr));
-
-            $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
-            if ( $lastMachineDataRec ) {
-                $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
-                $m = Yii::app()->getModules();
-                $t = $m['smto']['max_time_between_machine_records'];
-                if ($this->duration < 0 || $this->duration > $t ) {
-                    $this->duration = null;
-                }
-            }
-            if ($lineType == 'C') {
-        	    array_shift($arr);
-                array_shift($arr);
-                array_shift($arr);
-                array_shift($arr);
-            }
-            $this->da_max1 = intval(trim(array_shift($arr)));
-            $this->da_max2 = intval(trim(array_shift($arr)));
-            $this->da_max3 = intval(trim(array_shift($arr)));
-            $this->da_max4 = intval(trim(array_shift($arr)));
-
-            $this->da_avg1 = intval(trim(array_shift($arr)));
-            $this->da_avg2 = intval(trim(array_shift($arr)));
-            $this->da_avg3 = intval(trim(array_shift($arr)));
-            $this->da_avg4 = intval(trim(array_shift($arr)));
-
-            if ($lineType == 'C') {
-        	    array_shift($arr);
-                array_shift($arr);
-                array_shift($arr);
-                array_shift($arr);
-            }
-
-
-            $this->dd1 = intval(trim(array_shift($arr)));
-            $this->dd2 = intval(trim(array_shift($arr)));
-            $this->dd3 = intval(trim(array_shift($arr)));
-            $this->dd4 = intval(trim(array_shift($arr)));
-
-            $this->dd_change1 = intval(trim(array_shift($arr)));
-            $this->dd_change2 = intval(trim(array_shift($arr)));
-            $this->dd_change3 = intval(trim(array_shift($arr)));
-            $this->dd_change4 = intval(trim(array_shift($arr)));
-
-            //состояние станка (0...3), с точки зрения контроллера, на НАЧАЛО интервала (то есть 10 секунд назад от времени записи)
-            //0 - выключен, 1 - включен, 2 - холостой ход, 3 - работает
-            $this->state = trim(array_shift($arr));
-
-            //последняя причина простоя, указанная оператором станка на пульте контроллера
-            //0 - неизвестная причина, 1...15 - нажатая оператором станка кнопка.
-            $this->operator_last_fkey = intval(trim(array_shift($arr)));
-
-            $this->fkey_all = intval(trim(array_shift($arr)));
-            $this->flags = intval(trim(array_shift($arr)));
-
-            $c1 = trim(array_shift($arr));
-            $c2 = trim(array_shift($arr));
-            $c3 = trim(array_shift($arr));
-
-            $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
-
-            $this->operator_id = null;
-            if ($operatorRec) {
-                $this->operator_id = $operatorRec['id'];
-            }
-
-            $res = true;
-        } else {
-            $errors = 'Bad column count: ' . count($arr);
+        if ( count($arr) != $this->lineColumnCounts[$lineType] ) {
+            $errors = 'Bad column count in line: ' . count($arr);
+            Yii::log("$errors", 'info', __METHOD__);
+            return false;
         }
 
-        return $res;
+        // format *.dat example
+        // D,00BD3B330571,9462, 03.06.2011,21:43:46,
+        // 165,1023,241,11, 165,1023,241,10, 1,0,1,1, 0,0,0,0, 2,3, 0,0, 59,16,48508
+
+        // format *.cdt example
+        // C,1275AD210D84,51368, 26.12.2011,14:16:08,
+        // 1,1,1,1, 2,2,1,992, 1,1,1,504, 0,0,1,1, 0,0,0,1, 0,0,0,0, 0,44,0,0,0, 0,0,0,330, 59,16,48508, 8810A879
+
+
+        array_shift($arr); //skip type record - only C|D-type
+        $this->mac = trim(array_shift($arr));
+        $machineRec = $this->_machine->getRecByMAC($this->mac);
+        $this->machineId = $machineRec ? $machineRec['id'] : null;
+        $this->number = trim(array_shift($arr));
+        $date = trim(array_shift($arr));
+        $time = trim(array_shift($arr));
+
+        $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
+        if ( $lastMachineDataRec ) {
+            $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+            $m = Yii::app()->getModules();
+            $t = $m['smto']['max_time_between_machine_records'];
+            if ($this->duration < 0 || $this->duration > $t ) {
+                $this->duration = null;
+            }
+        }
+        if ($lineType == 'C') {
+            array_shift($arr);
+            array_shift($arr);
+            array_shift($arr);
+            array_shift($arr);
+        }
+        $this->da_max1 = intval(trim(array_shift($arr)));
+        $this->da_max2 = intval(trim(array_shift($arr)));
+        $this->da_max3 = intval(trim(array_shift($arr)));
+        $this->da_max4 = intval(trim(array_shift($arr)));
+
+        $this->da_avg1 = intval(trim(array_shift($arr)));
+        $this->da_avg2 = intval(trim(array_shift($arr)));
+        $this->da_avg3 = intval(trim(array_shift($arr)));
+        $this->da_avg4 = intval(trim(array_shift($arr)));
+
+        if ($lineType == 'C') {
+            array_shift($arr);
+            array_shift($arr);
+            array_shift($arr);
+            array_shift($arr);
+        }
+
+
+        $this->dd1 = intval(trim(array_shift($arr)));
+        $this->dd2 = intval(trim(array_shift($arr)));
+        $this->dd3 = intval(trim(array_shift($arr)));
+        $this->dd4 = intval(trim(array_shift($arr)));
+
+        $this->dd_change1 = intval(trim(array_shift($arr)));
+        $this->dd_change2 = intval(trim(array_shift($arr)));
+        $this->dd_change3 = intval(trim(array_shift($arr)));
+        $this->dd_change4 = intval(trim(array_shift($arr)));
+
+        //состояние станка (0...3), с точки зрения контроллера, на НАЧАЛО интервала (то есть 10 секунд назад от времени записи)
+        //0 - выключен, 1 - включен, 2 - холостой ход, 3 - работает
+        $this->state = trim(array_shift($arr));
+
+        //последняя причина простоя, указанная оператором станка на пульте контроллера
+        //0 - неизвестная причина, 1...15 - нажатая оператором станка кнопка.
+        $this->operator_last_fkey = intval(trim(array_shift($arr)));
+
+        $this->fkey_all = intval(trim(array_shift($arr)));
+        $this->flags = intval(trim(array_shift($arr)));
+
+        $c1 = trim(array_shift($arr));
+        $c2 = trim(array_shift($arr));
+        $c3 = trim(array_shift($arr));
+
+        $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+
+        $this->operator_id = null;
+        if ($operatorRec) {
+            $this->operator_id = $operatorRec['id'];
+        }
+
+        return true;
     }
 
     public function getSqlPart() {
-        $s = '';
+        $s = implode(',', array(
+            $this->number,
+            '"' . str_replace(':', '^', $this->dt) . '"',
+            ($this->duration == null || $this->duration < 0 ? 'null': $this->duration),
+            '"' . $this->mac . '"',
 
-        if ( $this->errors == null ) {
-            $s = implode(',', array(
-                $this->number,
-                '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? 'null': $this->duration),
-                '"' . $this->mac . '"',
+            ( !empty($this->machineId) ? $this->machineId : 'null' ),
+            ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
 
-                ( !empty($this->machineId) ? $this->machineId : 'null' ),
-                ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
+            $this->da_max1,$this->da_max2,$this->da_max3,$this->da_max4,
 
-                $this->da_max1,$this->da_max2,$this->da_max3,$this->da_max4,
+            $this->da_avg1,$this->da_avg2,$this->da_avg3,$this->da_avg4,
 
-                $this->da_avg1,$this->da_avg2,$this->da_avg3,$this->da_avg4,
+            $this->dd1,$this->dd2,$this->dd3,$this->dd4,
 
-                $this->dd1,$this->dd2,$this->dd3,$this->dd4,
+            $this->dd_change1,$this->dd_change2,$this->dd_change3,$this->dd_change4,
 
-                $this->dd_change1,$this->dd_change2,$this->dd_change3,$this->dd_change4,
+            $this->state,
 
-                $this->state,
+            $this->operator_last_fkey,
+            $this->fkey_all,
+            $this->flags,
+        ));
 
-                $this->operator_last_fkey,
-                $this->fkey_all,
-                $this->flags,
-            ));
-        }
-
-        $s = $s != '' ? '(' . $s . ')' : '';
+        $s = '(' . $s . ')';
 
         return $s;
     }

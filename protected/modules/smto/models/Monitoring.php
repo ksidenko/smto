@@ -40,6 +40,7 @@ class Monitoring {
             while ( $line = fgets($fd) ) {
 
                 if ( !isset($line[0]) || $line[0] != 'C' ) {
+                    Yii::log("ignore line ($line)", 'info', __METHOD__);
                     continue;
                 }
                 break;
@@ -48,14 +49,11 @@ class Monitoring {
             $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
             $lineParser->parseCSVLine($line);
 
-            // debug info
-            //$lineParser->state = 2; $lineParser->operatorId = '222';
-
             //echo '<pre>' . print_r($lineParser, true) . '</pre>'; die;
 
             $machineState = MachineState::getRec($lineParser->state);
             if (!$machineState) {
-                $this->errors[] = 'Не корректный статус станка (mac: '.$machineAR->mac.'): ' . $lineParser->state;
+                $this->errors[] = 'Не корректный статус станка (mac: '.$machineAR->mac.'): ( ' . $lineParser->state . ' )';
                 continue;
             }
 
@@ -68,7 +66,7 @@ class Monitoring {
             if ( !empty($lineParser->operator_id) ) {
                 $operatorInfo = Operator::getRec($lineParser->operator_id);
                 if (!$operatorInfo) {
-                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ' . $lineParser->operator_id;
+                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ( ' . $lineParser->operator_id . ' )';
                     $operatorInfo = new stdClass();
                     $operatorInfo->full_name = 'Не авторизован';
                 }

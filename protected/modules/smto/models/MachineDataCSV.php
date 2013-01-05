@@ -8,7 +8,6 @@
 class MachineDataCSV {
     public $id = null;
     public $separator = ',';
-    public $countColumns = 0;
 
     public $dt = null;
 

@@ -114,7 +114,7 @@ class Operator extends CActiveRecord
                 );
                 $criteria->limit = 1;
 
-                $res = Operator::model()->cache(60)->find($criteria);
+                $res = Operator::model()->cache(600)->find($criteria);
                 if ($res) {
                     $ids[$code] = $res;
                 }

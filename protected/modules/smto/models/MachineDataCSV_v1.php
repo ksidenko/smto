@@ -6,7 +6,9 @@
  */
 
 class MachineDataCSV_v1 extends MachineDataCSV {
-    
+
+    private $lineColumnCounts = 8;
+
     // in fields
     public $number = null;
     public $dt = null;
@@ -21,10 +23,6 @@ class MachineDataCSV_v1 extends MachineDataCSV {
 
     public function init() {
         parent::init();
-        $this->countColumns = 8;
-
-        $machineRec = $this->_machine->getRecByMAC($this->mac);
-        $this->machineId = $machineRec ? $machineRec['id'] : null;
     }
 
     static public function getSqlInsertPart () {
@@ -54,92 +52,90 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         $this->init();
 
         $arr = explode($this->separator, $line);
-        $res = false;
 
-        if (count($arr) == $this->countColumns) {
-            // format example
-            // //21.04.2011,15:51:48,0,1,0,0,0,24058455
+        if ( count($arr) != $this->lineColumnCounts ) {
+            $errors = 'Bad column count in line: ' . count($arr);
+            return false;
+        }
 
-            $date = trim(array_shift($arr));
-            $time = trim(array_shift($arr));
-            $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
-            if ( $lastMachineDataRec ) {
-                $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
-                $m = Yii::app()->getModules();
-                $maxDuration = $m['smto']['max_duration'];
-                if ($this->duration < 0 || $this->duration > $maxDuration ) {
-                    $this->duration = null;
-                }
+        $machineRec = $this->_machine->getRecByMAC($this->mac);
+        $this->machineId = $machineRec ? $machineRec['id'] : null;
+
+
+        // format example
+        // //21.04.2011,15:51:48,0,1,0,0,0,24058455
+
+        $date = trim(array_shift($arr));
+        $time = trim(array_shift($arr));
+        $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
+        if ( $lastMachineDataRec ) {
+            $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+            $m = Yii::app()->getModules();
+            $maxDuration = $m['smto']['max_duration'];
+            if ($this->duration < 0 || $this->duration > $maxDuration ) {
+                $this->duration = null;
             }
+        }
 
-            $amplitude = array_shift($arr);
+        $amplitude = array_shift($arr);
 
-            $this->da_max1 = $amplitude;
-            $powerOn = trim(array_shift($arr));
-            $isWorking = trim(array_shift($arr));
-            $isAlarm = trim(array_shift($arr));
-            $eventCode = trim(array_shift($arr));
+        $this->da_max1 = $amplitude;
+        $powerOn = trim(array_shift($arr));
+        $isWorking = trim(array_shift($arr));
+        $isAlarm = trim(array_shift($arr));
+        $eventCode = trim(array_shift($arr));
 
-            if ($powerOn == false) {
+        if ($powerOn == false) {
+            $this->state = MachineState::STATE_MACHINE_OFF;
+        } else {
+            if ($isAlarm) {
                 $this->state = MachineState::STATE_MACHINE_OFF;
             } else {
-                if ($isAlarm) {
-                    $this->state = MachineState::STATE_MACHINE_OFF;
-                } else {
-                    if ($isWorking == true) {
-                        $range = Amplitude::getAmplitudesRange($this->machineId);
-                        if ($range) {
-                            if ($amplitude < $range[0]) {
-                                $this->state = MachineState::STATE_MACHINE_ON; // Включен
-                            } else if ($amplitude < $range[1]) {
-                                $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
-                            } else  {
-                                $this->state = MachineState::STATE_MACHINE_WORK; // Работает
-                            } 
-                        } else {
-                            $this->state = MachineState::STATE_MACHINE_ON;
+                if ($isWorking == true) {
+                    $range = Amplitude::getAmplitudesRange($this->machineId);
+                    if ($range) {
+                        if ($amplitude < $range[0]) {
+                            $this->state = MachineState::STATE_MACHINE_ON; // Включен
+                        } else if ($amplitude < $range[1]) {
+                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
+                        } else  {
+                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
                         }
+                    } else {
+                        $this->state = MachineState::STATE_MACHINE_ON;
                     }
                 }
             }
-
-            $this->operator_last_fkey = $eventCode;
-            
-            $c1 = trim(array_shift($arr));
-            $c2 = $c3 = '';
-
-            $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
-
-            $this->operator_id = null;
-            if ($operatorRec) {
-                $this->operator_id = $operatorRec['id'];
-            }
-
-            $res = true;
-        } else {
-            $errors = 'Bad column count: ' . count($arr);
         }
 
-        return $res;
+        $this->operator_last_fkey = $eventCode;
+
+        $c3 = trim(array_shift($arr));
+        $c1 = $c2 = '';
+
+        $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+
+        $this->operator_id = null;
+        if ($operatorRec) {
+            $this->operator_id = $operatorRec['id'];
+        }
+
+        return true;
     }
 
     function getSqlPart() {
-        $s = '';
+        $s = implode(',', array(
+            '"' . str_replace(':', '^', $this->dt) . '"',
+            ($this->duration == null || $this->duration < 0 ? "null" : $this->duration),
+            '"' . $this->mac . '"',
+            ( !empty($this->machineId) ? $this->machineId : 'null' ),
+            ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
+            $this->da_max1,
+            $this->operator_last_fkey,
+            $this->state,
+        ));
 
-        if ( $this->errors == null ) {
-            $s = implode(',', array(
-                '"' . str_replace(':', '^', $this->dt) . '"',
-                ($this->duration == null || $this->duration < 0 ? "null" : $this->duration),
-                '"' . $this->mac . '"',
-                ( !empty($this->machineId) ? $this->machineId : 'null' ),
-                ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
-                $this->da_max1,
-                $this->operator_last_fkey,
-                $this->state,
-            ));
-        }
-
-        $s = $s != '' ? '(' . $s . ')' : '';
+        $s = '(' . $s . ')';
 
         return $s;
     }

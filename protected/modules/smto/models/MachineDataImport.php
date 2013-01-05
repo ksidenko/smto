@@ -18,7 +18,8 @@ class MachineDataImport {
 
     function __construct($mac, $version = '2.0') {
         $this->_db = Yii::app()->db;
-        //$this->db->query('truncate machine_log');
+        //DEBUG
+        //$this->_db->createCommand('truncate machine_data')->execute();
 
         $this->_mac = $mac;
         $this->_machine = Machine::getRecByMAC($this->_mac);
@@ -122,6 +123,10 @@ class MachineDataImport {
             }
         }
         print_r($processFiles);
+
+        if ($this->errors) {
+            Yii::log(print_r($this->errors, true), 'errors', __METHOD__);
+        }
     }
     
     protected function getFilenames($dir, $mac, $limit) {
@@ -147,16 +152,20 @@ class MachineDataImport {
         
         while ( $line = fgets($file) ) {
             //echo 'line: ' . $line . PHP_EOL;
-            $line = str_replace(array("\r\n", "\n"), '', $line);
+            $line = trim(str_replace(array("\r\n", "\n"), '', $line));
+
+            if ( !isset($line[0]) || $line[0] != 'D' ) {
+                continue; // skip comment or incorrect line
+            }
 
             $lineParser = $this->_manager->getLineParser();
             $res = $lineParser->parseCSVLine($line, $lastMachineDataRec);
 
-            $lastMachineDataRec = $lineParser;
             if ($res) {
                 $this->parsedRows[] = $lineParser;
+                $lastMachineDataRec = $lineParser;
             } else {
-                $errors []= $lineParser->errors;
+                $this->errors []= $lineParser->errors;
             }
         }
 
