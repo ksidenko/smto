@@ -39,7 +39,7 @@
                 array('label'=>'События станков', 'url'=>array('/smto/machineEvent/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineEventAdministrating')),
                 array('label'=>'Операторы', 'url'=>array('/smto/operator/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-OperatorAdministrating')),
                 //array('label'=>'Цвета событий', 'url'=>array('/smto/eventColor/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineEventAdministrating')),
-                array('label'=>'Данные со станков', 'url'=>array('/smto/machineData/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineDataAdministrating')),
+                //array('label'=>'Данные со станков', 'url'=>array('/smto/machineData/admin'), 'visible'=>Yii::app()->user->checkAccess('smto-MachineDataAdministrating')),
                 array('label'=>'Отчет', 'url'=>array('/smto/report/index'), 'visible'=>Yii::app()->user->checkAccess('smto-ReportIndex')),
                 array('label'=>'Лин. отчет', 'url'=>array('/smto/report/liniar'), 'visible'=>Yii::app()->user->checkAccess('smto-ReportLiniar')),
                 array('label'=>'Монитор', 'url'=>array('/smto/monitoring/monitor'), 'visible'=>Yii::app()->user->checkAccess('smto-MonitoringMonitor')),

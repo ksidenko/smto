@@ -39,6 +39,7 @@ class MachineDataImport {
 
         foreach($filenames as $filename) {
 
+
             //debug
             echo "=============================================$filename=========================" . PHP_EOL;
 
@@ -157,6 +158,15 @@ class MachineDataImport {
         if (!$file) {
             return false;
         }
+
+	    $fstat = fstat($file);
+            $size = $fstat['size'];
+            echo "size = $size" . PHP_EOL;
+	    if ( $size == 0 && file_exists($filename) ) {
+		echo "unlink $filename" . PHP_EOL;
+		unlink($filename);
+		return false;
+            }
         
         while ( $line = fgets($file) ) {
             //echo 'line: ' . $line . PHP_EOL;

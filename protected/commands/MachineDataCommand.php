@@ -2,7 +2,7 @@
 
 class MachineDataCommand extends CConsoleCommand {
     private $oldVersionFormatMACs = array(
-        'E67C3F93E858'
+        //'E67C3F93E858'
     );
 
     public function actionCheck() {
@@ -19,8 +19,11 @@ class MachineDataCommand extends CConsoleCommand {
 	
     	shuffle($machines);
 	
+	$i = 1;
         foreach($machines as $machineAR) {
-
+           if (empty($machineAR->mac)) {
+               continue;
+           }
 //TODO
 //            // Check max running import processes
 //    	    $check = "ps ax | grep -v grep | grep -i 'MachineData import' | grep -v grep ";
@@ -53,13 +56,14 @@ class MachineDataCommand extends CConsoleCommand {
             $cmd[] = "$dir/yiic";
             $cmd[] = "MachineData import";
             $cmd[] = "--mac=" . $machineAR->mac;
-            $cmd[] = "--maxProcessDataFiles=" . 20;
+            $cmd[] = "--maxProcessDataFiles=" . 200;
             $cmd[] = "> /dev/null 2>/dev/null &";
             $cmd = implode(' ', $cmd);
 
-            //echo "$cmd" . PHP_EOL;
+            echo "$i) $cmd" . PHP_EOL;
 
             exec($cmd);
+            $i++;
         }
     }
 

@@ -64,7 +64,7 @@ return CMap::mergeArray(
             ),
 
             'db'=>array(
-                'connectionString' => 'mysql:host=localhost;dbname=smto_07.07.2012',
+                'connectionString' => 'mysql:host=localhost;dbname=smto',
                 'emulatePrepare' => true,
                 'username' => 'root',
                 'password' => '1',
@@ -86,7 +86,7 @@ return CMap::mergeArray(
                 'routes'=>array(
                     'CFileLogRoute'=> array(
                         'class'=>'CFileLogRoute',
-                        'levels'=>'error, warning, info',
+                        'levels'=>'error, warning',
                         //'categories'=>'system.db.CDbCommand.*',
                     ),
                     'CWebLogRoute'=> array(

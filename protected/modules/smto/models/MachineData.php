@@ -267,7 +267,7 @@ class MachineData extends CActiveRecord
 
     static public function isIdentityRecords( $lastMachineDataRec, $parsedRow, $useHash = false ) {
 
-        if ( is_null($lastMachineDataRec->state) ) {
+        if ( !isset($lastMachineDataRec->state) || is_null($lastMachineDataRec->state) ) {
             return false;
         }
 
