@@ -108,23 +108,20 @@ class Amplitude extends CActiveRecord
             $res = false;
             try {
                 $criteria = new CDbCriteria();
-                $criteria->select = 'value, type';
+                $criteria->select = 'machine_state_id, value';
                 $criteria->addCondition('machine_id = :machine_id');
-                $criteria->addCondition('number = :number');
+                $criteria->addCondition('condition_number = :number');
                 $criteria->params = array(
                     ':machine_id' => $machineId,
-                    ':number' => 1
+                    ':number' => 12
                 );
 
-                $rows = Amplitude::model()->cache(600)->findAll($criteria);
+                $rows = MachineConfig::model()->cache(600)->findAll($criteria);
                 if ($rows) {
-                    $res = array('zero' => null, 'idle_run' => null);
-
                     foreach($rows as $row) {
-                        $res[$row['type']] = $row['value'];
+                        $res[$row['machine_state_id']] = $row['value'];
                     }
-
-                    $ids[$machineId] = array_values($res);
+                    $ids[$machineId] = $res;
                 }
             } catch (Exception $e) {
                 print_r($e->getMessage());

@@ -168,11 +168,13 @@ class MachineDataImport {
 		return false;
             }
         
+        $countRecordedRows = 0;
         while ( $line = fgets($file) ) {
-            //echo 'line: ' . $line . PHP_EOL;
+    	    //echo 'line: ' . $line . PHP_EOL;
             $line = trim(str_replace(array("\r\n", "\n"), '', $line));
 
             if ( isset($line[0]) && $line[0] == ';' ) {
+        	echo "skipping comment..." . $line[0] . PHP_EOL;
                 continue; // skip comment
             }
 
@@ -182,6 +184,7 @@ class MachineDataImport {
             if ($res) {
                 $this->parsedRows[] = $lineParser;
                 $lastMachineDataRec = $lineParser;
+                $countRecordedRows++;
             } else {
                 $this->errors []= $lineParser->errors;
             }
@@ -189,6 +192,11 @@ class MachineDataImport {
 
         fclose($file);
 
+	if ($countRecordedRows == 0) {
+	    echo "file $filename is bad, remove it!";
+	    unlink($filename);
+	}
+	
         //$c = count($this->parsedRows); echo "count parsed rows = $c"  . PHP_EOL; die;
 
         return true;

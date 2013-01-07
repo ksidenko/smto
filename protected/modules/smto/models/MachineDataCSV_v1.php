@@ -31,7 +31,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         if (self::$ignoreInsertDublicates) {
             $ignore = 'ignore';
         }
-        $sql = "insert $ignore into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_max1`, `operator_last_fkey`,  `state`)
+        $sql = "insert $ignore into machine_data (`dt`, `duration`, `mac`, `machine_id`, `operator_id`, `da_avg1`, `operator_last_fkey`,  `state`)
                 values " . PHP_EOL;
 
         return $sql;
@@ -59,9 +59,9 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             return false;
         }
 
+
         $machineRec = $this->_machine->getRecByMAC($this->mac);
         $this->machineId = $machineRec ? $machineRec['id'] : null;
-
 
         // format example
         // //21.04.2011,15:51:48,0,1,0,0,0,24058455
@@ -79,25 +79,38 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         }
 
         $amplitude = array_shift($arr);
+	//echo "ampl = $amplitude" . PHP_EOL;
 
-        $this->da_max1 = $amplitude;
+        $this->da_avg1 = $amplitude;
         $powerOn = trim(array_shift($arr));
         $isWorking = trim(array_shift($arr));
         $isAlarm = trim(array_shift($arr));
         $eventCode = trim(array_shift($arr));
 
+        //$range = Amplitude::getAmplitudesRange($this->machineId);
+        //echo '|'.print_r($range,true) . '|'; die;
+        
         if ($powerOn == false) {
             $this->state = MachineState::STATE_MACHINE_OFF;
         } else {
-            if ($isAlarm) {
-                $this->state = MachineState::STATE_MACHINE_OFF;
-            } else {
+                $range = Amplitude::getAmplitudesRange($this->machineId);
                 if ($isWorking == true) {
-                    $range = Amplitude::getAmplitudesRange($this->machineId);
                     if ($range) {
-                        if ($amplitude < $range[0]) {
+                        if ($amplitude < $range[MachineState::STATE_MACHINE_ON]) {
+                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // 
+                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
+                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
+                        } else  {
+                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
+                        }
+                    } else {
+                        $this->state = MachineState::STATE_MACHINE_ON;
+                    }
+                } else {
+                    if ($range) {
+                        if ($amplitude < $range[MachineState::STATE_MACHINE_ON]) {
                             $this->state = MachineState::STATE_MACHINE_ON; // Включен
-                        } else if ($amplitude < $range[1]) {
+                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
                             $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
                         } else  {
                             $this->state = MachineState::STATE_MACHINE_WORK; // Работает
@@ -106,7 +119,6 @@ class MachineDataCSV_v1 extends MachineDataCSV {
                         $this->state = MachineState::STATE_MACHINE_ON;
                     }
                 }
-            }
         }
 
         $this->operator_last_fkey = $eventCode;
@@ -131,7 +143,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             '"' . $this->mac . '"',
             ( !empty($this->machineId) ? $this->machineId : 'null' ),
             ( !empty($this->operator_id) ? $this->operator_id : 'null' ),
-            $this->da_max1,
+            $this->da_avg1,
             $this->operator_last_fkey,
             $this->state,
         ));
