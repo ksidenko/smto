@@ -100,7 +100,16 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 
         $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
         if ( $lastMachineDataRec ) {
-            $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+	    if ($this->dt == $lastMachineDataRec->dt) {
+	        return false;
+	    }
+	
+	    $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+	    if ($this->duration < 0) {
+		// we restore old data file, last rec is incorrect
+		$lastMachineDataRec = null;
+	    }
+	
             $m = Yii::app()->getModules();
             $t = $m['smto']['max_time_between_machine_records'];
             if ($this->duration < 0 || $this->duration > $t ) {

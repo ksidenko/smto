@@ -1,8 +1,12 @@
 echo -ne "dumping database...";
-mysqldump smto_new -h localhost -u sks --password=qazqaz --ignore-table=smto_new.machine_data -r dump_13.10.2011.sql
-mysqldump smto_new machine_data -h localhost -u sks --password=qazqaz --no-data >> dump_13.10.2011.sql
+mysqldump smto -h localhost -uroot -p1 \
+--ignore-table=smto.machine_data \
+--ignore-table=smto.machine_data_old \
+--ignore-table=smto.machine_data_old2 \
+--ignore-table=smto.machine_data_old3 \
+> dump_07.01.2013.sql
 
-mysqldump smto_07.07.2012 -h localhost -u root --password=1 \
+mysqldump smto -h localhost -uroot -p1 \
 p2_auth_assignment \
 p2_auth_item \
 p2_auth_item_child \
@@ -14,6 +18,6 @@ p2_info \
 p2_log \
 p2_page \
 p2_user \
--r dump_p2.sql
+>> dump_p2_07.01.2013.sql
 
 echo -ne "end";

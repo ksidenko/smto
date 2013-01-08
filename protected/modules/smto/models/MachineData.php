@@ -296,13 +296,21 @@ class MachineData extends CActiveRecord
                         $lastMachineDataRec->da_avg1.$lastMachineDataRec->da_avg2.$lastMachineDataRec->da_avg3.$lastMachineDataRec->da_avg4.
                         $lastMachineDataRec->dd1.$lastMachineDataRec->dd2.$lastMachineDataRec->dd3.$lastMachineDataRec->dd4.
                         $lastMachineDataRec->dd_change1.$lastMachineDataRec->dd_change2.$lastMachineDataRec->dd_change3.$lastMachineDataRec->dd_change4);
+                        
+                        $b = ($hash1 == $hash2);
                 } else { // version 1.0
-                    $hash1 = md5($parsedRow->da_max1);
+                    $hash1 = md5($parsedRow->da_avg1);
 
-                    $hash2 = md5($lastMachineDataRec->da_max1);
+                    $hash2 = md5($lastMachineDataRec->da_avg1);
+
+                    $b = ($hash1 == $hash2);
+
+                    if ($parsedRow->da_avg1 > 0) {
+                        if (abs($parsedRow->da_avg1 - $lastMachineDataRec->da_avg1)/$parsedRow->da_avg1 < 0.002) {
+    	                    $b = true;
+	                }
+                    }
                 }
-
-                $b = ($hash1 == $hash2);
             }
         }
 

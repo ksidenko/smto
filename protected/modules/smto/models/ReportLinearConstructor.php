@@ -12,7 +12,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public $secTotal;
 
-    public $maxDeltaDt = 240; // in seconds
+    public $maxDeltaDt = 20; // in seconds
 
     protected $output = array(
         'states' => array(
@@ -111,7 +111,7 @@ class ReportLinearConstructor extends ReportSearchForm {
             $machineStateCode = $machineDataRow['state'];
 
             if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
-                //continue;
+                continue;
             }
 
             if ($machineStateCode == MachineState::STATE_MACHINE_IDLE_RUN) {
@@ -120,7 +120,7 @@ class ReportLinearConstructor extends ReportSearchForm {
 
             $arrStates = array($machineStateCode);
             if ($machineStateCode == MachineState::STATE_MACHINE_WORK) {
-                //$arrStates []= MachineState::STATE_MACHINE_ON;
+                $arrStates []= MachineState::STATE_MACHINE_ON;
             }
 
             foreach ($arrStates as $machineStateCode) {

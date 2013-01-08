@@ -185,7 +185,7 @@ class ReportConstructor extends ReportSearchForm {
             $this->initMachineOutput ($currMachineId, $processMachines);
             $currMachineInfo = &$this->output['machines'][$currMachineId];
 
-            $machineState = MachineState::model()->findByPk($stateInfo['state']);
+            $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
             $currMachineInfo['states'] [$machineState->code] = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
@@ -207,7 +207,7 @@ class ReportConstructor extends ReportSearchForm {
             $currMachineInfo = &$this->output['machines'][$currMachineId];
 
             if (empty($stateInfo['operator_last_fkey'])) { // Оператор не жал кнопки Fkey
-                $machineState = MachineState::model()->findByPk($stateInfo['state']);
+                $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
                 $code = $machineState->code;
                 $name = $machineState->name;
                 $color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
@@ -266,14 +266,14 @@ class ReportConstructor extends ReportSearchForm {
                     }
 
                     if ($code == 'work') {
-                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
+                        $machineState = MachineState::model()->cache(600)->findByPk( MachineState::STATE_MACHINE_WORK );
                         $code = $machineState->code;
                         //$name = $machineState->name;
                         $name = 'Работа';
                             //$color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
                         $color = '#2f940d'; //todo
                     } else {
-                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_OFF );
+                        $machineState = MachineState::model()->cache(600)->findByPk( MachineState::STATE_MACHINE_OFF );
                         $code = $machineState->code;
                         //$name = $machineState->name;
                         $name = 'Простой';
@@ -351,7 +351,7 @@ class ReportConstructor extends ReportSearchForm {
                 foreach ($currMachineInfo['states'] as $c => $stateInfo) {
 
                     if (in_array($c, array('idle_run', 'work'))) {
-                        $machineState = MachineState::model()->findByPk( MachineState::STATE_MACHINE_WORK );
+                        $machineState = MachineState::model()->cache(600)->findByPk( MachineState::STATE_MACHINE_WORK );
                         $code = 'work';
                         $c = 'work';
                         $name = $machineState->name;
@@ -407,7 +407,7 @@ class ReportConstructor extends ReportSearchForm {
                 'states' => array(),
             );
 
-            $machineInfo = Machine::model()->findByPk($currMachineId);
+            $machineInfo = Machine::model()->cache(600)->findByPk($currMachineId);
             if ($machineInfo) {
                 $this->output['machines'][$currMachineId]['machine'] = array(
                     'id' => $machineInfo->id,

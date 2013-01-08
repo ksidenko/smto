@@ -44,7 +44,7 @@ class MachineDataImport {
             echo "=============================================$filename=========================" . PHP_EOL;
 
             $lastParsedRow = array_pop($this->parsedRows);
-            if ($lastParsedRow && intval($lastParsedRow->id) > 0 ) {
+            if ($lastParsedRow && intval($lastParsedRow->id) > 0 && $lastParsedRow->duration < 25200) {
                 $machineDataARLast = $lastParsedRow;
                 echo "=============================================Its AR!=========================" . PHP_EOL;
             } else {
@@ -63,6 +63,8 @@ class MachineDataImport {
             if ($machineDataARLast) {
                 $isAr = intval($machineDataARLast->id) > 0 ? 'true' : 'false';
                 echo "Found last row in DB: {$machineDataARLast->id}) {$machineDataARLast->dt} - {$machineDataARLast->duration} (is AR: $isAr)" . PHP_EOL;
+            } else {
+        	echo "Cannt find last rec." . PHP_EOL;
             }
 
             $this->parsedRows = array();
@@ -106,7 +108,7 @@ class MachineDataImport {
                 //echo $e->getTraceAsString();
                 //fb($e, '', '', true);
             }
-            if ( $cnt >= 1) {
+            //if ( $cnt >= 1) {
 
                 $filename_ = basename($filename);
                 $processFiles [$cnt]= $filename;
@@ -120,9 +122,11 @@ class MachineDataImport {
                     }
                     rename($filename, $path . $filename_);
                 } else {
-                    unlink($filename);
+	            if (file_exists($filename)) {
+                        unlink($filename);
+                    }
                 }
-            }
+            //}
         }
         print_r($processFiles);
 
@@ -249,7 +253,7 @@ class MachineDataImport {
         $sqlBody = rtrim($sqlBody, ',');
 
         if (trim($sqlBody) != '') {
-            $sql = $sqlHeader . $sqlBody . PHP_EOL ; //. ' ON DUPLICATE KEY UPDATE dt = dt' . PHP_EOL ;
+            $sql = $sqlHeader . $sqlBody . PHP_EOL . ' ON DUPLICATE KEY UPDATE dt = dt' . PHP_EOL ;
             Yii::log("$sql", 'info', __METHOD__);
         } else {
             $sql = '';
@@ -265,6 +269,7 @@ class MachineDataImport {
 
         $criteria = new CDbCriteria();
         $criteria->addCondition('machine_id = :machine_id');
+        $criteria->addCondition('duration < 25200'); // 7 * 60 * 60 == 25200, limit to record
         $criteria->addCondition('dt >= :dt');
         $criteria->params = array(
             ':machine_id' => $this->_machine->id,

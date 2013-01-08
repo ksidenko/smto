@@ -70,7 +70,15 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         $time = trim(array_shift($arr));
         $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
         if ( $lastMachineDataRec ) {
+    	    if ($this->dt == $lastMachineDataRec->dt) {
+    		return false;
+    	    }
             $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
+            if ($this->duration < 0) {
+        	// we restore old data file, last rec is incorrect
+        	$lastMachineDataRec = null;
+            }
+            
             $m = Yii::app()->getModules();
             $maxDuration = $m['smto']['max_duration'];
             if ($this->duration < 0 || $this->duration > $maxDuration ) {
@@ -78,53 +86,47 @@ class MachineDataCSV_v1 extends MachineDataCSV {
             }
         }
 
-        $amplitude = array_shift($arr);
+        $amplitude = intval(array_shift($arr));
 	//echo "ampl = $amplitude" . PHP_EOL;
-
         $this->da_avg1 = $amplitude;
         $powerOn = trim(array_shift($arr));
         $isWorking = trim(array_shift($arr));
         $isAlarm = trim(array_shift($arr));
         $eventCode = trim(array_shift($arr));
 
-        //$range = Amplitude::getAmplitudesRange($this->machineId);
-        //echo '|'.print_r($range,true) . '|'; die;
-        
         if ($powerOn == false) {
             $this->state = MachineState::STATE_MACHINE_OFF;
         } else {
                 $range = Amplitude::getAmplitudesRange($this->machineId);
-                if ($isWorking == true) {
-                    if ($range) {
-                        if ($amplitude < $range[MachineState::STATE_MACHINE_ON]) {
-                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // 
-                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
-                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
-                        } else  {
-                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
-                        }
-                    } else {
-                        $this->state = MachineState::STATE_MACHINE_ON;
-                    }
+	        //echo '|'.print_r($range,true) . '|'; die;                
+
+                if (!$range) {
+                    $this->state = MachineState::STATE_MACHINE_ON;
                 } else {
-                    if ($range) {
-                        if ($amplitude < $range[MachineState::STATE_MACHINE_ON]) {
-                            $this->state = MachineState::STATE_MACHINE_ON; // Включен
-                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
+                   if ($isWorking == true) {
+                        if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
                             $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
                         } else  {
                             $this->state = MachineState::STATE_MACHINE_WORK; // Работает
                         }
                     } else {
-                        $this->state = MachineState::STATE_MACHINE_ON;
-                    }
+                        if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
+                            $this->state = MachineState::STATE_MACHINE_ON; // Включен
+                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
+                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
+                        } else  {
+                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
+                        }
+	            }
                 }
         }
 
         $this->operator_last_fkey = $eventCode;
 
-        $c3 = trim(array_shift($arr));
-        $c1 = $c2 = '';
+        $code = trim(array_shift($arr));
+        $c1 = '';
+        $c2 = substr($code, 0, 3);
+        $c3 = substr($code, 3);
 
         $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
 
