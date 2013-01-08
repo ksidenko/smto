@@ -181,6 +181,7 @@ class Machine extends CActiveRecord
         //    'groups'=>array('select'=>'group.id'),
         //);
 
+        $criteria->select = 'id, name, code, span_number, place_number, code, ip, port, mac';
 
 
         return new CActiveDataProvider($this, array(
