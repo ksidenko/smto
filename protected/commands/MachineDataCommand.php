@@ -8,9 +8,6 @@ class MachineDataCommand extends CConsoleCommand {
     public function actionCheck() {
         //Yii::import('application.modules.smto.models.*');
 
-        //$oper = Operator::model()->findByPk(1);
-        //print_r(Operator::getRecByCode($oper->c1, $oper->c2, $oper->c3)->full_name);
-
         $machines = Machine::model()->real_records()->cache(60)->findAll();
         //$cnt = count($machines);echo "$cnt".PHP_EOL;die;
 
@@ -19,7 +16,7 @@ class MachineDataCommand extends CConsoleCommand {
 	
     	shuffle($machines);
 	
-	$i = 1;
+	    $i = 1;
         foreach($machines as $machineAR) {
            if (empty($machineAR->mac)) {
                continue;
