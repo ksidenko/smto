@@ -1,1 +1,1 @@
- mysql -h sks.211.ru -u sks -p -D smto_new < ./protected/runtime/dump.sql
+ mysql -h localhost -uroot -p1 -D smto < dump_07.01.2013.sql
