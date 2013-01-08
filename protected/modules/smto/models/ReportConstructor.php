@@ -203,7 +203,7 @@ class ReportConstructor extends ReportSearchForm {
             $currMachineInfo = &$this->output['machines'][$currMachineId];
 
             if (empty($stateInfo['operator_last_fkey'])) { // Оператор не жал кнопки Fkey
-                $machineState = MachineState::model()->cache(600)->findByPk($currMachineId);
+                $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
                 $code = $machineState->code;
                 $name = $machineState->name;
                 $color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
@@ -360,6 +360,10 @@ class ReportConstructor extends ReportSearchForm {
                         $code = $stateInfo['code'];
                         $name = $stateInfo['name'];
                         $color = $stateInfo['color'];
+
+                        if ($c == 'on') {
+                            $name = 'Необоснованный простой';    // вместо "включен"
+                        }
                     }
 
                     if (!isset($notWorkReportInfo['separate'][$currMachineId][$c])) {
