@@ -1,15 +1,15 @@
 <?php
 $this->breadcrumbs=array(
-	'Params'=>array('index'),
-	'Create',
+	'Параметры'=>array('index'),
+	'Управление',
 );
 
 $this->menu=array(
-	array('label'=>'List Param', 'url'=>array('index')),
-	array('label'=>'Manage Param', 'url'=>array('admin')),
+	array('label'=>'Список параметров', 'url'=>array('index')),
+	array('label'=>'Управление параметрами', 'url'=>array('admin')),
 );
 ?>
 
-<h1>Create Param</h1>
+<h1>Создать параметр</h1>
 
 <?php echo $this->renderPartial('_form', array('model'=>$model)); ?>

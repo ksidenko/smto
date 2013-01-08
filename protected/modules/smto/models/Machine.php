@@ -194,7 +194,7 @@ class Machine extends CActiveRecord
     public function getGroupsText() {
         $s = array();
 
-        foreach($this->groups as $group) {
+        foreach($this->cache(600)->groups as $group) {
             $s []= $group->name;
         }
 

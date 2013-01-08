@@ -71,12 +71,12 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
         if ( $lastMachineDataRec ) {
     	    if ($this->dt == $lastMachineDataRec->dt) {
-    		return false;
+    		    return false;
     	    }
             $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
             if ($this->duration < 0) {
-        	// we restore old data file, last rec is incorrect
-        	$lastMachineDataRec = null;
+        	    // we restore old data file, last rec is incorrect
+        	    $lastMachineDataRec = null;
             }
             
             $m = Yii::app()->getModules();
@@ -87,7 +87,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         }
 
         $amplitude = intval(array_shift($arr));
-	//echo "ampl = $amplitude" . PHP_EOL;
+	    //echo "ampl = $amplitude" . PHP_EOL;
         $this->da_avg1 = $amplitude;
         $powerOn = trim(array_shift($arr));
         $isWorking = trim(array_shift($arr));
@@ -97,28 +97,28 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         if ($powerOn == false) {
             $this->state = MachineState::STATE_MACHINE_OFF;
         } else {
-                $range = Amplitude::getAmplitudesRange($this->machineId);
-	        //echo '|'.print_r($range,true) . '|'; die;                
+            $range = Amplitude::getAmplitudesRange($this->machineId);
+            //echo '|'.print_r($range,true) . '|'; die;
 
-                if (!$range) {
-                    $this->state = MachineState::STATE_MACHINE_ON;
+            if (!$range) {
+                $this->state = MachineState::STATE_MACHINE_ON;
+            } else {
+                if ($isWorking == true) {
+                    if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
+                        $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
+                    } else  {
+                        $this->state = MachineState::STATE_MACHINE_WORK; // Работает
+                    }
                 } else {
-                   if ($isWorking == true) {
-                        if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
-                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
-                        } else  {
-                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
-                        }
-                    } else {
-                        if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
-                            $this->state = MachineState::STATE_MACHINE_ON; // Включен
-                        } else if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
-                            $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
-                        } else  {
-                            $this->state = MachineState::STATE_MACHINE_WORK; // Работает
-                        }
-	            }
+                    if ($amplitude < $range[MachineState::STATE_MACHINE_IDLE_RUN]) {
+                        $this->state = MachineState::STATE_MACHINE_ON; // Включен
+                    } else if ($amplitude < $range[MachineState::STATE_MACHINE_WORK]) {
+                        $this->state = MachineState::STATE_MACHINE_IDLE_RUN; // Холостой ход
+                    } else  {
+                        $this->state = MachineState::STATE_MACHINE_WORK; // Работает
+                    }
                 }
+            }
         }
 
         $this->operator_last_fkey = $eventCode;

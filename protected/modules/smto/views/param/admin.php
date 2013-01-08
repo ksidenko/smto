@@ -1,12 +1,12 @@
 <?php
 $this->breadcrumbs=array(
-	'Params'=>array('index'),
-	'Manage',
+	'Параметры'=>array('index'),
+	'Управление',
 );
 
 $this->menu=array(
-	array('label'=>'List Param', 'url'=>array('index')),
-	array('label'=>'Create Param', 'url'=>array('create')),
+    array('label'=>'Список параметров', 'url'=>array('index')),
+	array('label'=>'Создать параметр', 'url'=>array('create')),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -23,9 +23,9 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Manage Params</h1>
+<h1>Список параметров</h1>
 
-<?php echo CHtml::link('Advanced Search','#',array('class'=>'search-button')); ?>
+<?php echo CHtml::link('Расширенный поиск','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
 <?php $this->renderPartial('_search',array(
 	'model'=>$model,

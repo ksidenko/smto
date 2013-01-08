@@ -1,15 +1,15 @@
 <?php
 $this->breadcrumbs=array(
-	'Params',
+	'Параметры',
 );
 
 $this->menu=array(
-	array('label'=>'Create Param', 'url'=>array('create')),
-	array('label'=>'Manage Param', 'url'=>array('admin')),
+    array('label'=>'Создать параметр', 'url'=>array('create')),
+    array('label'=>'Управление параметрами', 'url'=>array('admin')),
 );
 ?>
 
-<h1>Params</h1>
+<h1>Параметры</h1>
 
 <?php $this->widget('zii.widgets.CListView', array(
 	'dataProvider'=>$dataProvider,

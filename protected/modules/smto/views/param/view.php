@@ -1,19 +1,20 @@
 <?php
 $this->breadcrumbs=array(
-	'Params'=>array('index'),
+	'Параметры'=>array('index'),
 	$model->id,
 );
 
 $this->menu=array(
-	array('label'=>'List Param', 'url'=>array('index')),
-	array('label'=>'Create Param', 'url'=>array('create')),
-	array('label'=>'Update Param', 'url'=>array('update', 'id'=>$model->id)),
-	array('label'=>'Delete Param', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Param', 'url'=>array('admin')),
+    array('label'=>'Список параметров', 'url'=>array('index')),
+    array('label'=>'Создать параметр', 'url'=>array('create')),
+    array('label'=>'Редактировать параметр', 'url'=>array('update', 'id'=>$model->id)),
+    array('label'=>'Удалить', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'Are you sure you want to delete this item?')),
+    array('label'=>'Управление параметрами', 'url'=>array('admin')),
 );
+
 ?>
 
-<h1>View Param #<?php echo $model->id; ?></h1>
+<h1>Просмотр параметра #<?php echo $model->id; ?></h1>
 
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,

@@ -64,7 +64,7 @@ class MachineDataImport {
                 $isAr = intval($machineDataARLast->id) > 0 ? 'true' : 'false';
                 echo "Found last row in DB: {$machineDataARLast->id}) {$machineDataARLast->dt} - {$machineDataARLast->duration} (is AR: $isAr)" . PHP_EOL;
             } else {
-        	echo "Cannt find last rec." . PHP_EOL;
+        	    echo "Cannt find last rec." . PHP_EOL;
             }
 
             $this->parsedRows = array();
@@ -122,7 +122,7 @@ class MachineDataImport {
                     }
                     rename($filename, $path . $filename_);
                 } else {
-	            if (file_exists($filename)) {
+	                if (file_exists($filename)) {
                         unlink($filename);
                     }
                 }
@@ -165,11 +165,11 @@ class MachineDataImport {
 
 	    $fstat = fstat($file);
             $size = $fstat['size'];
-            echo "size = $size" . PHP_EOL;
-	    if ( $size == 0 && file_exists($filename) ) {
-		echo "unlink $filename" . PHP_EOL;
-		unlink($filename);
-		return false;
+            //echo "size = $size" . PHP_EOL;
+            if ( $size == 0 && file_exists($filename) ) {
+                echo "unlink $filename" . PHP_EOL;
+                unlink($filename);
+                return false;
             }
         
         $countRecordedRows = 0;
