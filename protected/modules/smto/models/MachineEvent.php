@@ -130,16 +130,11 @@ class MachineEvent extends CActiveRecord
 
         if ( !isset($date[$id]) ) {
 
-            $res = false;
-            try {
-                $rows = MachineEvent::model()->cache(600)->findAll();
-                if ($rows) {
-                    foreach($rows as $row) {
-                        $date[$row->id] = $row;
-                    }
+            $rows = MachineEvent::model()->cache(600)->findAll();
+            if ($rows) {
+                foreach($rows as $row) {
+                    $date[$row->id] = $row;
                 }
-            } catch (Exception $e) {
-                //print_r($e->getMessage());
             }
         }
 

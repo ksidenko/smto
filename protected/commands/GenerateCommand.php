@@ -83,11 +83,13 @@ class GenerateCommand extends CConsoleCommand {
                     $dd_change4 += (rand(0,1) > 0.5) ? 1 : 0;
                 }
 
+                $operator_last_fkey = 0;
                 $t = strtotime($dt);
                 if ( $t < strtotime(date('Y-m-d\T17:10:00P'))) {
                     $state = 0;
                     $da_avg1 = 0;
                     $dd1 = 0;
+                    $operator_last_fkey = 2;
                 } else if ( $t < strtotime(date('Y-m-d\T17:15:00P')) ) {
                     $state = 1;
                     $da_avg1 = 5;
@@ -108,6 +110,7 @@ class GenerateCommand extends CConsoleCommand {
                     $state = 0;
                     $da_avg1 = 2;
                     $dd1 = 1;
+                    $operator_last_fkey = 5;
                 } else if ( $t < strtotime(date('Y-m-d\T18:00:00P')) ) {
                     $state = 3;
                     $da_avg1 = 80;
@@ -118,7 +121,6 @@ class GenerateCommand extends CConsoleCommand {
                     $dd1 = 1;
                 }
 
-                $operator_last_fkey = ($state <= 1 ? 0 : 0);
                 $fkey_all = 0;
                 $flags = 0;
 

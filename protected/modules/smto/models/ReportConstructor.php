@@ -197,25 +197,24 @@ class ReportConstructor extends ReportSearchForm {
         $countMachines = count($processMachines);
 
         foreach($dataNotWork as $stateInfo) {
-//            if ($this->machineReportType == 'join') {
-//                $currMachineId = 0;
-//            } else {
             $currMachineId = $stateInfo['machine_id'];
-//            }
 
             $this->initMachineOutput ($currMachineId, $processMachines);
             $currMachineInfo = &$this->output['machines'][$currMachineId];
 
             if (empty($stateInfo['operator_last_fkey'])) { // Оператор не жал кнопки Fkey
-                $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
+                $machineState = MachineState::model()->cache(600)->findByPk($currMachineId);
                 $code = $machineState->code;
                 $name = $machineState->name;
                 $color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
             } else {
-                $fkeyState = MachineEvent::getRec($stateInfo['operator_last_fkey']);
-                $code = $fkeyState->code;
-                $name = $fkeyState->name;
-                $color = $fkeyState->color;
+                $machineInfo = Machine::model()->cache(600)->findByPk($currMachineId);
+                $fkey = $machineInfo->cache(600)->fkey(array('select' => 'machine_event_id', 'condition' => 'number = ' . $stateInfo['operator_last_fkey']));
+                $fkeyState = $fkey[0]->cache(600)->machine_event;
+                //$fkeyState = MachineEvent::getRec($stateInfo['operator_last_fkey']);
+                $code = $fkeyState['code'];
+                $name = $fkeyState['name'];
+                $color = $fkeyState['color'];
             }
 
             $currMachineInfo['states'] [$code] = array(

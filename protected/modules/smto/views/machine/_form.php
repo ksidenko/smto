@@ -143,7 +143,7 @@
             foreach($model->groups as $group) {
                 $dataSelect[$group->id] = $group->name;
             }
-            $data = CHtml::listData(MachineGroup::model()->findAll(array('order' => 'name')), 'id', 'name');
+            $data = CHtml::listData(MachineGroup::model()->cache(600)->findAll(array('order' => 'name')), 'id', 'name');
 
             //print_r($dataSelect);print_r($data);die;
 
@@ -174,13 +174,13 @@
                 <?php echo $form->label(Fkey::model(), 'machine_event'); ?>
             </td>
 
-            <td width="40%">
-                <?php echo $form->label(Fkey::model(), 'type'); ?>
-            </td>
-
-            <td width="40%">
-                <?php echo $form->label(Fkey::model(), 'descr'); ?>
-            </td>
+<!--            <td width="40%">-->
+<!--                --><?php //echo $form->label(Fkey::model(), 'type'); ?>
+<!--            </td>-->
+<!---->
+<!--            <td width="40%">-->
+<!--                --><?php //echo $form->label(Fkey::model(), 'descr'); ?>
+<!--            </td>-->
 
             <td width="30">
                 <?php echo $form->label(Fkey::model(), 'status'); ?>

@@ -39,13 +39,13 @@
 
 	<td>
 		<?php //echo $form->labelEx($model,$index . 'type'); ?>
-		<?php echo $form->dropDownList($model, $index . 'type', array('work' => 'Работа', 'valid' => 'Обоснованный простой', 'not_valid' => 'Необоснованный простой'), array()); ?>
-		<?php echo $form->error($model,$index . 'type'); ?>
+		<?php //echo $form->dropDownList($model, $index . 'type', array('work' => 'Работа', 'valid' => 'Обоснованный простой', 'not_valid' => 'Необоснованный простой'), array()); ?>
+		<?php //echo $form->error($model,$index . 'type'); ?>
 	</td>
 
 	<td>
-		<?php echo $form->textField($model, $index . 'descr', array('size'=>20)); ?>
-		<?php echo $form->error($model,$index . 'descr'); ?>
+		<?php //echo $form->textField($model, $index . 'descr', array('size'=>20)); ?>
+		<?php //echo $form->error($model,$index . 'descr'); ?>
 	</td>
 
 	<td>

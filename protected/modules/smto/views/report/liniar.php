@@ -188,7 +188,7 @@
     foreach($chartData['states']['operator_last_fkey'] as $key => $machineStateInfo) {
         $arr = array();
         $arr['label'] = '';
-       // $arr['color'] = isset($machineStateInfo['info']['color']) ? $machineStateInfo['info']['color'] : '';
+        $arr['color'] = $machineStateInfo['info']['color'];
         $arr['lines'] = array(
             'show' => true,
             'lineWidth' => 7,

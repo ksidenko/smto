@@ -35,7 +35,7 @@ class ReportLinearConstructor extends ReportSearchForm {
         $this->machineInfo = Machine::model()->cache(60)->findByPk($this->machineId);
 
         if ($this->operatorId) {
-            $this->operatorInfo = Operator::model()->cache(60)->findByPk($this->operatorId);
+            $this->operatorInfo = Operator::model()->cache(600)->findByPk($this->operatorId);
         }
 
         if ($this->dtEnd) {
@@ -104,15 +104,13 @@ class ReportLinearConstructor extends ReportSearchForm {
         $lastTimeValues = array();
         foreach ($dataMachineInfo as $machineDataRow) {
 
+
+
             //-----------------------------------------------------------------------------------
             //Prepare chart data for machine states
             //-----------------------------------------------------------------------------------
 
             $machineStateCode = $machineDataRow['state'];
-
-            if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
-                continue;
-            }
 
             if ($machineStateCode == MachineState::STATE_MACHINE_IDLE_RUN) {
                 $machineStateCode = MachineState::STATE_MACHINE_WORK;
@@ -124,6 +122,10 @@ class ReportLinearConstructor extends ReportSearchForm {
             }
 
             foreach ($arrStates as $machineStateCode) {
+
+                if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
+                    continue;
+                }
 
                 //-----------------------------------------------------------------------------------
                 //Prepare chart data for machine states
@@ -161,6 +163,8 @@ class ReportLinearConstructor extends ReportSearchForm {
 
                 $this->output['states']['machine_state'][$machineStateCode]['info'] = $data_;
             }
+
+
 
             //-----------------------------------------------------------------------------------
             //Prepare chart data for machine analog values
@@ -214,10 +218,14 @@ class ReportLinearConstructor extends ReportSearchForm {
             //Prepare chart data for operator last keys
             //-----------------------------------------------------------------------------------
 
-            if ($machineDataRow['operator_last_fkey'] > 0) {
+            if ( $machineDataRow['operator_last_fkey'] > 0 ) {
 
                 $operatorLastKey = $machineDataRow['operator_last_fkey'];
-                $operatorLastKey += MachineEvent::$idOffset;
+
+                $fkey = $this->machineInfo->cache(600)->fkey(array('condition' => 'number = ' . $machineDataRow['operator_last_fkey']));
+                $fkeyState = $fkey[0]->cache(600)->machine_event;
+
+                $operatorLastKey = $fkeyState->id + MachineEvent::$idOffset;
 
                 // process break for machine states
                 if ( isset($lastTimeValues['operator_last_fkey'][$operatorLastKey]) ) {
@@ -239,15 +247,24 @@ class ReportLinearConstructor extends ReportSearchForm {
                     (int)$operatorLastKey
                 );
 
-                $fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
+                if (!empty($fkeyState)) {
+                    //$fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
 
-                $data_ = array(
-                    'code' => $fkeyState->code,
-                    'name' => $fkeyState->name,
-                    'color' => $fkeyState->color,
-                );
+                    $data_ = array(
+                        'code' => $fkeyState['code'],
+                        'name' => $fkeyState['name'],
+                        'color' => '#' . $fkeyState['color'],
+                    );
+                } else {
+                    $data_ = array(
+                        'code' => 'unknown_event',
+                        'name' => 'Не известное событие',
+                        'color' => '#000000',
+                    );
+                }
 
                 $this->output['states']['operator_last_fkey'][$operatorLastKey]['info'] = $data_;
+
             }
 
 

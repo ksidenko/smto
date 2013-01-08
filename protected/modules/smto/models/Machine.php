@@ -214,7 +214,7 @@ class Machine extends CActiveRecord
 
             'real_records' => array(
                 'condition' => 'rec_type="real"',
-                'order' => 't.name asc'
+                //'order' => 't.id asc'
             )
         );
 	}

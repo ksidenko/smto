@@ -40,12 +40,12 @@ class Fkey extends CActiveRecord
 	{
 		return array(
             array('id', 'safe'),
-			array('code, type', 'required'),
+			array('code', 'required'),
 			array('number, machine_id, machine_event_id, status', 'numerical', 'integerOnly'=>true),
 			array('code, color', 'length', 'max'=>128),
-			array('type', 'length', 'max'=>9),
+			//array('type', 'length', 'max'=>9),
 			array('rec_type', 'length', 'max'=>8),
-            array('color, descr', 'safe'),
+            array('color, type, descr', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, number, machine_id, code, color, type, status, rec_type', 'safe', 'on'=>'search'),
@@ -113,8 +113,7 @@ class Fkey extends CActiveRecord
 		return array(
             'default' => array( 
                 'condition' => 'rec_type="real"', 
-                
-             ), 
+            ),
         );
 	}
     
@@ -138,37 +137,11 @@ class Fkey extends CActiveRecord
 	}
     
 
-            public static function getRec($fkeyNumber, $machineId)   {
+    public static function getRec($fkeyNumber, $machineId)   {
         $criteria = new CDbCriteria();
         $criteria->compare('number', $fkeyNumber);
         $criteria->compare('machine_id', $machineId);
 
         return Fkey::model()->find($criteria);
-//        static $ids = array();
-//        
-//        $code = $c1.$c2.$c3;
-//        if ( !isset($ids[$code]) ) {
-//
-//            $res = false;
-//            try {
-//                $criteria = new CDbCriteria();
-//                $criteria->addCondition('c1 = :c1');
-//                $criteria->addCondition('c2 = :c2');
-//                $criteria->addCondition('c3 = :c3');
-//                $criteria->params = array(
-//                    ':c1' => $c1,':c2' => $c2,':c3' => $c3,
-//                );
-//                $criteria->limit = 1;
-//
-//                $res = Operator::model()->find($criteria);
-//                if ($res) {
-//                    $ids[$code] = $res;
-//                }
-//            } catch (Exception $e) {
-//                print_r($e->getMessage());
-//            }
-//        }
-//
-//        return isset($ids[$code]) ? $ids[$code] : false;
     }
 }
