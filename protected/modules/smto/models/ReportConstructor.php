@@ -214,7 +214,12 @@ class ReportConstructor extends ReportSearchForm {
                 //$fkeyState = MachineEvent::getRec($stateInfo['operator_last_fkey']);
                 $code = $fkeyState['code'];
                 $name = $fkeyState['name'];
-                $color = $fkeyState['color'];
+                $color = '#' . ltrim($fkeyState['color'], '#');
+    	        if (empty($code)) {
+                    $code ='event_undefined';
+                    $name = 'Событие не определено (' . $stateInfo['operator_last_fkey'] . ')' ;
+                    $color = '#000000';
+                }
             }
 
             $currMachineInfo['states'] [$code] = array(

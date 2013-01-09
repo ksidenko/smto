@@ -225,6 +225,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $fkey = $this->machineInfo->cache(600)->fkey(array('condition' => 'number = ' . $machineDataRow['operator_last_fkey']));
                 $fkeyState = $fkey[0]->cache(600)->machine_event;
 
+                $fkeyState->id = empty($fkeyState->id) ? 0 : $fkeyState->id;
                 $operatorLastKey = $fkeyState->id + MachineEvent::$idOffset;
 
                 // process break for machine states
@@ -247,18 +248,17 @@ class ReportLinearConstructor extends ReportSearchForm {
                     (int)$operatorLastKey
                 );
 
-                if (!empty($fkeyState)) {
-                    //$fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
-
+                //$fkeyState = MachineEvent::getRec($machineDataRow['operator_last_fkey']);
+                if (!empty($fkeyState->id)) {
                     $data_ = array(
                         'code' => $fkeyState['code'],
                         'name' => $fkeyState['name'],
-                        'color' => '#' . $fkeyState['color'],
+                        'color' => '#' . ltrim($fkeyState['color'], '#'),
                     );
                 } else {
                     $data_ = array(
-                        'code' => 'unknown_event',
-                        'name' => 'Не известное событие',
+                        'code' => 'event_undefined',
+                        'name' => 'Событие не определено (' . $machineDataRow['operator_last_fkey'] . ')',
                         'color' => '#000000',
                     );
                 }

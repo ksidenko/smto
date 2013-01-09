@@ -124,7 +124,7 @@
     'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js', 'jquery.flot.crosshair.js', 'jquery.flot.threshold.js')
 )); ?>
 
-<?php if (count($chartData) && isset($chartData['states']) && $chartData['states']['machine_state']) { ?>
+<?php if (count($chartData) && isset($chartData['states']) && ($chartData['states']['machine_state'] || $chartData['states']['operator_last_fkey'])) { ?>
 
 <?php
     $plotData = array(
