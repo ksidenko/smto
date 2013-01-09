@@ -83,7 +83,7 @@ $('.search-form form').submit(function(){
             'type'=>'raw',
             'name' => 'reachable',
             //'value' => 'if ( Helpers::checkHostReachable( "192.168.0.100", 80) !== false ) { return 1; } else { return 0; } ',
-            'value' => '"<div class=\"machine_reachable_" . Helpers::checkHostReachable( $data->ip, $data->port, 1) . "\" >&nbsp;</div>"',
+            //'value' => '"<div class=\"machine_reachable_" . Helpers::checkHostReachable( $data->ip, $data->port, 1) . "\" >&nbsp;</div>"',
         ),
         
 		array(
