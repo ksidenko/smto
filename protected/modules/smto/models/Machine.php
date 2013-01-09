@@ -462,6 +462,25 @@ class Machine extends CActiveRecord
         $line []= ';(если не кратен - то обязательно период фиксации должен быть больше)';
         $line []= 'PeakAveragePeriod=' . $this->peak_average_period;
 
+        $line []= '';
+        $line []= ';------------------------------------------------------------------';
+        $line []= '; Назначение кнопок (названия причин простоя)';
+        $line []= '; Первый параметр - номер кнопки 1...16';
+        $line []= '; Далее текст названия в кодировке UTF-8 (до 16 знаков)';
+        $line []= '; Вместо пробела следует указывать символ \'_\' (подчерк)';
+
+        $fkeys = $this->fkey(array('order' => 'number'));
+
+        foreach($fkeys as $fkey) {
+            $number = $fkey['number'];
+            $event = $fkey['machine_event'];
+            $eventName = $event['name'];
+            $eventName = str_replace(' ', '_', $eventName);
+
+            if ( $fkey['status'] && !empty($eventName) ) {
+                $line []= 'ReasonsNameU=' . $number . ',' . $eventName;
+            }
+        }
 
         $s = implode(PHP_EOL, $line);
         fwrite($fd, $s);
