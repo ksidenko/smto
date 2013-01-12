@@ -33,11 +33,11 @@
 		<?php echo $form->error($model,'full_name'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'phone'); ?>
+<!--	<div class="row">-->
+<!--		--><?php //echo $form->labelEx($model,'phone'); ?>
 		<?php echo $form->textField($model,'phone',array('size'=>32,'maxlength'=>32)); ?>
-		<?php echo $form->error($model,'phone'); ?>
-	</div>
+<!--		--><?php //echo $form->error($model,'phone'); ?>
+<!--	</div>-->
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить'); ?>

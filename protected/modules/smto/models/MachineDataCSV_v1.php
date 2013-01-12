@@ -124,9 +124,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         $this->operator_last_fkey = $eventCode;
 
         $code = trim(array_shift($arr));
-        $c1 = '';
-        $c2 = substr($code, 0, 3);
-        $c3 = substr($code, 3);
+        Operator::codeExplode($code, $c1,$c2,$c3);
 
         $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
 

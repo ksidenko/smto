@@ -20,9 +20,9 @@
 	<?php echo CHtml::encode($data->full_name); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('phone')); ?>:</b>
-	<?php echo CHtml::encode($data->phone); ?>
-	<br />
+<!--	<b>--><?php //echo CHtml::encode($data->getAttributeLabel('phone')); ?><!--:</b>-->
+<!--	--><?php //echo CHtml::encode($data->phone); ?>
+<!--	<br />-->
 
 
 </div>

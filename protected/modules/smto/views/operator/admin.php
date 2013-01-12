@@ -42,7 +42,7 @@ $('.search-form form').submit(function(){
 		'c2',
 		'c3',
 		'full_name',
-		'phone',
+		//'phone',
 		array(
 			'class'=>'CButtonColumn',
 		),

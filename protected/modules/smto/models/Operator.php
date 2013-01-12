@@ -40,10 +40,11 @@ class Operator extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('c1, c2, c3, full_name', 'required'),
+			array('c2, c3, full_name', 'required'),
+            array('c1', 'safe'),
 			array('c1, c2, c3', 'length', 'max'=>10),
 			array('full_name', 'length', 'max'=>1024),
-			array('phone', 'length', 'max'=>32),
+			//array('phone', 'length', 'max'=>32),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, c1, c2, c3, full_name, phone', 'safe', 'on'=>'search'),
@@ -72,9 +73,15 @@ class Operator extends CActiveRecord
 			'c2' => 'Код 2',
 			'c3' => 'Код 3',
 			'full_name' => 'Ф.И.О.',
-			'phone' => 'Телефон',
+			//'phone' => 'Телефон',
 		);
 	}
+
+    public function defaultScope() {
+        return array(
+            'condition' => 'delete_dt is null'
+        );
+    }
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
@@ -99,7 +106,7 @@ class Operator extends CActiveRecord
 		));
 	}
 
-    public static function getRecByCode($c1, $c2, $c3)   {
+    public static function getRecByCode($c1, $c2, $c3, $useCache = true)   {
         static $ids = array();
 
         $code = $c1.$c2.$c3;
@@ -116,7 +123,13 @@ class Operator extends CActiveRecord
                 );
                 $criteria->limit = 1;
 
-                $res = Operator::model()->cache(600)->find($criteria);
+                $res = Operator::model();
+
+                if ($useCache) {
+                    $res->cache(600);
+                }
+
+                $res = $res->resetScope()->find($criteria);
                 if ($res) {
                     $ids[$code] = $res;
                 }
@@ -146,5 +159,11 @@ class Operator extends CActiveRecord
         }
 
         return isset($date[$id]) ? $date[$id] : false;
+    }
+
+    public static function codeExplode($code, &$c1, &$c2, &$c3) {
+        $c1 = '';
+        $c2 = substr($code, 0, 3); //TODO
+        $c3 = substr($code, 3);
     }
 }

@@ -30,10 +30,10 @@
 		<?php echo $form->textField($model,'full_name',array('size'=>60,'maxlength'=>1024)); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->label($model,'phone'); ?>
-		<?php echo $form->textField($model,'phone',array('size'=>32,'maxlength'=>32)); ?>
-	</div>
+<!--	<div class="row">-->
+<!--		--><?php //echo $form->label($model,'phone'); ?>
+<!--		--><?php //echo $form->textField($model,'phone',array('size'=>32,'maxlength'=>32)); ?>
+<!--	</div>-->
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton('Search'); ?>

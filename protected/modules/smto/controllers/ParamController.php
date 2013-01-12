@@ -36,8 +36,10 @@ class ParamController extends SBaseController
 		if(isset($_POST['Param']))
 		{
 			$model->attributes=$_POST['Param'];
-			if($model->save())
+			if($model->save()) {
+                Yii::app()->cache->flush();
 				$this->redirect(array('view','id'=>$model->id));
+            }
 		}
 
 		$this->render('create',array(
@@ -60,8 +62,10 @@ class ParamController extends SBaseController
 		if(isset($_POST['Param']))
 		{
 			$model->attributes=$_POST['Param'];
-			if($model->save())
+			if($model->save()) {
+                Yii::app()->cache->flush();
 				$this->redirect(array('view','id'=>$model->id));
+            }
 		}
 
 		$this->render('update',array(
@@ -80,6 +84,7 @@ class ParamController extends SBaseController
 		{
 			// we only allow deletion via POST request
 			$this->loadModel($id)->delete();
+            Yii::app()->cache->flush();
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))

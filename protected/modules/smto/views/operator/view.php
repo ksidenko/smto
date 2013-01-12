@@ -23,6 +23,6 @@ $this->menu=array(
 		'c2',
 		'c3',
 		'full_name',
-		'phone',
+		//'phone',
 	),
 )); ?>
