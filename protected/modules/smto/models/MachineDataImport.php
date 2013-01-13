@@ -16,6 +16,8 @@ class MachineDataImport {
     private $_mac = '';
     private $_machine = null;
 
+    private $_maxRecordDuration = 25200; // 7*60*60 = 25200сек
+
     function __construct($version = '2.0', $mac) {
         $this->_db = Yii::app()->db;
         //DEBUG
@@ -25,6 +27,9 @@ class MachineDataImport {
 
         $this->_machine = Machine::getRecByMAC($this->_mac);
         $this->_manager = new MachineDataManager($version, $this->_mac);
+
+        $m = Yii::app()->getModules();
+        $this->_maxRecordDuration = $m['smto']['max_record_duration'];
 
         //TODO
         ini_set("max_execution_time", "300");
@@ -44,7 +49,7 @@ class MachineDataImport {
             echo "=============================================$filename=========================" . PHP_EOL;
 
             $lastParsedRow = array_pop($this->parsedRows);
-            if ($lastParsedRow && intval($lastParsedRow->id) > 0 && $lastParsedRow->duration < 25200) {
+            if ($lastParsedRow && intval($lastParsedRow->id) > 0 && $lastParsedRow->duration < $this->_maxRecordDuration ) {
                 $machineDataARLast = $lastParsedRow;
                 echo "=============================================Its AR!=========================" . PHP_EOL;
             } else {
@@ -221,7 +226,7 @@ class MachineDataImport {
 
             $isIdentityRecords = MachineData::isIdentityRecords($parsedRowPrev, $parsedRow, true);
 
-            if ($isIdentityRecords) {
+            if ($isIdentityRecords && $parsedRowPrev->duration < $this->_maxRecordDuration) {
                 $parsedRowPrev->dt = $parsedRow->dt;
                 //$duration = (strtotime($parsedRow->dt) - strtotime($parsedRowPrev->dt));
                 //$parsedRowPrev->duration += $duration;
@@ -269,11 +274,12 @@ class MachineDataImport {
 
         $criteria = new CDbCriteria();
         $criteria->addCondition('machine_id = :machine_id');
-        $criteria->addCondition('duration < 25200'); // 7 * 60 * 60 == 25200, limit to record
+        $criteria->addCondition('duration < :max_record_duration'); // 7 * 60 * 60 == 25200, limit to record
         $criteria->addCondition('dt >= :dt');
         $criteria->params = array(
             ':machine_id' => $this->_machine->id,
-            ':dt' => $dt
+            ':dt' => $dt,
+            ':max_record_duration' => $this->_maxRecordDuration,
         );
         $criteria->order = 'dt desc';
         $criteria->limit = 1;
