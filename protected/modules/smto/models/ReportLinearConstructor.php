@@ -301,7 +301,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $data_ = array(
                     'code' => '',
                     'id' => $operatorInfo->id,
-                    'name' => $operatorInfo->full_name,
+                    'name' => $operatorInfo->short_name,
                     'color' => '#FBC2C4',
                 );
 

@@ -81,6 +81,7 @@ class OperatorImport {
             unset($operatorAR);
             $operatorAR = $rec;
             $operatorAR->setIsNewRecord(false);
+            $operatorAR->full_name = $fullName;
             $operatorAR->create_dt = new CDbExpression('NOW()');
             $operatorAR->delete_dt = new CDbExpression('NULL');
             $res = $operatorAR->save(true);

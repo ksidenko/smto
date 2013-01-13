@@ -166,4 +166,22 @@ class Operator extends CActiveRecord
         $c2 = substr($code, 0, 3); //TODO
         $c3 = substr($code, 3);
     }
+
+    public function __get($name) {
+        if ($name == 'short_name') {
+            $operatorName = $this->full_name;
+            $operatorNameArr = explode(' ', $operatorName);
+            $operatorName = $operatorNameArr[0] . ' ';
+            if (isset($operatorNameArr[1])) {
+                $operatorName .= mb_substr($operatorNameArr[1], 0, 1, 'UTF-8') . '. ';
+            }
+            if (isset($operatorNameArr[2])) {
+                $operatorName .= mb_substr($operatorNameArr[2], 0, 1, 'UTF-8') . '.';
+            }
+
+            return $operatorName;
+        }
+
+        return parent::__get($name);
+    }
 }

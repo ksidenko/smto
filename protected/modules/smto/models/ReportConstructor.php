@@ -426,7 +426,7 @@ class ReportConstructor extends ReportSearchForm {
 
             if ( $this->operatorInfo ) {
                 $this->output['machines'] [$currMachineId]['operator'] = array(
-                    'name' => $this->operatorInfo->full_name
+                    'name' => $this->operatorInfo->short_name
                 );
             }
         }
