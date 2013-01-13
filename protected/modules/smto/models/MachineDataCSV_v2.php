@@ -150,6 +150,14 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $this->dd_change3 = intval(trim(array_shift($arr)));
         $this->dd_change4 = intval(trim(array_shift($arr)));
 
+        if ($lineType == 'C') {
+            array_shift($arr); // "сырое" состояние станка (0...3)
+            array_shift($arr); // состояние счетчика  S0
+            array_shift($arr); // состояние счетчика  S1
+            array_shift($arr); // состояние счетчика  S2
+            array_shift($arr); // состояние счетчика  S3
+        }
+
         //состояние станка (0...3), с точки зрения контроллера, на НАЧАЛО интервала (то есть 10 секунд назад от времени записи)
         //0 - выключен, 1 - включен, 2 - холостой ход, 3 - работает
         $this->state = trim(array_shift($arr));

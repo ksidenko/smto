@@ -634,4 +634,12 @@ class Machine extends CActiveRecord
         return rtrim(Param::getParamValue('machine_config_data_path'), '/') . '/' . 'd00' . substr($this->ip, -2) . '.cfg';
     }
 
+
+    public function __get($name) {
+        if ($name == 'full_name' ) {
+            return $this->place_number . ' ' .  $this->name;
+        }
+
+        return parent::__get($name);
+    }
 }

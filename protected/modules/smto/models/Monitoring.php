@@ -53,7 +53,7 @@ class Monitoring {
 
             $machineState = MachineState::getRec($lineParser->state);
             if (!$machineState) {
-                $this->errors[] = 'Не корректный статус станка (mac: '.$machineAR->mac.'): ( ' . $lineParser->state . ' )';
+                $this->errors[] = 'Не корректный статус станка ('.$machineAR->full_name.'): ( ' . $lineParser->state . ' )';
                 continue;
             }
 
@@ -66,13 +66,32 @@ class Monitoring {
             if ( !empty($lineParser->operator_id) ) {
                 $operatorInfo = Operator::getRec($lineParser->operator_id);
                 if (!$operatorInfo) {
-                    $this->errors[] = 'Не корректный идентификатор оператора (mac: '.$machineAR->mac.'): ( ' . $lineParser->operator_id . ' )';
+                    $this->errors[] = 'Не корректный идентификатор оператора ('.$machineAR->full_name.'): ( ' . $lineParser->operator_id . ' )';
                     $operatorInfo = new stdClass();
                     $operatorInfo->full_name = 'Не авторизован';
                 }
             } else {
                 $operatorInfo = new stdClass();
                 $operatorInfo->full_name = 'Не авторизован';
+            }
+
+            $operatorLastFkey = array();
+            if ($lineParser->operator_last_fkey > 0) {
+                //echo "{$lineParser->operator_last_fkey} | ";
+                $fkey = $machineAR->cache(600)->fkey(array('condition' => 'number = ' . $lineParser->operator_last_fkey));
+                $fkeyState = null;
+                if ($fkey) {
+                    $fkeyState = $fkey[0]->cache(600)->machine_event;
+                }
+                if (!empty($fkeyState->id)) {
+                    $operatorLastFkey = array(
+                        'code' => $fkeyState['code'],
+                        'name' => $fkeyState['name'],
+                        'color' => '#' . ltrim($fkeyState['color'], '#'),
+                    );
+                } else {
+                    $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
+                }
             }
 
             $dataOperator = array(
@@ -94,6 +113,7 @@ class Monitoring {
                 'ip' => $machineAR->ip,
                 'mac' => $machineAR->mac,
                 'state' => $dataState,
+                'operator_last_fkey' => $operatorLastFkey,
                 'operator' => $dataOperator,
                 'groups' => array_values($groupIds),
             );

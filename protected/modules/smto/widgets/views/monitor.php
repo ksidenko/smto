@@ -20,6 +20,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $mac = $machineInfo['mac'];
             $state = $machineInfo['state'];
             $operatorFullName = $machineInfo['operator']['full_name'];
+            $operatorLastFkey = $machineInfo['operator_last_fkey'];
 
             $code_ = '';
             if (!empty($code)) {
@@ -55,6 +56,11 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $title .= 'Пролет №: ' . $spanNumber . PHP_EOL;
             $title .= 'Место на плане: ' . $placeNumber . PHP_EOL;
             $title .= 'Состояние: ' . $state['name'] . PHP_EOL;
+
+            if ($operatorLastFkey) {
+                $title .= 'Причина простоя: ' . $operatorLastFkey['name'] . PHP_EOL;
+            }
+
             $title .= 'Оператор: ' . $operatorFullName . PHP_EOL;
 
             if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
