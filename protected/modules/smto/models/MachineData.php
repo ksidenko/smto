@@ -265,50 +265,50 @@ class MachineData extends CActiveRecord
         return strtotime(date(DATE_ATOM, $dt) . " +$sec seconds")*1000;
     }
 
-    static public function isIdentityRecords( $lastMachineDataRec, $parsedRow, $useHash = false ) {
+    static public function isIdentityRecords( $parsedRowPrev, $parsedRow, $useHash = false ) {
 
-        if ( !isset($lastMachineDataRec->state) || is_null($lastMachineDataRec->state) ) {
+        if ( !isset($parsedRowPrev->state) || is_null($parsedRowPrev->state) ) {
             return false;
         }
 
         $b = false;
 
-        $duration = strtotime($parsedRow->dt) - strtotime($lastMachineDataRec->dt);
+        $duration = strtotime($parsedRow->dt) - strtotime($parsedRowPrev->dt);
         $m = Yii::app()->getModules();
         $maxTime = $m['smto']['max_time_between_machine_records'];
 
         //echo "duration = $duration" . PHP_EOL;
         if ($duration >= 0 && $duration < $maxTime && // $duration may be 0!
-            $parsedRow->operator_id == $lastMachineDataRec->operator_id &&
-            $parsedRow->state == $lastMachineDataRec->state &&
-            $parsedRow->operator_last_fkey == $lastMachineDataRec->operator_last_fkey
+            $parsedRow->operator_id == $parsedRowPrev->operator_id &&
+            $parsedRow->state == $parsedRowPrev->state &&
+            $parsedRow->operator_last_fkey == $parsedRowPrev->operator_last_fkey
         ) {
             $b = true;
             if ($useHash) {
 
-                if ( !empty($lastMachineDataRec->da_max2) ) {
+                if ( !empty($parsedRowPrev->da_max2) ) {
                     $hash1 = md5($parsedRow->da_max1.$parsedRow->da_max2.$parsedRow->da_max3.$parsedRow->da_max4.
                         $parsedRow->da_avg1.$parsedRow->da_avg2.$parsedRow->da_avg3.$parsedRow->da_avg4.
                         $parsedRow->dd1.$parsedRow->dd2.$parsedRow->dd3.$parsedRow->dd4.
                         $parsedRow->dd_change1.$parsedRow->dd_change2.$parsedRow->dd_change3.$parsedRow->dd_change4);
 
-                    $hash2 = md5($lastMachineDataRec->da_max1.$lastMachineDataRec->da_max2.$lastMachineDataRec->da_max3.$lastMachineDataRec->da_max4.
-                        $lastMachineDataRec->da_avg1.$lastMachineDataRec->da_avg2.$lastMachineDataRec->da_avg3.$lastMachineDataRec->da_avg4.
-                        $lastMachineDataRec->dd1.$lastMachineDataRec->dd2.$lastMachineDataRec->dd3.$lastMachineDataRec->dd4.
-                        $lastMachineDataRec->dd_change1.$lastMachineDataRec->dd_change2.$lastMachineDataRec->dd_change3.$lastMachineDataRec->dd_change4);
+                    $hash2 = md5($parsedRowPrev->da_max1.$parsedRowPrev->da_max2.$parsedRowPrev->da_max3.$parsedRowPrev->da_max4.
+                        $parsedRowPrev->da_avg1.$parsedRowPrev->da_avg2.$parsedRowPrev->da_avg3.$parsedRowPrev->da_avg4.
+                        $parsedRowPrev->dd1.$parsedRowPrev->dd2.$parsedRowPrev->dd3.$parsedRowPrev->dd4.
+                        $parsedRowPrev->dd_change1.$parsedRowPrev->dd_change2.$parsedRowPrev->dd_change3.$parsedRowPrev->dd_change4);
                         
                         $b = ($hash1 == $hash2);
                 } else { // version 1.0
                     $hash1 = md5($parsedRow->da_avg1);
 
-                    $hash2 = md5($lastMachineDataRec->da_avg1);
+                    $hash2 = md5($parsedRowPrev->da_avg1);
 
                     $b = ($hash1 == $hash2);
 
                     if ($parsedRow->da_avg1 > 0) {
-                        if (abs($parsedRow->da_avg1 - $lastMachineDataRec->da_avg1)/$parsedRow->da_avg1 < 0.002) {
+                        if (abs($parsedRow->da_avg1 - $parsedRowPrev->da_avg1)/$parsedRow->da_avg1 < 0.002) {
     	                    $b = true;
-	                }
+	                    }
                     }
                 }
             }

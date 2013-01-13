@@ -224,7 +224,13 @@ class MachineDataImport {
         $parsedRowPrev = next($this->parsedRows);
         foreach ($this->parsedRows as $i => $parsedRow) {
 
-            $isIdentityRecords = MachineData::isIdentityRecords($parsedRowPrev, $parsedRow, true);
+            $useHash = true;
+            if (is_numeric($parsedRowPrev->state) && $parsedRowPrev->state == 0 &&
+                is_numeric($parsedRow->state) && $parsedRow->state == 0
+            ) {
+                $useHash = false;
+            }
+            $isIdentityRecords = MachineData::isIdentityRecords($parsedRowPrev, $parsedRow, $useHash);
 
             if ($isIdentityRecords && $parsedRowPrev->duration < $this->_maxRecordDuration) {
                 $parsedRowPrev->dt = $parsedRow->dt;
