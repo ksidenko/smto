@@ -4,7 +4,7 @@ class OperatorCommand extends CConsoleCommand {
 
     public function actionImport($filepath = '') {
 
-        $path = $filepath;
+        $path = trim($filepath);
         if (empty($path)) {
             $path = Param::getParamValue('operator_data_path');
         }
