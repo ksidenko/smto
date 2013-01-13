@@ -46,7 +46,12 @@
                 <?php echo $form->label($model,'operatorId'); ?>
             </td>
             <td>
-                <?php echo $form->dropDownList($model,'operatorId', array(0 => 'Все', -1 => 'Не зарегистрированные') + CHtml::listData(Operator::model()->findAll(array('order' => 'full_name')), 'id', 'full_name')) ?>
+                <?php echo $form->dropDownList($model,'operatorId',
+                array(
+                    'all' => 'Все',
+                    'by_pass' => "По карточкам",
+                    'not_register' => 'Не зарегистрированные',
+                ) + CHtml::listData(Operator::model()->findAll(array('order' => 'full_name')), 'id', 'full_name')) ?>
             </td>
 
 <!--        <tr>-->

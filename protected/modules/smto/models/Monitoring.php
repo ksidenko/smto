@@ -57,6 +57,9 @@ class Monitoring {
                 continue;
             }
 
+            if ($machineState->code == 'on') {
+                $machineState->name = "Необосн-й простой";
+            }
             $dataState = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,

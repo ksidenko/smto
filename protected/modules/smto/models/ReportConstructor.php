@@ -89,9 +89,11 @@ class ReportConstructor extends ReportSearchForm {
         //print_r($this->secTotal);die;
 
         if ($this->operatorId) {
-            if ($this->operatorId > 0) {
+            if (is_numeric($this->operatorId) && $this->operatorId > 0) {
                 $this->cr->compare('t.operator_id', $this->operatorId);
-            } else if ($this->operatorId == -1) {
+            } else if ($this->operatorId == 'by_pass') {
+                $this->cr->addCondition('t.operator_id > 0');
+            } else if ($this->operatorId == 'not_register') {
                 $this->cr->addCondition('t.operator_id is null');
             }
         }
