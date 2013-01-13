@@ -23,9 +23,9 @@ class ReportController extends SBaseController
 
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->getAssetManager()->publish($basePath . '/../js', true, -1, true/*YII_DEBUG*/);
-        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
-        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
-        //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
+        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
+        Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+        //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
 
         $isRunSearch = false;
         if (isset($_REQUEST['ReportConstructor'])) {
@@ -273,8 +273,8 @@ class ReportController extends SBaseController
 
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->assetManager->publish($basePath . '/../js', true, -1, true/*YII_DEBUG*/);
-        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
-        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
 
         $model = new ReportLinearConstructor();
         $chartData = array();

@@ -167,12 +167,12 @@
         $arr['lines'] = array(
             'show' => true,
             'lineWidth' => 1,
-            'fill' => false,
+            'fill' => true,
         );
         $arr['data'] = $chartData['machine_da_value']['data'];
 
         if (isset($chartData['machine_da_value']['info']['threshold'])) {
-            $arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
+            //$arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
         }
 
         $plotData['machine_detector_analog_value'] []= $arr;
