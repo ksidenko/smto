@@ -126,33 +126,53 @@ class ReportLinearConstructor extends ReportSearchForm {
                 if ($machineStateCode == MachineState::STATE_MACHINE_OFF) {
                     continue;
                 }
+	    
 
                 //-----------------------------------------------------------------------------------
                 //Prepare chart data for machine states
                 //-----------------------------------------------------------------------------------
 
+                $hasBreak = false;
                 // process break for machine states
                 if ( isset($lastTimeValues['machine_state'][$machineStateCode]) ) {
                     $dtPrev = $lastTimeValues['machine_state'][$machineStateCode];
                     $dt = $machineDataRow['dt'];
 
                     if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
-                        $this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
+                        $this->output['states']['machine_state'][$machineStateCode]['data'] [] = array();
+		                $hasBreak = true;
                     }
+                } else {
+            	    $hasBreak = true;
                 }
+                
                 // save last dt value for current machine state
                 $lastTimeValues['machine_state'][$machineStateCode] = $machineDataRow['dt'];
 
+		        $min =  max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart));
+	            //if ($hasBreak) {
+                $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
+                    $this->toJsTimestamp( $min ),
+                    (int)$machineStateCode
+                );
+                //       }
 
+                $max = min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd));
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
-                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                    $this->toJsTimestamp( $max-4 ),
                     (int)$machineStateCode
                 );
+                
+                $this->output['states']['machine_state'][$machineStateCode]['data'] [] = array();                
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
-                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                    $this->toJsTimestamp( $max-5 ),
                     (int)$machineStateCode
                 );
-                //$this->output['states']['machine_state'][$machineStateCode]['data'] [] = null;
+                
+                $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
+                    $this->toJsTimestamp( $max ),
+                    (int)$machineStateCode
+                );
 
                 $machineState = MachineState::getRec($machineStateCode);
                 $data_ = array(
@@ -170,12 +190,14 @@ class ReportLinearConstructor extends ReportSearchForm {
             //Prepare chart data for machine analog values
             //-----------------------------------------------------------------------------------
 
+	        $hasBreak = false;
             // process break for machine states
             if ( isset($lastTimeValues['machine_da_value']) ) {
                 $dtPrev = $lastTimeValues['machine_da_value'];
                 $dt = $machineDataRow['dt'];
                 if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
-                    $this->output['machine_da_value']['data'] []= null;
+                    $this->output['machine_da_value']['data'] []= array();
+		            $hasBreak = true;
                 }
             }
             // save last dt value for current machine state
@@ -189,25 +211,32 @@ class ReportLinearConstructor extends ReportSearchForm {
                 $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
                 (int)$machineDataRow['da_avg']
             );
-
             $data_ = array(
                 'code' => '',
                 'name' => 'Нагрузка da_avg',
                 'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_WORK),
             );
 
-            $belowValue = null;
+            $belowValue = array();
             foreach($this->machineInfo->cache(600)->config as $machineConfig) {
                 if ( $machineConfig->condition_number == (12 + $this->machineInfo->main_detector_analog) &&
-                    $machineConfig->machine_state_id == MachineState::STATE_MACHINE_WORK
+                    ($machineConfig->machine_state_id == MachineState::STATE_MACHINE_ON ||
+                     $machineConfig->machine_state_id == MachineState::STATE_MACHINE_IDLE_RUN ||
+                     $machineConfig->machine_state_id == MachineState::STATE_MACHINE_WORK )
                 ) {
-                    $belowValue = $machineConfig->value;
+                    $belowValue[$machineConfig->machine_state_id] = $machineConfig->value;
                 }
             }
             if ($belowValue) {
-                $data_ ['threshold'] = array(
-                    'below' => $belowValue,
-                    'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN)
+//                $data_ ['threshold'] = array(
+//                    'below' => $belowValue,
+//                    'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN)
+//                );
+                $data_['constraints'] = array(
+                    //array( 'threshold' => $belowValue[MachineState::STATE_MACHINE_ON], 'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_OFF), 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y < threshold; }') ),
+                    array( 'threshold' => $belowValue[MachineState::STATE_MACHINE_IDLE_RUN], 'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_ON), 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y <= threshold; }') ),
+                    array( 'threshold' => $belowValue[MachineState::STATE_MACHINE_IDLE_RUN], 'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_IDLE_RUN), 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y >= threshold;; }') ),
+                    array( 'threshold' => $belowValue[MachineState::STATE_MACHINE_WORK], 'color' => EventColor::getColorByCode('machine_' . MachineState::STATE_MACHINE_WORK), 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y > threshold;; }') ),
                 );
             }
 
@@ -233,7 +262,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                     $dtPrev = $lastTimeValues['operator_last_fkey'][$operatorLastKey];
                     $dt = $machineDataRow['dt'];
                     if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
-                        $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] [] = null;
+                        $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] [] = array();
                     }
                 }
                 // save last dt value for current machine state
@@ -282,7 +311,7 @@ class ReportLinearConstructor extends ReportSearchForm {
                     $dtPrev = $lastTimeValues['operator'][$operatorId];
                     $dt = $machineDataRow['dt'];
                     if (strtotime($dt) - $machineDataRow['duration'] - strtotime($dtPrev) > $this->maxDeltaDt) {
-                        $this->output['states']['operator'][$operatorId]['data'] [] = null;
+                        $this->output['states']['operator'][$operatorId]['data'] [] = array();
                     }
                 }
                 // save last dt value for current machine state

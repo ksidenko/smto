@@ -183,7 +183,7 @@ class MachineDataImport {
             $line = trim(str_replace(array("\r\n", "\n"), '', $line));
 
             if ( isset($line[0]) && $line[0] == ';' ) {
-        	echo "skipping comment..." . $line[0] . PHP_EOL;
+        	//echo "skipping comment..." . $line[0] . PHP_EOL;
                 continue; // skip comment
             }
 
@@ -225,7 +225,7 @@ class MachineDataImport {
         foreach ($this->parsedRows as $i => $parsedRow) {
 
             $useHash = true;
-            if (is_numeric($parsedRowPrev->state) && $parsedRowPrev->state == 0 &&
+            if ($parsedRowPrev && is_numeric($parsedRowPrev->state) && $parsedRowPrev->state == 0 &&
                 is_numeric($parsedRow->state) && $parsedRow->state == 0
             ) {
                 $useHash = false;

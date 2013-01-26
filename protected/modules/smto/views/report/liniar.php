@@ -50,79 +50,25 @@
 </div><!-- form -->
 
 <script>
+    var timeRange = <?php echo json_encode($timeRange); ?>;
+
     $(function() {
+        var dtStart = $("[id$=dtStart]"),
+            dtEnd = $("[id$=dtEnd]");
 
+        dtStart.datetimepicker('setDate', dtStart.val() );
+        dtEnd.datetimepicker('setDate', dtEnd.val() );
 
-        $.datepicker.regional['ru'] = {
-            closeText: 'Закрыть',
-            prevText: '<Пред',
-            nextText: 'След>',
-            currentText: 'Сегодня',
-            monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
-                'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-            monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
-                'Июл','Авг','Сен','Окт','Ноя','Дек'],
-            dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
-            dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
-            dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-            weekHeader: 'Не',
-            dateFormat: 'dd.mm.yy',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: ''
-        };
-        $.datepicker.setDefaults($.datepicker.regional['ru']);
-
-        $.timepicker.regional['ru'] = {
-            timeOnlyTitle: 'Выберите время',
-            timeText: 'Время',
-            hourText: 'Часы',
-            minuteText: 'Минуты',
-            secondText: 'Секунды',
-            millisecText: 'миллисекунды',
-            currentText: 'Текущее время',
-            closeText: 'Закрыть',
-            ampm: false
-        };
-        $.timepicker.setDefaults($.timepicker.regional['ru']);
-
-        $( "#ReportLinearConstructor_dtStart,#ReportLinearConstructor_dtEnd" ).datetimepicker({
-                changeMonth: true,
-                changeYear: true,
-                timeFormat: 'hh:mm:ss',
-                showSecond: true,
-                stepHour: 1,
-                stepMinute: 1,
-                stepSecond: 1,
-                hourGrid: 4,
-                minuteGrid: 10,
-                secondGrid: 10
-            }
-        );
-
-        $("#ReportLinearConstructor_dtStart").datetimepicker('setDate', $("#ReportLinearConstructor_dtStart").val() );
-        $("#ReportLinearConstructor_dtEnd").datetimepicker('setDate', $("#ReportLinearConstructor_dtEnd").val() );
-
-        var timeRange = <?php echo json_encode($timeRange); ?>;
-
-        $('#ReportLinearConstructor_timeRange').change(function(){
+        $('[id$=timeRange]').change(function(){
             var v = $(this).val();
             var s = timeRange['values'][v]['start_date'];
             var e = timeRange['values'][v]['end_date'];
 
-            $("#ReportLinearConstructor_dtStart").datetimepicker('setDate', s );
-            $("#ReportLinearConstructor_dtEnd").datetimepicker('setDate', e );
+            dtStart.datetimepicker('setDate', s );
+            dtEnd.datetimepicker('setDate', e );
         });
     });
 </script>
-
-<!--<div id="fixme" >&nbsp;</div>-->
-<?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
-//    'id' => 'fixme',
-//'excanvas.min.js',
-    'scriptFile'=>array('excanvas.min.js', 'jquery.flot.js','jquery.flot.selection.js', 'jquery.flot.navigate.js', 'jquery.flot.crosshair.js', 'jquery.flot.threshold.js')
-)); ?>
 
 <?php if (count($chartData) && isset($chartData['states']) && ($chartData['states']['machine_state'] || $chartData['states']['operator_last_fkey'])) { ?>
 
@@ -167,12 +113,21 @@
         $arr['lines'] = array(
             'show' => true,
             'lineWidth' => 1,
-            'fill' => true,
+            //'fill' => true,
         );
         $arr['data'] = $chartData['machine_da_value']['data'];
 
-        if (isset($chartData['machine_da_value']['info']['threshold'])) {
+        //$arr['fillBetween'] = 'foo';
+        if (isset($chartData['machine_da_value']['info']['constraints'])) {
             //$arr['threshold'] = $chartData['machine_da_value']['info']['threshold'];
+            $arr['constraints'] = $chartData['machine_da_value']['info']['constraints'];
+
+            //$arr['threshold'] = array('below' => 40, 'color' => '#FF0000');
+//            $arr['constraints'] = array(
+//                array( 'threshold' => 30, 'color' => "rgb(255,0,0)", 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y < threshold; }') ),
+//                array( 'threshold' => 60, 'color' => "rgb(0,255,0)", 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y < threshold;; }') ),
+//                array( 'threshold' => 60, 'color' => "rgb(0,0,255)", 'evaluate' => new CJavaScriptExpression('function(y, threshold){ return y > threshold;; }') ),
+//            );
         }
 
         $plotData['machine_detector_analog_value'] []= $arr;
@@ -201,7 +156,7 @@
 
 
     if (count($plotData['operator_last_fkey']) == 0) {
-        $plotData['operator_last_fkey'] []= array('data' => array(1,1));
+        //$plotData['operator_last_fkey'] []= array('data' => array(1,1));
     }
 
     $yAxisTicks['operator_last_fkey'] = $yAxisTicks['machine_state'];
@@ -216,6 +171,7 @@
 
     $lastKey = $key+2;
     $plotData['operator_last_fkey'] = array_merge($plotData['operator_last_fkey'], $plotData['machine_state']);
+    //$plotData['operator_last_fkey'] = $plotData['machine_state'];
 
 
     //Зарегистрированные операторы
@@ -243,14 +199,20 @@
 
         $yAxisTicks['operator_last_fkey'] []= array($key + 1, '');
     }
+
+//    $arrFillBetween = array(
+//        'data' => array(array(1358096400000, 40), array(1358100145000, 40)),
+//        'id' => 'foo'
+//    );
+//    $plotData['machine_detector_analog_value'] []= $arrFillBetween;
 ?>
 
 <script type="text/javascript">
     var plot0, plot1, plot2;
 
-    var data_machine_detector_analog_value = <?php echo json_encode($plotData['machine_detector_analog_value']); ?>;
-    var data_machine_state = <?php echo json_encode($plotData['machine_state']); ?>;
-    var data_operator_last_fkey = <?php echo json_encode($plotData['operator_last_fkey']); ?>;
+    var data_machine_detector_analog_value = <?php echo CJavaScript::encode($plotData['machine_detector_analog_value'], false); ?>;
+    //var data_machine_state = <?php echo CJavaScript::encode($plotData['machine_state'], false); ?>;
+    var data_operator_last_fkey = <?php echo CJavaScript::encode($plotData['operator_last_fkey'], false); ?>;
 
     var options = {
         xaxis: {
@@ -260,7 +222,7 @@
             min: <?php echo $model->startDttoJsTimestamp(); ?>,
             max: <?php echo $model->endDttoJsTimestamp(); ?>
             //tickSize:[10, "second"],
-//                timeformat: "%H:%M:%S"
+            //timeformat: "%H:%M:%S"
         },
         yaxis: {
             position: "right",
@@ -451,7 +413,7 @@
 
                 // find the nearest points, x-wise
                 for (j = 0; j < series.data.length; ++j)
-                    if (series.data[j][0] > pos.x)
+                    if (!series.data[j] || series.data[j][0] > pos.x)
                         break;
 
                 // now interpolate
@@ -465,7 +427,7 @@
 
                 //console.log(pos.y.toFixed(2));
 
-                if (latestItem) {
+                if (latestItem && typeof y.toFixed!= 'undefined') {
                     //if (previousPoint != latestItem.dataIndex) {
                     //    previousPoint = latestItem.dataIndex;
 
@@ -479,8 +441,9 @@
                    $("#tooltip").remove();
                     previousPoint = null;
                 }
-
-                $('#legend').html(y.toFixed(2));
+                if (typeof y.toFixed!= 'undefined') {
+            	    $('#legend').html(y.toFixed(2));
+                }
             }
         }
 

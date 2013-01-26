@@ -23,8 +23,19 @@ class ReportController extends SBaseController
 
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->getAssetManager()->publish($basePath . '/../js', true, -1, true/*YII_DEBUG*/);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/excanvas.min.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.selection.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.navigate.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.crosshair.js', CClientScript::POS_BEGIN);
+        //Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.threshold.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.threshold.multiple.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.fillbetween.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.pie.js', CClientScript::POS_BEGIN);
+
         Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
         Yii::app()->getClientScript()->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/init.datatimepicker.js', CClientScript::POS_END);
         //Yii::app()->getClientScript()->registerCssFile($baseUrl . '/jquery/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css', CClientScript::POS_END);
 
         $isRunSearch = false;
@@ -273,14 +284,24 @@ class ReportController extends SBaseController
 
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->assetManager->publish($basePath . '/../js', true, -1, true/*YII_DEBUG*/);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/excanvas.min.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.selection.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.navigate.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.crosshair.js', CClientScript::POS_BEGIN);
+        //Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.threshold.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.threshold.multiple.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.fillbetween.js', CClientScript::POS_BEGIN);
+
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-1.8.22.custom.min.js', CClientScript::POS_END);
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/jquery-ui/js/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/init.datatimepicker.js', CClientScript::POS_END);
 
         $model = new ReportLinearConstructor();
         $chartData = array();
 
-        $model->dtStart = '18-08-2012 10:00:00';
-        $model->dtEnd = '18-08-2012 10:10:00';
+//        $model->dtStart = '18-08-2012 10:00:00';
+//        $model->dtEnd = '18-08-2012 10:10:00';
 
         $isRunSearch = false;
         if (isset($_REQUEST['ReportLinearConstructor'])) {

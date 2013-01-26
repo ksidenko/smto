@@ -30,25 +30,46 @@ class Monitoring {
         foreach($machinesAR as $machineAR) {
             $machineDataFabric = new MachineDataManager('2.0');
 
-            $filename = $path . 'cr' . $machineAR->mac . '.cdt';
-            //echo $filename . '|';
+            if (!is_numeric($machineAR->mac)) { //format v2.0
+                $filename = $path . 'cr' . $machineAR->mac . '.cdt';
+                //echo $filename . '|';
 
-            $fd = @fopen($filename, 'r');
-            if (!$fd) {
-                continue;
-            }
-            while ( $line = fgets($fd) ) {
-
-                if ( !isset($line[0]) || $line[0] != 'C' ) {
-                    Yii::log("ignore line ($line)", 'info', __METHOD__);
+                $fd = @fopen($filename, 'r');
+                if (!$fd) {
                     continue;
                 }
-                break;
-            }
-            fclose($fd);
-            $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
-            $lineParser->parseCSVLine($line);
+                while ( $line = fgets($fd) ) {
 
+                    if ( !isset($line[0]) || $line[0] != 'C' ) {
+                        Yii::log("ignore line ($line)", 'info', __METHOD__);
+                        continue;
+                    }
+                    break;
+                }
+                fclose($fd);
+                $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
+                $lineParser->parseCSVLine($line);
+            } else { //format v1.0
+                /*$machineMonitor = new MachineMonitor($machineAR->ip, $machineAR->port);
+                $lineParser = $machineMonitor->run($machineAR->mac);
+                echo '<pre>!!!' . print_r($lineParser, true) . '</pre>'; die;
+                */
+                  $cr = new CDBCriteria();
+                  $cr->select = 'state, operator_id, operator_last_fkey';
+                  $cr->condition = 'machine_id = '.$machineAR->id . ' and dt > "' . date('Y-m-d H:i:s', strtotime('- 10 minutes')) . '"';
+                  $cr->limit = 1;
+                  $cr->order = 'dt desc';
+                  
+                $md = MachineData::model();
+                $lineParser = $md->find($cr);
+                if (!$lineParser) {
+                    $lineParser = new stdClass;
+                    $lineParser->state = 0;
+                    $lineParser->operator_id = 0;                    
+                    $lineParser->operator_last_fkey = 0;                    
+                } 
+            }
+                                                                        
             //echo '<pre>' . print_r($lineParser, true) . '</pre>'; die;
 
             $machineState = MachineState::getRec($lineParser->state);

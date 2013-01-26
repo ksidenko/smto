@@ -19,6 +19,7 @@ return CMap::mergeArray(
                     'CFileLogRoute' => array(
                         'class'=>'CFileLogRoute',
                         'levels'=>'error, warning',
+                       // 'enabled' => false,
                     ),
                     'CWebLogRoute' => array(
                         'class'=>'CWebLogRoute',
@@ -26,6 +27,7 @@ return CMap::mergeArray(
                         'showInFireBug'=>0,
                         'categories'=>'system.db.CDbCommand.*',
                         //'filter'=>'CLogFilter',
+                        'enabled' => false,                        
                     ),
                 ),
             ),

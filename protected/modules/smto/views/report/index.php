@@ -82,84 +82,36 @@
 </div><!-- form -->
 
 <script>
+    var timeRange = <?php echo json_encode($timeRange); ?>;
+
     $(function() {
 
-        $( ".machine_tabs" ).tabs();
+        $( ".machine_tabs" ).tabs().show();
 
-        $.datepicker.regional['ru'] = {
-            closeText: 'Закрыть',
-            prevText: '<Пред',
-            nextText: 'След>',
-            currentText: 'Сегодня',
-            monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-            monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
-            dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
-            dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
-            dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-            weekHeader: 'Не',
-            dateFormat: 'dd.mm.yy',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: ''
-        };
-        $.datepicker.setDefaults($.datepicker.regional['ru']);
+        var dtStart = $("[id$=dtStart]"),
+            dtEnd = $("[id$=dtEnd]");
 
-        $.timepicker.regional['ru'] = {
-            timeOnlyTitle: 'Выберите время',
-            timeText: 'Время',
-            hourText: 'Часы',
-            minuteText: 'Минуты',
-            secondText: 'Секунды',
-            millisecText: 'миллисекунды',
-            currentText: 'Текущее время',
-            closeText: 'Закрыть',
-            ampm: false
-        };
-        $.timepicker.setDefaults($.timepicker.regional['ru']);
+        dtStart.datetimepicker('setDate', dtStart.val() );
+        dtEnd.datetimepicker('setDate', dtEnd.val() );
 
-        $( "#ReportConstructor_dtStart,#ReportConstructor_dtEnd" ).datetimepicker({
-                changeMonth: true,
-                changeYear: true,
-                timeFormat: 'hh:mm:ss',
-                showSecond: true,
-                stepHour: 1,
-                stepMinute: 1,
-                stepSecond: 1,
-                hourGrid: 4,
-                minuteGrid: 10,
-                secondGrid: 10
-            }
-        );
-
-        $("#ReportConstructor_dtStart").datetimepicker('setDate', $("#ReportConstructor_dtStart").val() );
-        $("#ReportConstructor_dtEnd").datetimepicker('setDate', $("#ReportConstructor_dtEnd").val() );
-
-        var timeRange = <?php echo json_encode($timeRange); ?>;
-
-        $('#ReportConstructor_timeRange').change(function(){
+        $('[id$=timeRange]').change(function(){
             var v = $(this).val();
             var s = timeRange['values'][v]['start_date'];
             var e = timeRange['values'][v]['end_date'];
 
-            $("#ReportConstructor_dtStart").datetimepicker('setDate', s );
-            $("#ReportConstructor_dtEnd").datetimepicker('setDate', e );
+            dtStart.datetimepicker('setDate', s );
+            dtEnd.datetimepicker('setDate', e );
         });
     });
 </script>
 
 <?php if ( isset($chartDataJSON['reports']) ) { ?>
 
-<!--<div id="fixme" >&nbsp;</div>-->
-<?php $this->widget('application.extensions.EFlot.EFlotGraphWidget',array(
-//    'id' => 'fixme',
-)); ?>
-
 <?php foreach($machineIds as $machineId){  ?>
 <!--<div style="margin-top:10px"></div>-->
 <div class="row" style="padding: 10px 0px;">
 
-    <div id="tabs_<?php echo $machineId; ?>" class="machine_tabs" >
+    <div id="tabs_<?php echo $machineId; ?>" class="machine_tabs" style="display: none;">
         <ul>
             <li><a href="#tabs-report-main">Работа / Простой</a></li>
             <li><a href="#tabs-report-work">Работа</a></li>

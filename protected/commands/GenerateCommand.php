@@ -21,7 +21,7 @@ class GenerateCommand extends CConsoleCommand {
         exec("rm $dir/*.dat");
         //echo "machineId = $machineId, mac = $mac, dir = $dir" . PHP_EOL; die();
 
-        $dt_start = date("Y-m-d\T17:00:00P");
+        $dt_start = date("Y-m-d\T11:00:00P");
         $number = 0;
         for ($counter=0; $counter<$countFiles; $counter++) {
             echo '.';
@@ -85,33 +85,33 @@ class GenerateCommand extends CConsoleCommand {
 
                 $operator_last_fkey = 0;
                 $t = strtotime($dt);
-                if ( $t < strtotime(date('Y-m-d\T17:10:00P'))) {
+                if ( $t < strtotime(date('Y-m-d\T11:10:00P'))) {
                     $state = 0;
                     $da_avg1 = 0;
                     $dd1 = 0;
                     $operator_last_fkey = 2;
-                } else if ( $t < strtotime(date('Y-m-d\T17:15:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T11:15:00P')) ) {
                     $state = 1;
                     $da_avg1 = 5;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T17:20:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T11:20:00P')) ) {
                     $state = 2;
                     $da_avg1 = 40;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T17:30:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T11:30:00P')) ) {
                     $state = 3;
                     $da_avg1 = 90;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T17:40:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T11:40:00P')) ) {
                     $state = 1;
                     $da_avg1 = 7;
                     $dd1 = 1;
-                } else if ( $t < strtotime(date('Y-m-d\T17:50:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T11:50:00P')) ) {
                     $state = 0;
                     $da_avg1 = 2;
                     $dd1 = 1;
                     $operator_last_fkey = 5;
-                } else if ( $t < strtotime(date('Y-m-d\T18:00:00P')) ) {
+                } else if ( $t < strtotime(date('Y-m-d\T12:00:00P')) ) {
                     $state = 3;
                     $da_avg1 = 80;
                     $dd1 = 1;
@@ -124,7 +124,7 @@ class GenerateCommand extends CConsoleCommand {
                 $fkey_all = 0;
                 $flags = 0;
 
-                if ( $t < strtotime(date('Y-m-d\T17:30:00P')) ) {
+                if ( $t < strtotime(date('Y-m-d\T11:30:00P')) ) {
                     $operatorInfo = Operator::model()->findBySql('select * from operator where id = 1');
                 } else {
                     $operatorInfo = Operator::model()->findBySql('select * from operator where id = 2');
