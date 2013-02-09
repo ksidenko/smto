@@ -42,7 +42,8 @@ return CMap::mergeArray(
                 'max_duration' => 100,
                 'max_time_between_machine_records' => 60,
                 'is_save_process_files' => false,
-                'max_record_duration' => 25200, // 7*60*60 = 25200сек
+                'max_record_duration' => 25200, // 7*60*60 = 25200 sec
+                'max_last_time_modify' => 60, // 60 sec
             )
         ),
         'onBeginRequest' =>function($event){

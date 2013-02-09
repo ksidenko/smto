@@ -28,19 +28,32 @@ class Monitoring {
         $groups = array();
 
         foreach($machinesAR as $machineAR) {
+
+            $cache = Yii::app()->cache->get(__METHOD__ . $machineAR->mac);
+            if ($cache) {
+                $output['machines'][$machineAR->id] = $cache;
+                continue;
+            }
+
             $machineDataFabric = new MachineDataManager('2.0');
 
-	    $lineParser = null;
+            $isMachineAvailable = true;
+
+	        $lineParser = null;
             if (!is_numeric($machineAR->mac)) { //format v2.0
                 $filename = $path . 'cr' . $machineAR->mac . '.cdt';
                 //echo $filename . '|';
+
+                $lastModifyTime = @filemtime($filename);
+                if ( !$lastModifyTime || $lastModifyTime < ( strtotime('now') + Yii::app()->getModule('smto')->max_last_time_modify ) ) {
+                    $isMachineAvailable = false;
+                }
 
                 $fd = @fopen($filename, 'r');
                 if (!$fd) {
                     continue;
                 }
                 while ( $line = fgets($fd) ) {
-
                     if ( !isset($line[0]) || $line[0] != 'C' ) {
                         Yii::log("ignore line ($line)", 'info', __METHOD__);
                         continue;
@@ -79,9 +92,9 @@ class Monitoring {
                 continue;
             }
 	    
-	    if ($machineState->code == 'on') {
-		$machineState->name = "Включен";
-	    }
+            if ($machineState->code == 'on') {
+                $machineState->name = "Включен";
+            }
 
             if ($machineState->code == 'on' && empty($lineParser->operator_last_fkey)) {
                 $machineState->name = "Необосн-й простой";
@@ -123,8 +136,8 @@ class Monitoring {
                         'color' => '#' . ltrim($fkeyState['color'], '#'),
                     );
                     if ($machineState->code == 'on') {
-                	$machineState->name = $fkeyState['name'];
-                	$dataState['name'] = $fkeyState['name'];
+                        $machineState->name = $fkeyState['name'];
+                        $dataState['name'] = $fkeyState['name'];
                     }
                 } else {
                     $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
@@ -152,7 +165,10 @@ class Monitoring {
                 'operator_last_fkey' => $operatorLastFkey,
                 'operator' => $dataOperator,
                 'groups' => array_values($groupIds),
+                'isMachineAvailable' => $isMachineAvailable,
             );
+
+            Yii::app()->cache->set(__METHOD__ . $machineAR->mac, $output['machines'][$machineAR->id], 20);
         }
 
         $output['groups'] = $groups;

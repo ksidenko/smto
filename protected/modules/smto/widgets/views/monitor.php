@@ -21,6 +21,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $state = $machineInfo['state'];
             $operatorFullName = $machineInfo['operator']['full_name'];
             $operatorLastFkey = $machineInfo['operator_last_fkey'];
+            $isMachineAvailable = $machineInfo['isMachineAvailable'];
 
             $code_ = '';
             if (!empty($code)) {
@@ -55,7 +56,18 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $title .= 'Инв. №: ' . $code . PHP_EOL;
             $title .= 'Пролет №: ' . $spanNumber . PHP_EOL;
             $title .= 'Место на плане: ' . $placeNumber . PHP_EOL;
-            $title .= 'Состояние: ' . $state['name'] . PHP_EOL;
+
+            if ($isMachineAvailable) {
+                $title .= 'Состояние: ' . $state['name'] . PHP_EOL;
+                if ($state['code'] == 'off') {
+                    $color = $state['color'];
+                } else {
+                    $color = isset($operatorLastFkey['color']) ? $operatorLastFkey['color'] : $state['color'];
+                }
+            } else {
+                $title .= 'Состояние: ' . 'Станок не доступен' . PHP_EOL;
+                $color = 'grey';
+            }
 
             if ($operatorLastFkey) {
                 $title .= 'Причина простоя: ' . $operatorLastFkey['name'] . PHP_EOL;
@@ -69,11 +81,6 @@ foreach($this->data['groups'] as $groupId => $groupName) {
                 $title .= 'MAC: ' . $mac . PHP_EOL;
             }
 
-	    if ($state['code'] == 'off') {
-		$color = $state['color'];
-	    } else {
-    		$color = isset($operatorLastFkey['color']) ? $operatorLastFkey['color'] : $state['color'];
-	    }
             $divMachineInfo = CHtml::tag('div', array(
                 'class' => 'monitor-group-machine',
                 'style' => 'background-color:' . $color,

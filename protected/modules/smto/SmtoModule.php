@@ -6,6 +6,8 @@ class SmtoModule extends CWebModule
     public $max_time_between_machine_records;
     public $is_save_process_files;
     public $max_record_duration;
+    public $max_last_time_modify;
+
 
 	public function init()
 	{
