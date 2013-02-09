@@ -69,9 +69,14 @@ foreach($this->data['groups'] as $groupId => $groupName) {
                 $title .= 'MAC: ' . $mac . PHP_EOL;
             }
 
+	    if ($state['code'] == 'off') {
+		$color = $state['color'];
+	    } else {
+    		$color = isset($operatorLastFkey['color']) ? $operatorLastFkey['color'] : $state['color'];
+	    }
             $divMachineInfo = CHtml::tag('div', array(
                 'class' => 'monitor-group-machine',
-                'style' => 'background-color:' . $state['color'],
+                'style' => 'background-color:' . $color,
                 'title' => $title,
                 'onclick' => "document.location.href='" . $this->getUrlReport($machineId) . "'"
             ), $div_ );

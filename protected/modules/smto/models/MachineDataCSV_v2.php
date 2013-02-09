@@ -99,6 +99,12 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $time = trim(array_shift($arr));
 
         $this->dt = date('Y/m/d', strtotime($date)) . ' ' . $time;
+        
+        if ( strtotime($this->dt) > ( strtotime('now') + 1 * 60 * 60 ) ) {
+            Yii::log("Incorrect data time in record: ($line)", 'error', __METHOD__);
+            return false;
+        }
+        
         if ( $lastMachineDataRec ) {
 	    if ($this->dt == $lastMachineDataRec->dt) {
 	        return false;
@@ -170,6 +176,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $this->flags = intval(trim(array_shift($arr)));
 
         $c1 = trim(array_shift($arr));
+        $c1 = 0;//TODO: hack?
         $c2 = trim(array_shift($arr));
         $c3 = trim(array_shift($arr));
 

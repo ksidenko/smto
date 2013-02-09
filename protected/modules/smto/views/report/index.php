@@ -19,7 +19,12 @@
                 <?php echo $form->label($model,'timetableId'); ?>
             </td>
             <td width="200" >
-                <?php echo $form->dropDownList($model,'timetableId', array(0 => 'День') + CHtml::listData(Timetable::model()->findAll(array('order' => 'id asc')), 'id', 'name')) ?>
+        	<table border=0 style="width:135px;" > <tr>
+                    <td><?php echo $form->dropDownList($model,'timetableId', array(0 => 'День',)+ CHtml::listData(Timetable::model()->findAll(array('order' => 'id asc')), 'id', 'name'))            	?></td>
+            	    <td><?php echo $form->label($model,'withoutBreaks'); ?></td>
+        	    <td><?php echo $form->checkbox($model, 'withoutBreaks', array( 'value' => 1, 'uncheckValue' => 0, 'checked' => ($model->withoutBreaks ? true : false))); ?></td>
+        	</tr></table>
+		<div style="clear:both;"></div>
             </td>
         </tr>
         <tr>
@@ -49,7 +54,6 @@
                 <?php echo $form->dropDownList($model,'operatorId',
                 array(
                     'all' => 'Все',
-                    'by_pass' => "По карточкам",
                     'not_register' => 'Не зарегистрированные',
                 ) + CHtml::listData(Operator::model()->findAll(array('order' => 'full_name')), 'id', 'full_name')) ?>
             </td>
@@ -75,7 +79,20 @@
     </table>
 
     <div class="row submit">
-        <?php echo CHtml::submitButton('Отобразить'); ?>
+        <table border="0" style="width:300px" >
+            <tr>
+	        <td>
+	            <?php echo CHtml::submitButton('Отобразить'); ?>
+	        </td>
+    		<td>
+    		    <table border=0 style="width:135px;" > <tr>
+	            <td><?php echo $form->label($model, 'byPass' ); ?></td>
+	    	    <td><?php echo $form->checkbox($model, 'byPass', array( 'value' => 1, 'uncheckValue' => 0, 'checked' => ($model->byPass ? true : false ))); ?></td>
+	    	    </tr></table>
+		</td>
+	    </tr>
+	</table>
+        <div style="clear:both;"></div>
     </div>
  
 <?php $this->endWidget(); ?>
@@ -168,6 +185,7 @@
                     pie: {
                         show: true,
                         radius: '110',
+                        startAngle: 0.7,
                         offset:{
                             top:0,
                             left:0
@@ -292,7 +310,11 @@
         }
     });
 <?php } else if ($isRunSearch) {
-    echo "Нет данных за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+    if(!$model->byPass){
+	echo "Нет данных за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+    } else {
+	echo "Нет зарегистрированных событий за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+    }
 }
 ?>
 </script>

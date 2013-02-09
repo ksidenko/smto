@@ -179,7 +179,7 @@
     if (isset($chartData['states']['operator'])) {
         $plotData['operator'] = array();
         foreach($chartData['states']['operator'] as $key => $machineStateInfo) {
-            $key = $machineStateInfo['info']['id'] + Operator::$idOffset;
+            //$key =  $machineStateInfo['info']['id'] ;//+ Operator::$idOffset;
             $name = $machineStateInfo['info']['name'];
             $arr = array();
             $arr['label'] = '';
@@ -220,7 +220,10 @@
             mode: 'time',
             //minTickSize: [1, "second"]
             min: <?php echo $model->startDttoJsTimestamp(); ?>,
-            max: <?php echo $model->endDttoJsTimestamp(); ?>
+            max: <?php echo $model->endDttoJsTimestamp(); ?>,
+            monthNames: ["янв", "фев", "мар", "апр", "май", "июнь", "июль", "авг", "сен", "окт", "нояб", "дек"],
+            dayNames: ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+            
             //tickSize:[10, "second"],
             //timeformat: "%H:%M:%S"
         },

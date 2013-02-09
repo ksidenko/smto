@@ -14,6 +14,8 @@ class ReportLinearConstructor extends ReportSearchForm {
 
     public $maxDeltaDt = 20; // in seconds
 
+    public $operatorIds = array();
+
     protected $output = array(
         'states' => array(
             'machine_state' => array(),
@@ -158,17 +160,17 @@ class ReportLinearConstructor extends ReportSearchForm {
                 //       }
 
                 $max = min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd));
+/*		$delta = 0.05;                
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
-                    $this->toJsTimestamp( $max-4 ),
+                    $this->toJsTimestamp( $min + floor(($max-$min)/2)-$delta ),
                     (int)$machineStateCode
                 );
-                
-                $this->output['states']['machine_state'][$machineStateCode]['data'] [] = array();                
+                $this->output['states']['machine_state'][$machineStateCode]['data'] [] = array();
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
-                    $this->toJsTimestamp( $max-5 ),
+                    $this->toJsTimestamp( $min + floor(($max-$min)/2)+$delta ),
                     (int)$machineStateCode
                 );
-                
+*/                
                 $this->output['states']['machine_state'][$machineStateCode]['data'] []= array(
                     $this->toJsTimestamp( $max ),
                     (int)$machineStateCode
@@ -268,12 +270,26 @@ class ReportLinearConstructor extends ReportSearchForm {
                 // save last dt value for current machine state
                 $lastTimeValues['operator_last_fkey'][$operatorLastKey] = $machineDataRow['dt'];
 
+		$min = max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart));
                 $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
-                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                    $this->toJsTimestamp( $min ),
                     (int)$operatorLastKey
                 );
+
+                $max = min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd));
+/*                $delta = 0.05;
                 $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
-                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                    $this->toJsTimestamp( $min + floor(($max - $min)/2.0)-$delta ),
+                    (int)$operatorLastKey
+                );
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] [] = array();                
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
+                    $this->toJsTimestamp( $min + floor(($max - $min)/2.0)+$delta ),
+                    (int)$operatorLastKey
+                );
+*/
+                $this->output['states']['operator_last_fkey'][$operatorLastKey]['data'] []= array(
+                    $this->toJsTimestamp( $max ),
                     (int)$operatorLastKey
                 );
 
@@ -303,8 +319,16 @@ class ReportLinearConstructor extends ReportSearchForm {
 
             if ($machineDataRow['operator_id'] > 0) {
 
-                $operatorId = $machineDataRow['operator_id'];
-                $operatorId += Operator::$idOffset;
+		if (!isset($this->operatorIds[$machineDataRow['operator_id']])) {
+		    if ($this->operatorIds) {
+		        $ids = array_values($this->operatorIds);
+		    } else {
+			$ids = array(Operator::$idOffset+1);
+		    }
+
+		    $this->operatorIds[$machineDataRow['operator_id']] = max($ids) + 1;
+		}
+		$operatorId = $this->operatorIds[$machineDataRow['operator_id']];
 
                 // process break for machine states
                 if ( isset($lastTimeValues['operator'][$operatorId]) ) {
@@ -317,12 +341,26 @@ class ReportLinearConstructor extends ReportSearchForm {
                 // save last dt value for current machine state
                 $lastTimeValues['operator'][$operatorId] = $machineDataRow['dt'];
 
+		$min = max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart));
                 $this->output['states']['operator'][$operatorId] ['data'] []= array(
-                    $this->toJsTimestamp( max(strtotime($machineDataRow['dt']) - $machineDataRow['duration'], strtotime($this->dtStart)) ),
+                    $this->toJsTimestamp( $min ),
                     (int)$operatorId
                 );
+                $max = min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd));
+/*                $delta = 0.05;
                 $this->output['states']['operator'][$operatorId] ['data'] []= array(
-                    $this->toJsTimestamp( min(strtotime($machineDataRow['dt']), strtotime($this->dtEnd)) ),
+                    $this->toJsTimestamp( $min + floor( ($max - $min)/2 ) - $delta),
+                    (int)$operatorId
+                );
+                $this->output['states']['operator'][$operatorId] ['data'] []= array();
+                $this->output['states']['operator'][$operatorId] ['data'] []= array(
+                    $this->toJsTimestamp( $min + floor( ($max - $min)/2 ) + $delta),
+                    (int)$operatorId
+                );
+*/                
+
+                $this->output['states']['operator'][$operatorId] ['data'] []= array(
+                    $this->toJsTimestamp( $max ),
                     (int)$operatorId
                 );
 

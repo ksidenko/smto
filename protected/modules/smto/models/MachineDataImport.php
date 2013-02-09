@@ -232,11 +232,15 @@ class MachineDataImport {
             }
             $isIdentityRecords = MachineData::isIdentityRecords($parsedRowPrev, $parsedRow, $useHash);
 
+	    if ($parsedRowPrev && $parsedRow) {
+		echo "row: $parsedRowPrev->dt, $parsedRow->duration" . PHP_EOL;
+	    }
             if ($isIdentityRecords && $parsedRowPrev->duration < $this->_maxRecordDuration) {
                 $parsedRowPrev->dt = $parsedRow->dt;
                 //$duration = (strtotime($parsedRow->dt) - strtotime($parsedRowPrev->dt));
                 //$parsedRowPrev->duration += $duration;
                 $parsedRowPrev->duration += $parsedRow->duration;
+                echo "join: $parsedRowPrev->dt: $parsedRowPrev->duration" . PHP_EOL;
                 unset($parsedRow, $this->parsedRows[$i]);
             } else {
                 $parsedRowPrev = $parsedRow;

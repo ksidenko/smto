@@ -36,8 +36,10 @@ class MachineEventController extends SBaseController
 		if(isset($_POST['MachineEvent']))
 		{
 			$model->attributes=$_POST['MachineEvent'];
-			if($model->save())
+			if($model->save()) {
+    				Yii::app()->cache->flush();
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('create',array(
@@ -60,8 +62,10 @@ class MachineEventController extends SBaseController
 		if(isset($_POST['MachineEvent']))
 		{
 			$model->attributes=$_POST['MachineEvent'];
-			if($model->save())
+			if($model->save()){
+				Yii::app()->cache->flush();
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('update',array(
@@ -80,7 +84,7 @@ class MachineEventController extends SBaseController
 		{
 			// we only allow deletion via POST request
 			$this->loadModel($id)->delete();
-
+			Yii::app()->cache->flush();
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));

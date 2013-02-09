@@ -131,7 +131,7 @@ class ReportSearchForm extends CFormModel
             array('dtStart', 'required'),
             //array('dtStart, dtEnd', 'date'),
             array('timeRange, dtStart, dtEnd', 'safe'),
-            array('machineId, operatorId, timetableId', 'type', 'type' => 'int'),
+            array('machineId, operatorId, timetableId, byPass, withoutBreaks', 'type', 'type' => 'int'),
             //array('graphReportType', 'in', 'range' => array_keys(self::$arrGraphType)),
             //array('machineReportType', 'in', 'range' => array_keys(self::$arrMachineReportType)),
         );
@@ -145,7 +145,9 @@ class ReportSearchForm extends CFormModel
             'machineReportType' => 'Станок',
             'operatorId' => 'Оператор',
             'timetableId' => 'График работы',
-            'graphReportType' => 'Вывод'
+            'graphReportType' => 'Вывод',
+            'byPass' => 'По карточкам',
+            'withoutBreaks' => 'С учетом перерывов',
         );
     }
 }

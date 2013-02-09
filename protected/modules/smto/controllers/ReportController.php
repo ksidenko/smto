@@ -284,7 +284,8 @@ class ReportController extends SBaseController
 
         $basePath=Yii::getPathOfAlias('application');
         $baseUrl=Yii::app()->assetManager->publish($basePath . '/../js', true, -1, true/*YII_DEBUG*/);
-        Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/excanvas.min.js', CClientScript::POS_BEGIN);
+        //Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/excanvas.min.js', CClientScript::POS_BEGIN);
+        Yii::app()->clientScript->registerScriptFile($baseUrl . '/flashcanvas/bin/flashcanvas.js', CClientScript::POS_BEGIN);
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.js', CClientScript::POS_BEGIN);
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.selection.js', CClientScript::POS_BEGIN);
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/jquery/flot/jquery.flot.navigate.js', CClientScript::POS_BEGIN);
@@ -307,6 +308,10 @@ class ReportController extends SBaseController
         if (isset($_REQUEST['ReportLinearConstructor'])) {
             $model->attributes=$_REQUEST['ReportLinearConstructor'];
 
+	    $totalTime = abs(strtotime($model->dtEnd) - strtotime($model->dtStart));
+	    if ($totalTime >= 7 * 24 * 60 * 60) {
+		$model->dtEnd = date('d.m.Y H:i:s', strtotime($model->dtStart . ' +7 days -1 seconds') );
+	    }
             //if ($model->validate()) {
                 $chartData = $model->getData();
                 $isRunSearch = true;

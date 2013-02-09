@@ -30,6 +30,7 @@ class Monitoring {
         foreach($machinesAR as $machineAR) {
             $machineDataFabric = new MachineDataManager('2.0');
 
+	    $lineParser = null;
             if (!is_numeric($machineAR->mac)) { //format v2.0
                 $filename = $path . 'cr' . $machineAR->mac . '.cdt';
                 //echo $filename . '|';
@@ -77,15 +78,21 @@ class Monitoring {
                 $this->errors[] = 'Не корректный статус станка ('.$machineAR->full_name.'): ( ' . $lineParser->state . ' )';
                 continue;
             }
+	    
+	    if ($machineState->code == 'on') {
+		$machineState->name = "Включен";
+	    }
 
-            if ($machineState->code == 'on') {
+            if ($machineState->code == 'on' && empty($lineParser->operator_last_fkey)) {
                 $machineState->name = "Необосн-й простой";
             }
+            
             $dataState = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
                 'color' => EventColor::getColorByCode('machine_' . $lineParser->state),
             );
+
 
             if ( !empty($lineParser->operator_id) ) {
                 $operatorInfo = Operator::getRec($lineParser->operator_id);
@@ -98,9 +105,11 @@ class Monitoring {
                 $operatorInfo = new stdClass();
                 $operatorInfo->full_name = 'Не авторизован';
             }
+            
 
             $operatorLastFkey = array();
             if ($lineParser->operator_last_fkey > 0) {
+            
                 //echo "{$lineParser->operator_last_fkey} | ";
                 $fkey = $machineAR->cache(600)->fkey(array('condition' => 'number = ' . $lineParser->operator_last_fkey));
                 $fkeyState = null;
@@ -113,11 +122,14 @@ class Monitoring {
                         'name' => $fkeyState['name'],
                         'color' => '#' . ltrim($fkeyState['color'], '#'),
                     );
+                    if ($machineState->code == 'on') {
+                	$machineState->name = $fkeyState['name'];
+                	$dataState['name'] = $fkeyState['name'];
+                    }
                 } else {
                     $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
                 }
             }
-
             $dataOperator = array(
                 'full_name' => $operatorInfo->full_name,
             );
