@@ -70,7 +70,11 @@
     });
 </script>
 
-<?php if (count($chartData) && isset($chartData['states']) && ($chartData['states']['machine_state'] || $chartData['states']['operator_last_fkey'])) { ?>
+<?php if (count($chartData) && isset($chartData['states']) && (
+        $chartData['states']['machine_state'] ||
+        $chartData['states']['operator_last_fkey'] ||
+        $chartData['states']['operator']
+        )) { ?>
 
 <?php
     $plotData = array(

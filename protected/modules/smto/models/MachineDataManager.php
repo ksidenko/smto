@@ -34,11 +34,17 @@ class MachineDataManager {
         return $s;
     }
 
-    function getLineParser() {
+    function getLineParser($useCurr = false) {
         $res = null;
 
         if ($this->_version == '1.0') {
-            $res = new MachineDataCSV_v1();
+
+            if ($useCurr) {
+                $res = new MachineDataCSV_v1_curr();
+            } else {
+                $res = new MachineDataCSV_v1();
+            }
+
             $res->mac = $this->_mac;
         } else if ($this->_version == '2.0') {
             $res = new MachineDataCSV_v2();

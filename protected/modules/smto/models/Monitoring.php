@@ -24,7 +24,7 @@ class Monitoring {
 
         $path = Machine::getMachineDataPathCurr();
 
-        $machinesAR = Machine::model()->cache(600)->findAll();
+        $machinesAR = Machine::model()->cache(600)->real_records()->findAll();
         $groups = array();
 
         foreach($machinesAR as $machineAR) {
@@ -35,12 +35,9 @@ class Monitoring {
                 continue;
             }
 
-            $machineDataFabric = new MachineDataManager('2.0');
-
-            $isMachineAvailable = true;
-
 	        $lineParser = null;
             if (!is_numeric($machineAR->mac)) { //format v2.0
+                $machineDataFabric = new MachineDataManager('2.0', $machineAR->mac);
                 $filename = $path . 'cr' . $machineAR->mac . '.cdt';
                 //echo $filename . '|';
 
@@ -51,6 +48,10 @@ class Monitoring {
 
                 $fd = @fopen($filename, 'r');
                 if (!$fd) {
+                    if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
+                        $link = CHtml::link('Станок', array('machine/update', 'id'=>$machineAR->id));
+                        $this->errors[] = "$link {$machineAR->full_name} ( $machineAR->mac, $machineAR->ip ) не доступен";
+                    }
                     continue;
                 }
                 while ( $line = fgets($fd) ) {
@@ -61,91 +62,109 @@ class Monitoring {
                     break;
                 }
                 fclose($fd);
-                $lineParser = $machineDataFabric->getLineParser($machineAR->mac);
+                $lineParser = $machineDataFabric->getLineParser();
                 $lineParser->parseCSVLine($line);
+                $lineParser->isMachineAvailable = $isMachineAvailable;
             } else { //format v1.0
-                /*$machineMonitor = new MachineMonitor($machineAR->ip, $machineAR->port);
-                $lineParser = $machineMonitor->run($machineAR->mac);
-                echo '<pre>!!!' . print_r($lineParser, true) . '</pre>'; die;
-                */
-                  $cr = new CDBCriteria();
-                  $cr->select = 'state, operator_id, operator_last_fkey';
-                  $cr->condition = 'machine_id = '.$machineAR->id . ' and dt > "' . date('Y-m-d H:i:s', strtotime('- 10 minutes')) . '"';
-                  $cr->limit = 1;
-                  $cr->order = 'dt desc';
-                  
-                $md = MachineData::model();
-                $lineParser = $md->find($cr);
-                if (!$lineParser) {
-                    $lineParser = new stdClass;
-                    $lineParser->state = 0;
-                    $lineParser->operator_id = 0;                    
-                    $lineParser->operator_last_fkey = 0;                    
-                } 
+
+                if (true) {
+                    $machineDataFabric = new MachineDataManager('1.0', $machineAR->mac);
+
+                    $c = $machineAR->place_number;
+                    $c = str_repeat('0', (10 - strlen($c)) ) . $c;
+                    $filename = $path . 'cro' .  $c . '.ddt';
+                    //echo $filename . '|';
+
+                    $lastModifyTime = @filemtime($filename);
+                    if ( !$lastModifyTime || $lastModifyTime < ( strtotime('now') + Yii::app()->getModule('smto')->max_last_time_modify ) ) {
+                        $isMachineAvailable = false;
+                    }
+
+                    $fd = @fopen($filename, 'r');
+                    if (!$fd) {
+                        if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
+                            $link = CHtml::link('Станок', array('machine/update', 'id'=>$machineAR->id));
+                            $this->errors[] = "$link {$machineAR->full_name} ( $machineAR->mac, $machineAR->ip ) не доступен";
+                        }
+                        continue;
+                    }
+                    $line = fgets($fd);
+                    fclose($fd);
+
+                    $lineParser = $machineDataFabric->getLineParser(true);
+                    $lineParser->parseCSVLine($line);
+
+                    if ($lineParser->isMachineAvailable && !$isMachineAvailable) {
+                        $lineParser->isMachineAvailable = false;
+                    }
+                } else {
+                    // read last data from DB
+                    $cr = new CDBCriteria();
+                    $cr->select = 'state, operator_id, operator_last_fkey';
+                    $cr->condition = 'machine_id = '.$machineAR->id . ' and dt > "' . date('Y-m-d H:i:s', strtotime('- 10 minutes')) . '"';
+                    $cr->limit = 1;
+                    $cr->order = 'dt desc';
+
+                    $md = MachineData::model();
+                    $lineParser = $md->find($cr);
+                    if (!$lineParser) {
+                        $lineParser = new MachineDataCSV_v1_curr();
+                        $lineParser->state = 0;
+                        $lineParser->operator_id = 0;
+                        $lineParser->operator_last_fkey = 0;
+                        $lineParser->isMachineAvailable = false;
+                    }
+                }
             }
-                                                                        
             //echo '<pre>' . print_r($lineParser, true) . '</pre>'; die;
 
-            $machineState = MachineState::getRec($lineParser->state);
+            $machineState = $lineParser->machineStateInfo;
+
             if (!$machineState) {
                 $this->errors[] = 'Не корректный статус станка ('.$machineAR->full_name.'): ( ' . $lineParser->state . ' )';
                 continue;
             }
-	    
-            if ($machineState->code == 'on') {
-                $machineState->name = "Включен";
-            }
 
-            if ($machineState->code == 'on' && empty($lineParser->operator_last_fkey)) {
-                $machineState->name = "Необосн-й простой";
-            }
-            
-            $dataState = array(
+            $machineStateInfo = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
-                'color' => EventColor::getColorByCode('machine_' . $lineParser->state),
+                'color' => $machineState->color,
             );
 
+            $operatorInfo = $lineParser->operatorInfo;
+            if (!$operatorInfo && !empty($lineParser->operator_id)) {
+                $this->errors[] = 'Не корректный идентификатор оператора ('.$machineAR->full_name.'): ( ' . $lineParser->operator_id . ' )';
+            }
 
-            if ( !empty($lineParser->operator_id) ) {
-                $operatorInfo = Operator::getRec($lineParser->operator_id);
-                if (!$operatorInfo) {
-                    $this->errors[] = 'Не корректный идентификатор оператора ('.$machineAR->full_name.'): ( ' . $lineParser->operator_id . ' )';
-                    $operatorInfo = new stdClass();
-                    $operatorInfo->full_name = 'Не авторизован';
-                }
-            } else {
+            if (!$operatorInfo) {
                 $operatorInfo = new stdClass();
-                $operatorInfo->full_name = 'Не авторизован';
+                $operatorInfo->full_name = $operatorInfo->short_name = 'Не авторизован';
             }
-            
 
-            $operatorLastFkey = array();
-            if ($lineParser->operator_last_fkey > 0) {
-            
-                //echo "{$lineParser->operator_last_fkey} | ";
-                $fkey = $machineAR->cache(600)->fkey(array('condition' => 'number = ' . $lineParser->operator_last_fkey));
-                $fkeyState = null;
-                if ($fkey) {
-                    $fkeyState = $fkey[0]->cache(600)->machine_event;
-                }
-                if (!empty($fkeyState->id)) {
-                    $operatorLastFkey = array(
-                        'code' => $fkeyState['code'],
-                        'name' => $fkeyState['name'],
-                        'color' => '#' . ltrim($fkeyState['color'], '#'),
-                    );
-                    if ($machineState->code == 'on') {
-                        $machineState->name = $fkeyState['name'];
-                        $dataState['name'] = $fkeyState['name'];
-                    }
-                } else {
-                    $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
-                }
-            }
-            $dataOperator = array(
+            $operatorInfo = array(
+                'short_name' => $operatorInfo->short_name,
                 'full_name' => $operatorInfo->full_name,
             );
+
+            $machineEventInfo = array();
+
+            if ($lineParser->machineEventInfo) {
+                $machineEventInfo = array(
+                    'code' => $lineParser->machineEventInfo->code,
+                    'name' => $lineParser->machineEventInfo->name,
+                    'color' => '#' . ltrim($lineParser->machineEventInfo->color, '#'),
+                );
+            } else if ($lineParser->operator_last_fkey > 0) {
+                $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
+            }
+
+            if ($machineState->code == 'on') { // станок включен
+                if ( $lineParser->operator_last_fkey == 0 ) { // событие не указано
+                    $machineStateInfo['name'] = "Необосн-й простой";
+                } else if ( $lineParser->machineEventInfo ) { // событие указано
+                    $machineStateInfo['name'] = $lineParser->machineEventInfo->name;
+                }
+            }
 
             $groupIds = array();
             foreach ($machineAR->cache(600)->groups as $group) {
@@ -153,19 +172,20 @@ class Monitoring {
                 $groupIds [] = $group->id;
             }
 
+            //$lineParser->isMachineAvailable = true;
             $output['machines'][$machineAR->id] = array(
                 'full_name' => $machineAR->full_name,
                 'name' => $machineAR->name,
-                'code' => $machineAR->code,
-                'span_number' => $machineAR->span_number,
+                'code' => ltrim($machineAR->code, '№'),
+                'span_number' => ltrim($machineAR->span_number, '№'),
                 'place_number' => $machineAR->place_number,
                 'ip' => $machineAR->ip,
                 'mac' => $machineAR->mac,
-                'state' => $dataState,
-                'operator_last_fkey' => $operatorLastFkey,
-                'operator' => $dataOperator,
+                'machineStateInfo' => $machineStateInfo,
+                'machineEventInfo' => $machineEventInfo,
+                'operatorInfo' => $operatorInfo,
                 'groups' => array_values($groupIds),
-                'isMachineAvailable' => $isMachineAvailable,
+                'isMachineAvailable' => $lineParser->isMachineAvailable,
             );
 
             Yii::app()->cache->set(__METHOD__ . $machineAR->mac, $output['machines'][$machineAR->id], 20);

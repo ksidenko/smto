@@ -11,6 +11,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
         foreach($this->data['machines'] as $machineId => $machineInfo) {
             if ( !in_array($groupId, $machineInfo['groups']) ) continue;
 
+            // machine info
             $fullName = $machineInfo['full_name'];
             $name = $machineInfo['name'];
             $code = $machineInfo['code'];
@@ -18,9 +19,10 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $placeNumber = $machineInfo['place_number'];
             $ip = $machineInfo['ip'];
             $mac = $machineInfo['mac'];
-            $state = $machineInfo['state'];
-            $operatorFullName = $machineInfo['operator']['full_name'];
-            $operatorLastFkey = $machineInfo['operator_last_fkey'];
+
+            $machineStateInfo = $machineInfo['machineStateInfo'];
+            $machineEventInfo = $machineInfo['machineEventInfo'];
+            $operatorName = $machineInfo['operatorInfo']['short_name'];
             $isMachineAvailable = $machineInfo['isMachineAvailable'];
 
             $code_ = '';
@@ -36,7 +38,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             }
 
             $div1 = CHtml::tag('div', array('class' => 'monitor-group-machine-name'), $name);
-            $div2 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $state['name']);
+            $div2 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $machineStateInfo['name']);
             //$div3 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $code);
             $arr = array($code_, $spanNumber_, $placeNumber_);
             foreach ($arr as $key => $value) {
@@ -48,7 +50,7 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $div = implode(', ', $arr);
             if (empty($div)) $div = '&nbsp;';
             $div4 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $div);
-            $div5 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $operatorFullName);
+            $div5 = CHtml::tag('div', array('class' => 'monitor-group-machine-state-name'), $operatorName);
             $div_ = $div1 . $div2 . $div3 . $div4 . $div5;
 
             $title  = 'Наименование: ' . $fullName . PHP_EOL;
@@ -57,23 +59,27 @@ foreach($this->data['groups'] as $groupId => $groupName) {
             $title .= 'Пролет №: ' . $spanNumber . PHP_EOL;
             $title .= 'Место на плане: ' . $placeNumber . PHP_EOL;
 
-            if ($isMachineAvailable) {
-                $title .= 'Состояние: ' . $state['name'] . PHP_EOL;
-                if ($state['code'] == 'off') {
-                    $color = $state['color'];
-                } else {
-                    $color = isset($operatorLastFkey['color']) ? $operatorLastFkey['color'] : $state['color'];
-                }
+            $title .= 'Состояние: ' . $machineStateInfo['name'] . PHP_EOL;
+            if ($machineStateInfo['code'] == 'off') {
+                $color = $machineStateInfo['color'];
             } else {
-                $title .= 'Состояние: ' . 'Станок не доступен' . PHP_EOL;
+                $color = $machineStateInfo['color'];
+
+                if ( isset($machineEventInfo['color']) ) {
+                    $color = $machineEventInfo['color'];
+                }
+            }
+
+            if (!$isMachineAvailable) {
+                $title .= 'Станок не доступен' . PHP_EOL;
                 $color = 'grey';
             }
 
-            if ($operatorLastFkey) {
-                $title .= 'Причина простоя: ' . $operatorLastFkey['name'] . PHP_EOL;
+            if ($machineEventInfo) {
+                $title .= 'Причина простоя: ' . $machineEventInfo['name'] . PHP_EOL;
             }
 
-            $title .= 'Оператор: ' . $operatorFullName . PHP_EOL;
+            $title .= 'Оператор: ' . $operatorName . PHP_EOL;
 
             if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
                 $title .= '---------------' . PHP_EOL;

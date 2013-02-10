@@ -92,7 +92,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 
         array_shift($arr); //skip type record - only C|D-type
         $this->mac = trim(array_shift($arr));
-        $machineRec = $this->_machine->getRecByMAC($this->mac);
+        $machineRec = Machine::getRecByMAC($this->mac);
         $this->machineId = $machineRec ? $machineRec['id'] : null;
         $this->number = trim(array_shift($arr));
         $date = trim(array_shift($arr));
@@ -112,8 +112,8 @@ class MachineDataCSV_v2 extends MachineDataCSV {
 	
 	    $this->duration = strtotime($this->dt) - strtotime($lastMachineDataRec->dt);
 	    if ($this->duration < 0) {
-		// we restore old data file, last rec is incorrect
-		$lastMachineDataRec = null;
+		    // we restore old data file, last rec is incorrect
+		    $lastMachineDataRec = null;
 	    }
 	
             $m = Yii::app()->getModules();
@@ -180,7 +180,7 @@ class MachineDataCSV_v2 extends MachineDataCSV {
         $c2 = trim(array_shift($arr));
         $c3 = trim(array_shift($arr));
 
-        $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+        $operatorRec = Operator::getRecByCode($c1, $c2, $c3);
 
         $this->operator_id = null;
         if ($operatorRec) {

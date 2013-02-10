@@ -60,7 +60,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         }
 
 
-        $machineRec = $this->_machine->getRecByMAC($this->mac);
+        $machineRec = Machine::getRecByMAC($this->mac);
         $this->machineId = $machineRec ? $machineRec['id'] : null;
 
         // format example
@@ -126,7 +126,7 @@ class MachineDataCSV_v1 extends MachineDataCSV {
         $code = trim(array_shift($arr));
         Operator::codeExplode($code, $c1,$c2,$c3);
 
-        $operatorRec = $this->_operator->getRecByCode($c1, $c2, $c3);
+        $operatorRec = Operator::getRecByCode($c1, $c2, $c3);
 
         $this->operator_id = null;
         if ($operatorRec) {

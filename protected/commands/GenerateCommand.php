@@ -21,7 +21,10 @@ class GenerateCommand extends CConsoleCommand {
         exec("rm $dir/*.dat");
         //echo "machineId = $machineId, mac = $mac, dir = $dir" . PHP_EOL; die();
 
-        $dt_start = date("Y-m-d\T11:00:00P");
+        $operatorInfo1 = Operator::model()->findBySql('select * from operator where id = 1');
+        $operatorInfo2 = Operator::model()->findBySql('select * from operator where id = 2');
+
+        $dt_start = date("Y-m-d\T10:00:00P");
         $number = 0;
         for ($counter=0; $counter<$countFiles; $counter++) {
             echo '.';
@@ -36,76 +39,62 @@ class GenerateCommand extends CConsoleCommand {
                 }
 
                 $dt = date("d.m.Y,H:i:s", strtotime($dt_file . " +" . ( $i * $deltaSec ) . " seconds"));
-
                 echo $dt . PHP_EOL;
 
                 $randomize = false;
 
-                $da_max1 = 0;
-                $da_max2 = 0;
-                $da_max3 = 0;
-                $da_max4 = 0;
+                $da_max1 = 0;$da_max2 = 0;$da_max3 = 0;$da_max4 = 0;
 
-                $da_avg1 = 0;
-                $da_avg2 = 0;
-                $da_avg3 = 0;
-                $da_avg4 = 0;
+                $da_avg1 = 0;$da_avg2 = 0;$da_avg3 = 0;$da_avg4 = 0;
 
-                $dd1 = 0;
-                $dd2 = 0;
-                $dd3 = 0;
-                $dd4 = 0;
+                $dd1 = 0;$dd2 = 0;$dd3 = 0;$dd4 = 0;
 
-                $dd_change1 = 0;
-                $dd_change2 = 0;
-                $dd_change3 = 0;
-                $dd_change4 = 0;
+                $dd_change1 = 0;$dd_change2 = 0;$dd_change3 = 0;$dd_change4 = 0;
 
                 if ($randomize) {
-                    $da_max1 += rand(0,10);
-                    $da_max2 += rand(0,10);
-                    $da_max3 += rand(0,10);
-                    $da_max4 += rand(0,10);
+                    $da_max1 += rand(0,10);$da_max2 += rand(0,10);$da_max3 += rand(0,10);$da_max4 += rand(0,10);
 
-                    $da_avg1 += rand(0,10);
-                    $da_avg2 += rand(0,10);
-                    $da_avg3 += rand(0,10);
-                    $da_avg4 += rand(0,10);
+                    $da_avg1 += rand(0,10);$da_avg2 += rand(0,10);$da_avg3 += rand(0,10);$da_avg4 += rand(0,10);
 
-                    $dd1 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd2 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd3 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd4 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd1 += (rand(0,1) > 0.5) ? 1 : 0;$dd2 += (rand(0,1) > 0.5) ? 1 : 0;$dd3 += (rand(0,1) > 0.5) ? 1 : 0;$dd4 += (rand(0,1) > 0.5) ? 1 : 0;
 
-                    $dd_change1 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd_change2 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd_change3 += (rand(0,1) > 0.5) ? 1 : 0;
-                    $dd_change4 += (rand(0,1) > 0.5) ? 1 : 0;
+                    $dd_change1 += (rand(0,1) > 0.5) ? 1 : 0;$dd_change2 += (rand(0,1) > 0.5) ? 1 : 0;$dd_change3 += (rand(0,1) > 0.5) ? 1 : 0;$dd_change4 += (rand(0,1) > 0.5) ? 1 : 0;
                 }
 
-                $operator_last_fkey = 0;
+                $operatorInfo = $operatorInfo1;
+
+                $operator_last_fkey = 2;
                 $t = strtotime($dt);
-                if ( $t < strtotime(date('Y-m-d\T11:10:00P'))) {
+                if ( $t < strtotime(date('Y-m-d\T11:00:00P'))) {
                     $state = 0;
                     $da_avg1 = 0;
                     $dd1 = 0;
                     $operator_last_fkey = 2;
+                    $operatorInfo = $operatorInfo1;
                 } else if ( $t < strtotime(date('Y-m-d\T11:15:00P')) ) {
                     $state = 1;
-                    $da_avg1 = 5;
+                    $da_avg1 = 0;
                     $dd1 = 1;
+                    $operator_last_fkey = 2;
+                    $operatorInfo = $operatorInfo1;
                 } else if ( $t < strtotime(date('Y-m-d\T11:20:00P')) ) {
                     $state = 2;
                     $da_avg1 = 40;
                     $dd1 = 1;
+                    $operator_last_fkey = 0;
+                    $operatorInfo = $operatorInfo1;
                 } else if ( $t < strtotime(date('Y-m-d\T11:30:00P')) ) {
                     $state = 3;
                     $da_avg1 = 90;
                     $dd1 = 1;
+                    $operator_last_fkey = 0;
+                    $operatorInfo = $operatorInfo1;
                 } else if ( $t < strtotime(date('Y-m-d\T11:40:00P')) ) {
                     $state = 1;
                     $da_avg1 = 7;
                     $dd1 = 1;
+                    $operator_last_fkey = 0;
+                    $operatorInfo = $operatorInfo1;
                 } else if ( $t < strtotime(date('Y-m-d\T11:50:00P')) ) {
                     $state = 0;
                     $da_avg1 = 2;
@@ -115,20 +104,18 @@ class GenerateCommand extends CConsoleCommand {
                     $state = 3;
                     $da_avg1 = 80;
                     $dd1 = 1;
+                    $operator_last_fkey = 0;
                 } else {
                     $state = 3;
                     $da_avg1 = 120;
                     $dd1 = 1;
+                    $operator_last_fkey = 0;
+                    $operatorInfo = new stdClass();
+                    $operatorInfo->c1 = $operatorInfo->c2 = $operatorInfo->c3 = 0;
                 }
 
                 $fkey_all = 0;
                 $flags = 0;
-
-                if ( $t < strtotime(date('Y-m-d\T11:30:00P')) ) {
-                    $operatorInfo = Operator::model()->findBySql('select * from operator where id = 1');
-                } else {
-                    $operatorInfo = Operator::model()->findBySql('select * from operator where id = 2');
-                }
 
                 $c1 = $operatorInfo->c1;
                 $c2 = $operatorInfo->c2;

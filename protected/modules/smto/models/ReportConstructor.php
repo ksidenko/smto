@@ -94,51 +94,54 @@ class ReportConstructor extends ReportSearchForm {
             $t1_ = explode(':',  $this->timetableInfo->time_from );
             $t2_ = explode(':',  $this->timetableInfo->time_to );            
             
-	    $t1 = ($t1_[0]*60 + $t1_[1])*60;
-	    $t2 = ($t2_[0]*60 + $t2_[1])*60;	    
+            $t1 = ($t1_[0]*60 + $t1_[1])*60;
+            $t2 = ($t2_[0]*60 + $t2_[1])*60;
 	    
     	    $dt = abs($t2-$t1);
     
     	    $s = strtotime($this->dtStart) - strtotime(date('Y/m/d 00:00:00', strtotime($this->dtStart)));
     	    $e = strtotime($this->dtEnd) - strtotime(date('Y/m/d 00:00:00', strtotime($this->dtEnd)));
 
-//	    echo "$s - $e" . '|';   echo $t1 .' - ' . $t2;    die;
-            //middle case, count days
+            // echo "$s - $e" . '|';   echo $t1 .' - ' . $t2;    die;
+            // middle case, count days
             $days = floor( (strtotime($this->dtEnd) - strtotime($this->dtStart))/ (60*60*24));
             //echo $days; die;
-	    if ($days == 0) {
-		if ($s <= $t1 && $t2 <= $e) {
-		    $dt = $t2-$t1;
-		} else if ($t1 < $s && $t2 < $e) {
-		    $dt = $t2 - $s;
-		} else if ($s < $t1 && $e < $t2) {
-		    $dt = $e - $t1;
-		} else {
-		    $dt = $e - $s;
-		}
-	      $delta = $dt;
-	     //echo $delta;die;
-	    } else {
-		$days--;
-        	    //start case
-	        if ($s <= $t1)
-    		    $delta += ($t2 -$t1);
-    	        else if ($t1 < $s && $s < $t2)
-        	    $delta += ($t2 - $s);
-		else 
-        	    $delta += 0;
-            
-            //echo $delta; die;
-            
-	    //end case
-        	    if ($e <= $t1)
-    			    $delta += 0;
-		    else if ($t1 < $e && $e < $t2)
-    	    	        $delta += ($e - $t1);
-		    else 
-    			$delta += ($t2-$t1);
-        	
-        	    $delta += ($days*$dt);
+
+            if ($days == 0) {
+                if ($s <= $t1 && $t2 <= $e) {
+                    $dt = $t2-$t1;
+                } else if ($t1 < $s && $t2 < $e) {
+                    $dt = $t2 - $s;
+                } else if ($s < $t1 && $e < $t2) {
+                    $dt = $e - $t1;
+                } else {
+                    $dt = $e - $s;
+                }
+
+                $delta = $dt;
+            } else {
+                $days--;
+
+                //start case
+                if ($s <= $t1)
+                    $delta += ($t2 -$t1);
+                else if ($t1 < $s && $s < $t2)
+                    $delta += ($t2 - $s);
+                else
+                    $delta += 0;
+
+                //echo $delta; die;
+
+                //end case
+                if ($e <= $t1)
+                    $delta += 0;
+                else if ($t1 < $e && $e < $t2)
+                    $delta += ($e - $t1);
+                else
+                    $delta += ($t2-$t1);
+
+
+                $delta += ($days*$dt);
             }
             
         
@@ -148,15 +151,16 @@ class ReportConstructor extends ReportSearchForm {
         //print_r($this->getAttributes());die;
         //print_r($this->secTotal);die;
 
-	//print_r($this->operatorId);die;
+        //print_r($this->operatorId);die;
 
-	//echo $this->withoutBreaks;die;
+        //echo $this->withoutBreaks;die;
 
         if ($this->withoutBreaks) {
     	    $dt =  strtotime($this->dtEnd) -  strtotime($this->dtStart);
     	    $breakTotal = 300;
+
     	    if ($this->timetableInfo) {
-        	$breakTotal = 100;
+        	    $breakTotal = 100;
     	    }
     	    $this->secTotalWithoutBreaks = ceil($dt * (1.0/(24*60*60)*$breakTotal*60));
     	    //echo  $this->secTotalWithoutBreaks; die;
@@ -190,48 +194,40 @@ class ReportConstructor extends ReportSearchForm {
         if ($this->timetableInfo) {
     	    $this->cr->select []= new CDbExpression("SUM(
             time_to_sec(timediff(
-    	    IF(
-                cast('{$this->timetableInfo->time_to}' as time) < cast(t.dt as time),
-                cast('{$this->timetableInfo->time_to}' as time),
-                cast(t.dt as time)
-            )
-            ,
-            IF(
-                cast('{$this->timetableInfo->time_from}' as time) < cast(DATE_SUB(t.dt, INTERVAL t.duration SECOND) as time),
-                cast(DATE_SUB(t.dt, INTERVAL t.duration SECOND) as time),
-                cast('{$this->timetableInfo->time_from}' as time)
-            )
-	    ))
-	    ) + 0  as sec_duration");
+                IF(
+                    cast('{$this->timetableInfo->time_to}' as time) < cast(t.dt as time),
+                    cast('{$this->timetableInfo->time_to}' as time),
+                    cast(t.dt as time)
+                )
+                ,
+                IF(
+                    cast('{$this->timetableInfo->time_from}' as time) < cast(DATE_SUB(t.dt, INTERVAL t.duration SECOND) as time),
+                    cast(DATE_SUB(t.dt, INTERVAL t.duration SECOND) as time),
+                    cast('{$this->timetableInfo->time_from}' as time)
+                )
+            ))
+            ) + 0  as sec_duration");
         
         } else {
-        $this->cr->select []= new CDbExpression("SUM(
-            UNIX_TIMESTAMP(
-            IF(
-                '{$this->dtEnd}' < t.dt,
-                '{$this->dtEnd}',
-                t.dt
-            ))
-            -
-            UNIX_TIMESTAMP(
-            IF(
-                '{$this->dtStart}' < DATE_SUB(t.dt, INTERVAL t.duration SECOND),
-                DATE_SUB(t.dt, INTERVAL t.duration SECOND),
-                '{$this->dtStart}'
-            ))
-        ) + 0  as sec_duration");
-	}
+            $this->cr->select []= new CDbExpression("SUM(
+                UNIX_TIMESTAMP(
+                IF(
+                    '{$this->dtEnd}' < t.dt,
+                    '{$this->dtEnd}',
+                    t.dt
+                ))
+                -
+                UNIX_TIMESTAMP(
+                IF(
+                    '{$this->dtStart}' < DATE_SUB(t.dt, INTERVAL t.duration SECOND),
+                    DATE_SUB(t.dt, INTERVAL t.duration SECOND),
+                    '{$this->dtStart}'
+                ))
+            ) + 0  as sec_duration");
+        }
 
 
         $this->crNotWorking = clone($this->cr);
-
-//        if ($this->machineReportType == 'join') {
-//            //$this->cr->select [] = new CDbExpression('count(distinct t.machine_id) as cnt_machine');
-//            //$this->cr->group []= 't.state';
-//            //$this->crNotWorking->group []= 't.operator_last_fkey';
-//        } else if ($this->machineReportType == 'machines') {
-//            //$this->cr->select [] = new CDbExpression('1 as cnt_machine');
-//        }
 
         $this->cr->group += array('t.machine_id', 't.state');
         $this->crNotWorking->group += array('t.machine_id', 't.state', 't.operator_last_fkey');
@@ -269,30 +265,22 @@ class ReportConstructor extends ReportSearchForm {
         $processMachines = array();
         foreach($dataWork as $stateInfo) { // loop througth machine states
 
-//            if ( in_array($stateInfo['status'], array(MachineState::STATE_MACHINE_IDLE_RUN, MachineState::STATE_MACHINE_WORK)) ) {
-//                $stateCode = 'state_idle';
-//            } else {
-//                $stateCode = 'state_work';
-//            }
 
-//            if ($this->machineReportType == 'join') {
-//                $currMachineId = 0;
-//            } else {
             $currMachineId = $stateInfo['machine_id'];
-//            }
 
             $this->initMachineOutput ($currMachineId, $processMachines);
             $currMachineInfo = &$this->output['machines'][$currMachineId];
+            $secDuration = $stateInfo['sec_duration'];
+
+            //echo $stateInfo['state'] . '-'.$secDuration. '|';
 
             $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
             $currMachineInfo['states'] [$machineState->code] = array(
                 'code' => $machineState->code,
                 'name' => $machineState->name,
                 'color' => EventColor::getColorByCode('machine_' . $stateInfo['state']),
-                'sec_duration' => $stateInfo['sec_duration'],
+                'sec_duration' => $secDuration,
             );
-            
-            
         }
 
         $countMachines = count($processMachines);
@@ -303,42 +291,41 @@ class ReportConstructor extends ReportSearchForm {
             $currMachineInfo = &$this->output['machines'][$currMachineId];
             $secTotalWithoutBreaks = &$currMachineInfo['machine']['sec_total_without_breaks'];
             $secDuration = $stateInfo['sec_duration'];
-            //echo $stateInfo['state'] . '-'.$secDuration;
+            //echo $stateInfo['state'] . '-'.$secDuration. '|';
 
             if ( $this->secTotalWithoutBreaks > 0 ) {
-	    	$currMachineInfo['states'] ['time_break'] = array(
+	    	    $currMachineInfo['states'] ['time_break'] = array(
     	    	    'code' => 'time_break',
     	    	    'name' => 'регламентированный перерыв',
     	    	    'color' => '#0000AA',
     	    	    'sec_duration' => $this->secTotalWithoutBreaks,
-    		);
-	    }
+                );
+            }
 	    
             if (empty($stateInfo['operator_last_fkey'])) { // Оператор не жал кнопки Fkey
                 $machineState = MachineState::model()->cache(600)->findByPk($stateInfo['state']);
                 $code = $machineState->code;
                 $name = $machineState->name;
                 $color = EventColor::getColorByCode('machine_' . $stateInfo['state']);
-		//echo  $machineState->code . ' - '.$stateInfo['sec_duration'];die;
+		        //echo  $machineState->code . ' - '.$stateInfo['sec_duration'];die;
 
                 if ($code == 'on' && $secTotalWithoutBreaks > 0) {
                     if ( $secDuration > $secTotalWithoutBreaks) {
-                	$secDuration -= $secTotalWithoutBreaks;
-                	$secTotalWithoutBreaks = 0;
+                        $secDuration -= $secTotalWithoutBreaks;
+                        $secTotalWithoutBreaks = 0;
                     } else {
-                	$secTotalWithoutBreaks -= $secDuration;
-                	$secDuration = 0;
+                        $secTotalWithoutBreaks -= $secDuration;
+                        $secDuration = 0;
                     }
                 }
                 
                 if ($code == 'on') { //and operator_last_fkey == 0
             	    $name = 'необоснованный простой';    // вместо "включен"
                 }
-            } else {
+            } else { // operator_last_fkey != 0
                 $machineInfo = Machine::model()->cache(600)->findByPk($currMachineId);
                 $fkey = $machineInfo->cache(600)->fkey(array('select' => 'machine_event_id', 'condition' => 'number = ' . $stateInfo['operator_last_fkey']));
                 $fkeyState = $fkey[0]->cache(600)->machine_event;
-                //$fkeyState = MachineEvent::getRec($stateInfo['operator_last_fkey']);
                 $code = $fkeyState['code'];
                 $name = $fkeyState['name'];
                 $color = '#' . ltrim($fkeyState['color'], '#');
@@ -347,35 +334,40 @@ class ReportConstructor extends ReportSearchForm {
                     $name = 'Событие не определено (' . $stateInfo['operator_last_fkey'] . ')' ;
                     $color = '#000000';
                 }
+                if (isset($currMachineInfo['states'] [$code])) {
+                    $secDuration += $currMachineInfo['states'] [$code]['sec_duration'];
+                }
             }
 
-	    if ( $secDuration > 0 ) {
+	        if ( $secDuration > 0 ) {
                 $currMachineInfo['states'] [$code] = array(
-	            'code' => $code,
+	                'code' => $code,
     	            'name' => $name,
     	            'color' => $color,
-    		    'sec_duration' => $secDuration,
+    		        'sec_duration' => $secDuration,
                 );
             }
-        }
+        } //end foreach
+
         // считаем для каждого станка не учтеное время
         foreach($this->output['machines'] as $currMachineId => &$currMachineInfo) {
             $secTotalProcess = 0;
 
-	    if ( $currMachineInfo['machine']['sec_total_without_breaks'] > 0 &&
-                 isset($currMachineInfo['states'] ['off'])) {
-                 $secTotalWithoutBreaks = &$currMachineInfo['machine']['sec_total_without_breaks'];                 
+	        if ( $currMachineInfo['machine']['sec_total_without_breaks'] > 0 &&
+                 isset($currMachineInfo['states'] ['off']) ) {
 
-	        $secDuration_ = $currMachineInfo['states'] ['off']['sec_duration'];
-    	        $secDuration_ -= $secTotalWithoutBreaks;
-    	        $secDuration_ = max(0, $secDuration_);
-	        $currMachineInfo['states'] ['off']['sec_duration'] = $secDuration_;
-		$secTotalWithoutBreaks = 0;	        
-		
-	        if ($secDuration_ == 0) {
-    	    	    unset( $currMachineInfo['states'] ['off'] );
-	        }
-	    }
+                $secTotalWithoutBreaks = &$currMachineInfo['machine']['sec_total_without_breaks'];
+
+                $secDuration_ = $currMachineInfo['states'] ['off']['sec_duration'];
+                $secDuration_ -= $secTotalWithoutBreaks;
+                $secDuration_ = max(0, $secDuration_);
+                $currMachineInfo['states'] ['off']['sec_duration'] = $secDuration_;
+                $secTotalWithoutBreaks = 0;
+
+                if ($secDuration_ == 0) {
+                    unset( $currMachineInfo['states'] ['off'] );
+                }
+            }
 
             foreach($currMachineInfo['states'] as $stateInfo) {
                 $secTotalProcess += $stateInfo['sec_duration'] ;

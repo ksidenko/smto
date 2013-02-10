@@ -15,6 +15,8 @@ class MachineState extends CActiveRecord
     const STATE_MACHINE_IDLE_RUN = 2; // холостой ход
     const STATE_MACHINE_WORK = 3; // работа
 
+    public $color;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return MachineState the static model class
