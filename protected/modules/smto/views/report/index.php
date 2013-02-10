@@ -38,7 +38,7 @@
                 $data = array();
                 foreach($machinesData as $machineData) {
                     foreach($machineData->cache(600)->groups as $group) {
-                        $data[$group->name][$machineData->id] = $machineData->full_name;
+                        $data[$group->name][$machineData->id] = $machineData->full_name_list;
                     }
                 }
                 //$data=CHtml::listData($data, 'id', 'name', 'groups.name');

@@ -636,7 +636,7 @@ class Machine extends CActiveRecord
 
 
     public function __get($name) {
-        if ($name == 'full_name' ) {
+        if ($name == 'full_name_list' ) {
             return $this->place_number . ' ' .  $this->name;
         }
 

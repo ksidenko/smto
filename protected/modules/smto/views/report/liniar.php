@@ -5,7 +5,7 @@
 
     <?php echo $form->errorSummary($model); ?>
 
-    <table width="500px" >
+    <table width="500px" style="margin-bottom: 0px;">
         <tr>
             <td>
                 <?php echo $form->dropDownList($model,'timeRange', $timeRange['labels']); ?>
@@ -28,7 +28,7 @@
                     $data = array();
                     foreach($machinesData as $machineData) {
                         foreach($machineData->cache(600)->groups as $group) {
-                            $data[$group->name][$machineData->id] = $machineData->full_name;
+                            $data[$group->name][$machineData->id] = $machineData->full_name_list;
                         }
                     }
                     //$data=CHtml::listData($data, 'id', 'name', 'groups.name');
@@ -39,7 +39,7 @@
         </tr>
     </table>
 
-    <div class="row submit">
+    <div class="row submit" style="margin: 0px 0px;">
         <?php echo CHtml::submitButton('Отобразить'); ?>
 
         <button id="reset_selection" style="display: none; float:right; " >Сбросить выделение</button>
@@ -498,24 +498,22 @@
 </script>
 
 <?php
-    $h = 220;
+    $h = 200;
     $w = 940;
     $h_slave1 = round($h / 1);
     //$h_slave2 = round($h_slave1 / 1.6);
 ?>
 
-<p>
 <!--    <label>Отобразить значения аналогового датчика <input type="checkbox" class="show_da_values" ></label>-->
 <!--<div id="legend"></div>-->
-</p>
 
 <div id="line_report_machine_detector_analog_value" style="width:<?php echo $w; ?>px;height:<?php echo $h; ?>px;"></div>
 <div id="line_report_operator_last_fkey" style="width:<?php echo $w; ?>px;height:<?php echo $h_slave1; ?>px;"></div>
 <!--<div id="line_report_machine_state" style="width:<?php //echo $w; ?>px;height:<?php //echo $h_slave2; ?>px; display:none;"></div>-->
 
-
 <?php } else if ($isRunSearch) {
-    echo "Нет данных за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+    //echo "Нет данных за выбранный период с <b>{$model->dtStart}</b> по <b>{$model->dtEnd}</b>";
+    echo "За данный период на станке операций не производилось";
 }
 ?>
 

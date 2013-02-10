@@ -553,7 +553,7 @@ class ReportConstructor extends ReportSearchForm {
             if ($machineInfo) {
                 $this->output['machines'][$currMachineId]['machine'] = array(
                     'id' => $machineInfo->id,
-                    'name' => $machineInfo->full_name,
+                    'name' => $machineInfo->full_name_list,
                     'work_type' => $machineInfo->work_type,
                     'sec_total_without_breaks' => $this->secTotalWithoutBreaks,
                 );

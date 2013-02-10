@@ -36,13 +36,15 @@ class Monitoring {
             }
 
 	        $lineParser = null;
+            $isMachineAvailable = true;
+
             if (!is_numeric($machineAR->mac)) { //format v2.0
                 $machineDataFabric = new MachineDataManager('2.0', $machineAR->mac);
                 $filename = $path . 'cr' . $machineAR->mac . '.cdt';
                 //echo $filename . '|';
 
                 $lastModifyTime = @filemtime($filename);
-                if ( !$lastModifyTime || $lastModifyTime < ( strtotime('now') + Yii::app()->getModule('smto')->max_last_time_modify ) ) {
+                if ( !$lastModifyTime || ($lastModifyTime < ( strtotime('now') - Yii::app()->getModule('smto')->max_last_time_modify ) ) ) {
                     $isMachineAvailable = false;
                 }
 
@@ -50,7 +52,7 @@ class Monitoring {
                 if (!$fd) {
                     if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
                         $link = CHtml::link('Станок', array('machine/update', 'id'=>$machineAR->id));
-                        $this->errors[] = "$link {$machineAR->full_name} ( $machineAR->mac, $machineAR->ip ) не доступен";
+                        $this->errors[] = "$link {$machineAR->full_name_list} ( $machineAR->mac, $machineAR->ip ) не доступен";
                     }
                     continue;
                 }
@@ -67,16 +69,18 @@ class Monitoring {
                 $lineParser->isMachineAvailable = $isMachineAvailable;
             } else { //format v1.0
 
-                if (true) {
+                if (0) {
                     $machineDataFabric = new MachineDataManager('1.0', $machineAR->mac);
 
                     $c = $machineAR->place_number;
                     $c = str_repeat('0', (10 - strlen($c)) ) . $c;
+
+                    $path = str_replace('cr_out', 'cro_out', $path);
                     $filename = $path . 'cro' .  $c . '.ddt';
                     //echo $filename . '|';
 
                     $lastModifyTime = @filemtime($filename);
-                    if ( !$lastModifyTime || $lastModifyTime < ( strtotime('now') + Yii::app()->getModule('smto')->max_last_time_modify ) ) {
+                    if ( !$lastModifyTime || ($lastModifyTime < ( strtotime('now') - Yii::app()->getModule('smto')->max_last_time_modify ) ) ) {
                         $isMachineAvailable = false;
                     }
 
@@ -84,7 +88,7 @@ class Monitoring {
                     if (!$fd) {
                         if (Yii::app()->user->checkAccess('smto-MonitoringAdministrating')) {
                             $link = CHtml::link('Станок', array('machine/update', 'id'=>$machineAR->id));
-                            $this->errors[] = "$link {$machineAR->full_name} ( $machineAR->mac, $machineAR->ip ) не доступен";
+                            $this->errors[] = "$link {$machineAR->full_name_list} ( $machineAR->mac, $machineAR->ip ) не доступен";
                         }
                         continue;
                     }
@@ -121,7 +125,7 @@ class Monitoring {
             $machineState = $lineParser->machineStateInfo;
 
             if (!$machineState) {
-                $this->errors[] = 'Не корректный статус станка ('.$machineAR->full_name.'): ( ' . $lineParser->state . ' )';
+                $this->errors[] = 'Не корректный статус станка ('.$machineAR->full_name_list.'): ( ' . $lineParser->state . ' )';
                 continue;
             }
 
@@ -133,7 +137,7 @@ class Monitoring {
 
             $operatorInfo = $lineParser->operatorInfo;
             if (!$operatorInfo && !empty($lineParser->operator_id)) {
-                $this->errors[] = 'Не корректный идентификатор оператора ('.$machineAR->full_name.'): ( ' . $lineParser->operator_id . ' )';
+                $this->errors[] = 'Не корректный идентификатор оператора ('.$machineAR->full_name_list.'): ( ' . $lineParser->operator_id . ' )';
             }
 
             if (!$operatorInfo) {
@@ -155,7 +159,7 @@ class Monitoring {
                     'color' => '#' . ltrim($lineParser->machineEventInfo->color, '#'),
                 );
             } else if ($lineParser->operator_last_fkey > 0) {
-                $this->errors[] = 'Событие не определено для ' . $machineAR->full_name . ': ( ' . $lineParser->operator_last_fkey . ' )';
+                $this->errors[] = 'Событие не определено для ' . $machineAR->full_name_list . ': ( ' . $lineParser->operator_last_fkey . ' )';
             }
 
             if ($machineState->code == 'on') { // станок включен
@@ -164,6 +168,10 @@ class Monitoring {
                 } else if ( $lineParser->machineEventInfo ) { // событие указано
                     $machineStateInfo['name'] = $lineParser->machineEventInfo->name;
                 }
+            }
+
+            if (!$lineParser->isMachineAvailable) {
+                $machineStateInfo['name'] = "Нет связи";
             }
 
             $groupIds = array();
